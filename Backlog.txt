@@ -1,5 +1,8 @@
-Backlog Produit – Sprint 0 : Application Web Agenda
-=====================================================
+Backlog Produit : Application Web Agenda
+===============================================
+
+– Sprint 0 :
+=============
 
 1. Création de compte
 ---------------------
@@ -26,3 +29,33 @@ En tant qu'utilisateur, je veux pouvoir supprimer un rendez-vous, afin de gérer
 En tant qu'utilisateur, je veux afficher une liste de mes rendez-vous, afin de visualiser facilement les événements à venir.
 
 
+- Sprint 1 :
+============
+
+1. Affichage du calendrier
+--------------------------
+En tant qu'utilisateur connecté, je veux afficher mes rendez-vous dans une vue calendrier (jour, semaine, mois), afin de visualiser mon planning de manière chronologique.
+
+2. Création de calendrier
+--------------------------
+En tant qu'utilisateur, je veux pouvoir créer un nouveau calendrier, afin de catégoriser mes rendez-vous (personnel, professionnel, etc.).
+
+3. Modification de calendrier
+-----------------------------
+En tant qu'utilisateur, je veux pouvoir modifier un calendrier existant (nom, couleur, etc.), afin de maintenir mon organisation à jour.
+
+4. Suppression de calendrier
+-----------------------------
+En tant qu'utilisateur, je veux pouvoir supprimer un calendrier, afin de nettoyer ma liste de calendriers.
+
+5. Affichage de la liste des calendriers
+----------------------------------------
+En tant qu'utilisateur, je veux afficher une liste de mes calendriers, afin de pouvoir les gérer et les sélectionner.
+
+6. Modification du profil
+-------------------------
+En tant qu'utilisateur, je veux pouvoir modifier les informations de mon profil (nom, email, mot de passe), afin de maintenir mes données personnelles à jour.
+
+7. Suppression de compte
+------------------------
+En tant qu'utilisateur, je veux pouvoir supprimer mon compte de manière définitive, afin de garantir le droit à l'oubli de mes données personnelles.
