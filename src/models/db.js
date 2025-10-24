@@ -15,7 +15,7 @@ const appointmentSchema = new mongoose.Schema({
     date_debut: { type: Date, required: true },
     date_fin: { type: Date, required: true },
     description: { type: String, default: '' }
-}, { _id: false }); // Désactive l'id automatique pour les sous-documents si inutile
+});
 
 // Schéma pour les agendas (Calendar)
 const calendarSchema = new mongoose.Schema({
