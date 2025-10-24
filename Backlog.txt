@@ -1,0 +1,28 @@
+Backlog Produit – Sprint 0 : Application Web Agenda
+=====================================================
+
+1. Création de compte
+---------------------
+En tant que nouvel utilisateur, je veux créer un compte, afin d'accéder à mon agenda personnel.
+
+2. Connexion
+------------
+En tant qu'utilisateur inscrit, je veux me connecter à mon compte, afin d'accéder à mes rendez-vous.
+
+3. Ajout de rendez-vous
+------------------------
+En tant qu'utilisateur connecté, je veux ajouter un rendez-vous, afin de planifier mes événements.
+
+4. Modification de rendez-vous
+------------------------------
+En tant qu'utilisateur, je veux pouvoir modifier un rendez-vous existant, afin de mettre à jour les informations.
+
+5. Suppression de rendez-vous
+-----------------------------
+En tant qu'utilisateur, je veux pouvoir supprimer un rendez-vous, afin de gérer mon planning.
+
+6. Affichage d'une liste des rendez-vous
+----------------------------------------
+En tant qu'utilisateur, je veux afficher une liste de mes rendez-vous, afin de visualiser facilement les événements à venir.
+
+
