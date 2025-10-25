@@ -37,6 +37,7 @@ router.get('/agenda', auth, (req, res) => {
 router.get('/user/calendars', auth, calendarController.getAllCalendarsIdsTitles);
 router.delete('/user/calendar/:calendarId', auth, calendarController.deleteCalendar);
 router.put('/user/calendar/updateTitle', auth, calendarController.updateCalendarTitle);
+router.post('/user/calendar/create', auth, calendarController.addCalendar);
 
 
 router.get('/user/logout', (req, res) => {

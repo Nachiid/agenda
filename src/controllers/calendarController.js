@@ -86,6 +86,31 @@ exports.updateCalendarTitle = async (req, res) => {
     }
 };
 
+/**
+ * Crée un nouveau calendrier pour l'utilisateur connecté.
+ */
+exports.addCalendar = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { title } = req.body;
+
+        if (!title) {
+            return res.status(400).json({ error: 'Le titre du calendrier est requis' });
+        }
+
+        const newCalendar = await model.createCalendar(userId, title,[]);
+
+        return res.status(201).json({
+            message: 'Calendrier créé avec succès',
+            calendar: newCalendar
+        });
+
+    } catch (error) {
+        console.error('Erreur addCalendar:', error);
+        return res.status(500).json({ error: 'Erreur serveur lors de la création du calendrier' });
+    }
+};
+
 
 /*
 exports.showCalendar = async (req, res) => {

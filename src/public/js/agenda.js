@@ -189,6 +189,63 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
 
 
+    // Creer un calendrier
+
+    const btnNewEvent = document.getElementById('btnNewEvent');
+    const inputTitle = document.getElementById('newCalendarTitle');
+
+    btnNewEvent.addEventListener('click', async () => {
+        const title = inputTitle.value.trim();
+        if (!title) return alert('Veuillez entrer un titre pour le calendrier');
+
+        try {
+            const res = await fetch('/user/calendar/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ title })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                return alert(data.error || 'Erreur lors de la création du calendrier');
+            }
+
+            // Réinitialiser le champ input
+            inputTitle.value = '';
+
+            // Afficher le nouveau calendrier dans la liste
+            const listVisible = document.getElementById('calendarVisible');
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('calendar-item');
+
+            const label = document.createElement('label');
+            label.classList.add('calendar-option');
+            label.innerHTML = `
+                <input type="checkbox" value="${data.calendar._id}">
+                <span class="calendar-color" style="background:${data.calendar.color}"></span>
+                <span>${data.calendar.title}</span>
+            `;
+            wrapper.appendChild(label);
+
+            // Ajouter bouton poubelle si >1 calendrier
+            const deleteBtn = document.createElement('button');
+            deleteBtn.classList.add('btn-delete-calendar');
+            deleteBtn.value = data.calendar._id;
+            deleteBtn.title = 'Supprimer';
+            deleteBtn.innerHTML = '🗑️';
+            wrapper.appendChild(deleteBtn);
+
+            listVisible.appendChild(wrapper);
+
+            alert('Calendrier créé avec succès !');
+
+        } catch (err) {
+            console.error(err);
+            alert('Erreur serveur, réessayez plus tard');
+        }
+    });
 
 
 });
