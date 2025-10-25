@@ -23,6 +23,8 @@ router.get('/login', (req, res) => {
 // === ROUTES API (utilisateurs) === //
 router.post('/user/register', userController.register);
 router.post('/user/login', userController.login);
+
+// === ROUTES PAGE PRIVE === //
 router.post('/appointment',appointmentController.rajouteAppointment);
 router.delete('/deletAppointment',appointmentController.deletAppointment);
 router.put('/updateAppointment',appointmentController.updateAppointment);
@@ -33,6 +35,8 @@ router.get('/agenda', auth, (req, res) => {
     res.sendFile(path.join(__dirname, '../views/agenda.html'));
 });
 router.get('/user/calendars', auth, calendarController.getAllCalendarsIdsTitles);
+router.delete('/calendar/:calendarId', auth, calendarController.deleteCalendar);
+
 
 router.get('/user/logout', (req, res) => {
     res.clearCookie('token');  

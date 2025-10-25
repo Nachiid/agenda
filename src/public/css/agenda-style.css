@@ -216,6 +216,13 @@ body.dashboard-body {
     accent-color: #4F46E5;
 }
 
+.calendar-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
 /* ====== BUTTONS ====== */
 .btn,
 .btn-icon {
@@ -274,6 +281,7 @@ body.dashboard-body {
   gap: 8px;
   margin-bottom: 6px;
   cursor: pointer;
+  flex-grow: 1;
 }
 
 .calendar-color {
@@ -294,6 +302,31 @@ body.dashboard-body {
 .show-more:hover {
   text-decoration: underline;
 }
+
+
+.btn-delete-calendar {
+    background: transparent;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    font-size: 16px;
+    transition: color 0.2s ease, transform 0.2s ease;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-delete-calendar:hover {
+    color: #e74c3c;
+    transform: scale(1.2);
+}
+
+.btn-delete-calendar:focus {
+    outline: none;
+}
+
+
 
 
 

@@ -31,6 +31,35 @@ exports.getAllCalendarsIdsTitles = async (req, res) => {
 };
 
 
+exports.deleteCalendar = async (req, res) => {
+    try {
+        const userID = req.user.id;
+        const { calendarId } = req.params;
+
+        if (!calendarId) {
+            return res.status(400).json({ error: 'calendarId est requis' });
+        }
+
+        const userCalendars = await model.getAllCalendarsIdsTitles(userID);
+
+        if (userCalendars.length <= 1) {
+            return res.status(400).json({ error: 'Impossible de supprimer le dernier calendrier' });
+        }
+
+        const deleted = await model.deleteCalendar(userID, calendarId);
+
+        if (!deleted) {
+            return res.status(404).json({ error: 'Calendrier introuvable ou non autorisé' });
+        }
+
+        return res.status(200).json({ message: 'Calendrier supprimé avec succès', calendar: deleted });
+    } catch (error) {
+        console.error('Erreur deleteCalendar:', error);
+        return res.status(500).json({ error: 'Erreur serveur lors de la suppression du calendrier' });
+    }
+};
+
+
 /*
 exports.showCalendar = async (req, res) => {
     try {

@@ -154,4 +154,17 @@ exports.createCalendar = async function (userId, title, appointments = []) {
     return await newCalendar.save();
 };
 
+/**
+ * Supprime un calendrier pour un utilisateur donné.
+ */
+exports.deleteCalendar = async function(userId, calendarId) {
+    // On s'assure que le calendrier appartient à l'utilisateur
+    const deletedCalendar = await Calendar.findOneAndDelete({
+        _id: calendarId,
+        userId: userId
+    });
+
+    return deletedCalendar;
+};
+
 
