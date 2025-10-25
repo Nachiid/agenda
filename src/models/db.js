@@ -28,8 +28,9 @@ const calendarSchema = new mongoose.Schema({
 // Création des modèles
 const User = mongoose.model('User', userSchema);
 const Calendar = mongoose.model('Calendar', calendarSchema);
+const Appointment = mongoose.model('Appointment', appointmentSchema);
 
-module.exports = { User, Calendar };
+module.exports = { User, Calendar,Appointment };
 
 
 

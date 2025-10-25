@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const userController = require('../controllers/userController');
+const userController        = require('../controllers/userController');
+const appointmentController = require('../controllers/appointmentController');
 const auth = require('../middleware/auth');
 
 // === ROUTES PAGES === //
@@ -28,6 +29,9 @@ router.get('/agenda', auth, (req, res) => {
 // === ROUTES API (utilisateurs) === //
 router.post('/user/register', userController.register);
 router.post('/user/login', userController.login);
+router.post('/appointment',appointmentController.rajouteAppointment);
+router.delete('/deletAppointment',appointmentController.deletAppointment);
+router.put('/updateAppointment',appointmentController.updateAppointment);
 router.get('/user/profile', auth,  userController.getuser);
 
 
