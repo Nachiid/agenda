@@ -53,6 +53,38 @@ exports.getProfil = function (id) {
 }
 
 /**
+ * Ajoute un rendez-vous à un calendrier.
+ * @param {string} calendarId - L'ID du calendrier.
+ * @param {Object} appointmentData - Les données du rendez-vous.
+ * @param {string} appointmentData.name - Titre du rendez-vous.
+ * @param {Date|string} appointmentData.date_debut - Date/heure de début.
+ * @param {Date|string} appointmentData.date_fin - Date/heure de fin.
+ * @param {string} [appointmentData.description] - Description du rendez-vous.
+ * @returns {Promise<Object>} Le calendrier mis à jour.
+ */
+exports.addAppointment = async function (calendarId, appointmentData) {
+    // Récupérer le calendrier
+    const calendar = await Calendar.findById(calendarId);
+    if (!calendar) throw new Error('Calendrier introuvable');
+
+    // Créer le nouveau rendez-vous
+    const newAppointment = {
+        name: appointmentData.name,
+        date_debut: appointmentData.date_debut,
+        date_fin: appointmentData.date_fin,
+        description: appointmentData.description || ' '
+    };
+
+    // Ajouter au calendrier
+    calendar.appointments.push(newAppointment);
+
+    // Sauvegarder le calendrier
+    await calendar.save();
+    return calendar;
+};
+
+
+/**
  * Supprime un rendez-vous d'un calendrier.
  * Cherche le calendrier contenant le RDV, supprime le RDV et sauvegarde le calendrier.
  */
@@ -130,7 +162,7 @@ exports.getAllCalendarsIdsTitles = async function (userId) {
  */
 exports.createCalendar = async function (userId, title, appointments = []) {
 
-        const colorPalette = [
+    const colorPalette = [
         '#3498db', // Bleu
         '#2ecc71', // Vert
         '#e74c3c', // Rouge
@@ -149,7 +181,8 @@ exports.createCalendar = async function (userId, title, appointments = []) {
     const availableColors = colorPalette.filter(c => !usedColors.includes(c));
     const color = availableColors[0];
 
-    const newCalendar = new Calendar({title, color, userId, appointments
+    const newCalendar = new Calendar({
+        title, color, userId, appointments
     });
     return await newCalendar.save();
 };
@@ -157,7 +190,7 @@ exports.createCalendar = async function (userId, title, appointments = []) {
 /**
  * Supprime un calendrier pour un utilisateur donné.
  */
-exports.deleteCalendar = async function(userId, calendarId) {
+exports.deleteCalendar = async function (userId, calendarId) {
     const deletedCalendar = await Calendar.findOneAndDelete({
         _id: calendarId,
         userId: userId
@@ -170,7 +203,7 @@ exports.deleteCalendar = async function(userId, calendarId) {
 /**
  * Modifie le titre d'un calendrier pour un utilisateur donné.
  */
-exports.updateCalendarTitle = async function(userId, calendarId, newTitle) {
+exports.updateCalendarTitle = async function (userId, calendarId, newTitle) {
     const updatedCalendar = await Calendar.findOneAndUpdate(
         { _id: calendarId, userId },
         { $set: { title: newTitle } },

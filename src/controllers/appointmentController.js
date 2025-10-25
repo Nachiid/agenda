@@ -1,8 +1,6 @@
 const jwt = require('jsonwebtoken');
 const model = require("../models/model");
 
-const {Calendar } = require('../models/db');
-
 
 exports.rajouteAppointment = async (req ,res) => {
     try{
@@ -31,17 +29,19 @@ exports.rajouteAppointment = async (req ,res) => {
         if (!calendar) {
             return res.status(404).json({ error: 'Calendrier introuvable pour cet utilisateur' });
         }
-        // creation d'un rdv
-        const newAppointment = {
-            name:titre,
-            date_debut:start,
-            date_fin:end,
-            description: description || ' '
-        }
-        calendar.appointments.push(newAppointment);
-        await calendar.save();
 
-        return res.status(200).json({message :'le RDV a été bien ajouté !'});
+        // Ajouter le rendez-vous
+        const updatedCalendar = await model.addAppointment(calendarId, {
+            titre,
+            date_debut,
+            date_fin,
+            description
+        });
+
+        return res.status(200).json({
+            message: 'Rendez-vous ajouté avec succès',
+            calendar: updatedCalendar
+        });
 
     }catch(error){
         console.error('Erreur addAppointment:', error);
