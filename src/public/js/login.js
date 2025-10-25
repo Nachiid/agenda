@@ -15,7 +15,6 @@ loginForm.addEventListener('submit', async e => {
 
         if (res.ok) {
             loginForm.reset();
-            alert(data.message);
             window.location.href = 'agenda';
 
         } else {

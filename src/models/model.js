@@ -158,7 +158,6 @@ exports.createCalendar = async function (userId, title, appointments = []) {
  * Supprime un calendrier pour un utilisateur donné.
  */
 exports.deleteCalendar = async function(userId, calendarId) {
-    // On s'assure que le calendrier appartient à l'utilisateur
     const deletedCalendar = await Calendar.findOneAndDelete({
         _id: calendarId,
         userId: userId
@@ -166,5 +165,19 @@ exports.deleteCalendar = async function(userId, calendarId) {
 
     return deletedCalendar;
 };
+
+
+/**
+ * Modifie le titre d'un calendrier pour un utilisateur donné.
+ */
+exports.updateCalendarTitle = async function(userId, calendarId, newTitle) {
+    const updatedCalendar = await Calendar.findOneAndUpdate(
+        { _id: calendarId, userId },
+        { $set: { title: newTitle } },
+        { new: true }
+    );
+    return updatedCalendar;
+};
+
 
 

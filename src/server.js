@@ -6,7 +6,6 @@ const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes');
 
 dotenv.config();
-connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,6 +22,12 @@ app.use('/', authRoutes);
 
 
 // Démarrage du serveur
-app.listen(PORT, () => {
-  console.log(`🚀 Serveur lancé sur : http://localhost:${PORT}`);
-});
+(async () => {
+  try {
+    await connectDB();
+    app.listen(PORT, () => console.log(`🚀 Serveur lancé sur : http://localhost:${PORT}`));
+  } catch (err) {
+    console.error('Impossible de démarrer le serveur :', err);
+  }
+})();
+

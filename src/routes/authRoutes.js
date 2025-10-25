@@ -35,7 +35,8 @@ router.get('/agenda', auth, (req, res) => {
     res.sendFile(path.join(__dirname, '../views/agenda.html'));
 });
 router.get('/user/calendars', auth, calendarController.getAllCalendarsIdsTitles);
-router.delete('/calendar/:calendarId', auth, calendarController.deleteCalendar);
+router.delete('/user/calendar/:calendarId', auth, calendarController.deleteCalendar);
+router.put('/user/calendar/updateTitle', auth, calendarController.updateCalendarTitle);
 
 
 router.get('/user/logout', (req, res) => {

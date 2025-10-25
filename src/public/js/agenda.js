@@ -28,8 +28,13 @@ document.addEventListener('DOMContentLoaded', async function () {
         const calendarData = data.calendar;
 
         if (calendarData) {
+
             const titleDiv = document.querySelector('.calendar-title');
-            if (titleDiv) titleDiv.textContent = calendarData.title;
+            if (titleDiv) {
+                titleDiv.textContent = calendarData.title;
+                titleDiv.dataset.calendarId = calendarData._id;
+            }
+
 
             const events = calendarData.appointments.map(r => ({
                 id: r._id,
@@ -102,14 +107,13 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (!confirm('Voulez-vous vraiment supprimer ce calendrier ?')) return;
 
             try {
-                const res = await fetch(`/calendar/${calendarId}`, {
+                const res = await fetch(`/user/calendar/${calendarId}`, {
                     method: 'DELETE',
                     credentials: 'include'
                 });
                 const data = await res.json();
 
                 if (res.ok) {
-                    alert('Calendrier supprimé avec succès');
 
                     // Supprime le wrapper complet (label + bouton)
                     const wrapper = document.querySelector(`.calendar-item label input[value="${calendarId}"]`)?.closest('.calendar-item');
@@ -131,5 +135,60 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         });
     });
+
+    const titleEl = document.querySelector('.calendar-title');
+    const inputEl = document.querySelector('.calendar-title-input');
+    const btnUpdate = document.querySelector('.btn-update-title');
+    const calendarId = titleEl.dataset.calendarId;
+
+    // Quand on clique sur le titre, on montre le champ et le bouton
+    titleEl.addEventListener('click', () => {
+        inputEl.style.display = 'inline-block';
+        btnUpdate.style.display = 'inline-block';
+        inputEl.value = titleEl.textContent.trim();
+        inputEl.focus();
+    });
+
+    // Quand on clique sur "Modifier"
+    btnUpdate.addEventListener('click', async () => {
+        const newTitle = inputEl.value.trim();
+        if (!newTitle) return alert('Titre invalide');
+
+        try {
+            const res = await fetch('/user/calendar/updateTitle', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ calendarId, newTitle })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert(data.error || 'Erreur lors de la mise à jour du titre');
+            } else {
+                // Mettre à jour le titre principal
+                titleEl.textContent = newTitle;
+
+                // Masquer le champ input et le bouton
+                inputEl.style.display = 'none';
+                btnUpdate.style.display = 'none';
+
+                // --- Mettre à jour le titre dans la liste des calendriers ---
+                const labelSpan = document.querySelector(
+                    `.calendar-option input[value="${calendarId}"] + .calendar-color + span`
+                );
+                if (labelSpan) {
+                    labelSpan.textContent = newTitle;
+                }
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Erreur serveur, réessayez plus tard');
+        }
+    });
+
+
+
 
 });
