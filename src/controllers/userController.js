@@ -31,6 +31,8 @@ exports.register = async (req, res) => {
 
     try {
         const NewUser = await model.register(firstName, lastName, email, password);
+        const userId = await model.getUserIdByEmail(email)
+        await model.createCalendar(userId, 'Mon agenda', []);
         return res.status(201).json({ message: "Utilisateur ajouté", user: NewUser });
     } catch (err) {
         return res.status(500).json({ error: "Erreur lors de l’inscription" });

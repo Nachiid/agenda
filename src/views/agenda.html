@@ -65,32 +65,23 @@
             </div>
 
             <!-- Liste des calendriers -->
-            <div class="sidebar-section calendars-list">
-                <div class="sidebar-section">
-                    <h3 class="sidebar-title">Mes calendrier</h3>
-                    <button class="btn btn-primary btn-full" id="btnNewEvent">+ Nouvel Calendrier</button>
-                </div>
-                <label class="calendar-option">
-                    <input type="checkbox" checked>
-                    <span class="calendar-color" style="background:#4F46E5"></span>
-                    <span>Personnel</span>
-                </label>
-                <label class="calendar-option">
-                    <input type="checkbox" checked>
-                    <span class="calendar-color" style="background:#10B981"></span>
-                    <span>Famille</span>
-                </label>
-                <label class="calendar-option">
-                    <input type="checkbox">
-                    <span class="calendar-color" style="background:#EF4444"></span>
-                    <span>Travail</span>
-                </label>
-                <label class="calendar-option">
-                    <input type="checkbox">
-                    <span class="calendar-color" style="background:#3B82F6"></span>
-                    <span>Amis</span>
-                </label>
-            </div>
+<!-- Liste des calendriers -->
+<div class="sidebar-section calendars-list">
+  <div class="sidebar-section">
+    <h3 class="sidebar-title">Mes calendriers</h3>
+    <button class="btn btn-primary btn-full" id="btnNewEvent">+ Nouvel Calendrier</button>
+  </div>
+
+  <!-- Calendriers visibles -->
+  <div id="calendarVisible"></div>
+
+  <!-- Calendriers masqués -->
+  <details id="calendarHiddenWrapper">
+    <summary class="show-more">Afficher plus</summary>
+    <div id="calendarHidden"></div>
+  </details>
+</div>
+
         </aside>
 
         <!-- Zone principale (calendrier à droite) -->

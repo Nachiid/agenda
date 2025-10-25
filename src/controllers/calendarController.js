@@ -19,6 +19,18 @@ exports.showFirstCalendar = async (req, res) => {
 
 }
 
+exports.getAllCalendarsIdsTitles = async (req, res) => {
+    try {
+        const userID = req.user.id;
+        const calendars = await model.getAllCalendarsIdsTitles(userID);
+        return res.status(200).json({ calendars });
+    } catch (error) {
+        console.error('Erreur getAllCalendars:', error);
+        return res.status(500).json({ error: 'Erreur serveur lors de la récupération des calendriers' });
+    }
+};
+
+
 /*
 exports.showCalendar = async (req, res) => {
     try {

@@ -261,6 +261,42 @@ body.dashboard-body {
     background: rgba(255,255,255,0.4);
 }
 
+
+.calendars-list {
+  max-height: 320px; /* limite la hauteur totale */
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.calendar-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+
+.calendar-color {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+.show-more {
+  color: #4f46e5;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 8px;
+  user-select: none;
+}
+
+.show-more:hover {
+  text-decoration: underline;
+}
+
+
+
 /* ====== RESPONSIVE ====== */
 @media (max-width: 1200px) {
     .dashboard-container {

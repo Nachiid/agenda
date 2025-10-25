@@ -11,10 +11,15 @@ exports.register = async function (firstName, lastName, email, password) {
     const newUser = new User({ firstName, lastName, email, password: hashPassword });
     const savedUser = await newUser.save();
 
-    const defaultCalendar = new Calendar({title: 'Mon agenda', color: '#3498db',userId: savedUser._id, appointments: []});
-    await defaultCalendar.save();
-
     return savedUser;
+};
+
+/**
+ * Récupère l'ID d'un utilisateur à partir de son email.
+ */
+exports.getUserIdByEmail = async function (email) {
+    const user = await User.findOne({ email }, '_id');
+    return user ? user._id : null;
 };
 
 
@@ -111,4 +116,42 @@ exports.getFirstCalendar = async function (userId) {
     const calendar = await Calendar.findOne({ userId: userId });
     return calendar;
 };
+
+/**
+ * Renvoie les id, titres et couleurs de tous les calendriers d'un utilisateur
+ */
+exports.getAllCalendarsIdsTitles = async function (userId) {
+    const calendars = await Calendar.find({ userId: userId }).select('_id title color');
+    return calendars;
+};
+
+/**
+ * Crée un calendrier pour un utilisateur donné.
+ */
+exports.createCalendar = async function (userId, title, appointments = []) {
+
+        const colorPalette = [
+        '#3498db', // Bleu
+        '#2ecc71', // Vert
+        '#e74c3c', // Rouge
+        '#f1c40f', // Jaune
+        '#9b59b6', // Violet
+        '#1abc9c', // Turquoise
+        '#e67e22', // Orange
+        '#34495e', // Gris foncé
+        '#ff6b6b', // Rose
+        '#16a085'  // Vert foncé
+    ];
+
+    const userCalendars = await Calendar.find({ userId });
+    const usedColors = userCalendars.map(c => c.color);
+
+    const availableColors = colorPalette.filter(c => !usedColors.includes(c));
+    const color = availableColors[0];
+
+    const newCalendar = new Calendar({title, color, userId, appointments
+    });
+    return await newCalendar.save();
+};
+
 
