@@ -23,6 +23,7 @@ signupForm.addEventListener('submit', async (e) => {
 
         const data = await res.json(); 
         if (res.ok) {
+            alert("compte cree")
             window.location.href = 'login';
         } else {
             showMessage(data.error  || 'Erreur de l\'inscription ');

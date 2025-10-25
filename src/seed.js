@@ -1,11 +1,10 @@
-require('dotenv').config({ path: '../.env' }); // ../ pour remonter à la racine
+require('dotenv').config({ path: '../.env' });
 const connectDB = require('./models/connexionDB');
 const model = require('./models/model');
 const { User, Calendar } = require('./models/db');
 
 async function seedAll() {
   try {
-    // Connexion à MongoDB
     await connectDB();
     console.log('✅ Connecté à MongoDB');
 
@@ -24,7 +23,7 @@ async function seedAll() {
 
     const createdUsers = [];
     for (const u of usersData) {
-      const user = await model.inscription(u.firstName, u.lastName, u.email, u.password);
+      const user = await model.register(u.firstName, u.lastName, u.email, u.password);
       createdUsers.push(user);
       console.log('-> utilisateur créé :', user.email);
     }
@@ -39,17 +38,35 @@ async function seedAll() {
     const calendars = [];
     for (const user of createdUsers) {
       for (const t of calendarTypes) {
+        // Générer des rendez-vous aléatoires pour l'utilisateur "aymen"
+        const appointments = [];
+        if (user.firstName.toLowerCase() === 'aymen') {
+          for (let i = 0; i < 5; i++) {
+            const start = new Date();
+            start.setDate(start.getDate() + i); // aujourd'hui + i jours
+            start.setHours(9 + i, 0); // heure de début 9h + i
+            const end = new Date(start);
+            end.setHours(end.getHours() + 1); // durée 1h
+            appointments.push({
+              name: `Rendez-vous ${i + 1}`,
+              date_debut: start,
+              date_fin: end,
+              description: `Description du rendez-vous ${i + 1}`
+            });
+          }
+        }
+
         calendars.push({
           title: t.title,
           color: t.color,
           userId: user._id,
-          appointments: []
+          appointments
         });
       }
     }
 
     await Calendar.insertMany(calendars);
-    console.log('📅 Calendriers créés pour chaque utilisateur');
+    console.log('📅 Calendriers créés avec rendez-vous pour l’utilisateur Aymen');
 
   } catch (err) {
     console.error('❌ Erreur pendant le seedAll :', err);

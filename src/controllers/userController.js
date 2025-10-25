@@ -30,7 +30,7 @@ exports.register = async (req, res) => {
     }
 
     try {
-        const NewUser = await model.inscription(firstName, lastName, email, password);
+        const NewUser = await model.register(firstName, lastName, email, password);
         return res.status(201).json({ message: "Utilisateur ajouté", user: NewUser });
     } catch (err) {
         return res.status(500).json({ error: "Erreur lors de l’inscription" });
@@ -53,7 +53,7 @@ exports.login = async (req, res) => {
             return res.status(400).json({ error: 'Adresse email invalide.' });
         }
 
-        const user = await model.connexion(email, password);
+        const user = await model.login(email, password);
         if (!user) {
             return res.status(401).json({ error: 'Email ou mot de passe incorrect.' });
         }
@@ -81,6 +81,8 @@ exports.login = async (req, res) => {
         return res.status(500).json({ error: 'Erreur interne du serveur.' });
     }
 };
+
+
 exports.getuser = async (req , res) => {
     const id = req.user.id;
     try {

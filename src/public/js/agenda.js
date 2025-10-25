@@ -1,7 +1,4 @@
-
-
-
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', async function () {
     const calendarEl = document.getElementById('calendar');
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
@@ -11,34 +8,37 @@ document.addEventListener('DOMContentLoaded', async function() {
         navLinks: true,
         selectable: true,
         editable: true,
-        events: [] // on va les ajouter après
+        events: []
     });
-
     calendar.render();
 
+
     // --- Afficher les RDV dans le calendrier ---
-   /* const userId = localStorage.getItem('userId');
-    if (!userId) return;
-
     try {
-        const res = await fetch(`http://localhost:5000/user/${userId}`);
-        const rdvs = await res.json();
+        const res = await fetch('/user/agenda', { credentials: 'include' });
+        if (!res.ok) throw new Error('Erreur récupération calendrier');
+        const data = await res.json();
+        const calendarData = data.calendar;
 
-        // Transformer les RDV pour FullCalendar
-        const events = rdvs.map(r => ({
+        if (!calendarData) return;
+
+        const titleDiv = document.querySelector('.calendar-title');
+        titleDiv.textContent = calendarData.title;
+        
+        const events = calendarData.appointments.map(r => ({
             id: r._id,
-            title: r.titre,
-            start: r.dateDebut,
-            end: r.dateFin,
-            extendedProps: { description: r.comment || '' }
+            title: r.name,
+            start: r.date_debut,
+            end: r.date_fin,
+            color: calendarData.color,
+            extendedProps: { description: r.description || '' }
         }));
 
-        // Ajouter les événements au calendrier
         events.forEach(ev => calendar.addEvent(ev));
-
-    } catch (error) {
-        console.error('Erreur en récupérant les RDV :', error);
-    }*/
+    } catch (err) {
+        console.error(err);
+        alert('Impossible de charger votre calendrier');
+    }
 });
 
 

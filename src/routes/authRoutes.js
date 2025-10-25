@@ -3,9 +3,10 @@ const router = express.Router();
 const path = require('path');
 const userController        = require('../controllers/userController');
 const appointmentController = require('../controllers/appointmentController');
+const calendarController = require('../controllers/calendarController');
 const auth = require('../middleware/auth');
 
-// === ROUTES PAGES === //
+// === ROUTES PAGES PUBLICS=== //
 router.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../index.html'));
 });
@@ -18,13 +19,6 @@ router.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, '../views/login.html'));
 });
 
-router.get('/profile', auth, (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/profile.html'));
-});
-
-router.get('/agenda', auth, (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/agenda.html'));
-});
 
 // === ROUTES API (utilisateurs) === //
 router.post('/user/register', userController.register);
@@ -33,6 +27,12 @@ router.post('/appointment',appointmentController.rajouteAppointment);
 router.delete('/deletAppointment',appointmentController.deletAppointment);
 router.put('/updateAppointment',appointmentController.updateAppointment);
 router.get('/user/profile', auth,  userController.getuser);
+
+router.get('/user/agenda', auth,  calendarController.showFirstCalendar);
+router.get('/agenda', auth, (req, res) => {
+    res.sendFile(path.join(__dirname, '../views/agenda.html'));
+});
+
 
 
 router.get('/user/logout', (req, res) => {

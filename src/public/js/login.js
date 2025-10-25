@@ -1,5 +1,3 @@
-const loginForm = document.querySelector('#loginForm');
-
 loginForm.addEventListener('submit', async e => {
     e.preventDefault();
     const email = document.querySelector('#email').value.trim();
@@ -10,7 +8,7 @@ loginForm.addEventListener('submit', async e => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
-            credentials: 'include' // IMPORTANT : pour que le cookie httpOnly soit accepté
+            credentials: 'include'
         });
 
         const data = await res.json();
@@ -18,7 +16,8 @@ loginForm.addEventListener('submit', async e => {
         if (res.ok) {
             loginForm.reset();
             alert(data.message);
-            window.location.href = '/agenda';
+            window.location.href = 'agenda';
+
         } else {
             alert(data.error || 'Erreur de login');
         }

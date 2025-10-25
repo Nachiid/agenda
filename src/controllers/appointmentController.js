@@ -27,7 +27,7 @@ exports.rajouteAppointment = async (req ,res) => {
         }
         
         // Vérification que le calendrier appartient bien à l'utilisateur connecté
-        const calendar = await model.calendarAppartientAUser(calendarId, userId);
+        const calendar = await model.getUserCalendar(calendarId, userId);
         if (!calendar) {
             return res.status(404).json({ error: 'Calendrier introuvable pour cet utilisateur' });
         }

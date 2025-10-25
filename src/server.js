@@ -19,7 +19,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Utilisation du routeur
 app.use('/', authRoutes);
-//app.use('/', require('./routes/appointment'));
 
 
 
