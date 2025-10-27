@@ -212,5 +212,51 @@ exports.updateCalendarTitle = async function (userId, calendarId, newTitle) {
     return updatedCalendar;
 };
 
+/**
+ * Met à jour les informations de profil d'un utilisateur.
+ * @param {string} userId - L'ID de l'utilisateur à modifier.
+ * @param {Object} data - Les données du profil à mettre à jour.
+ * @returns {Promise<Object>} L'utilisateur mis à jour.
+ */
+exports.modifierProfile = async function (userId, data) {
+    const updateData = {};
+
+    if (data.firstName !== undefined) updateData.firstName = data.firstName;
+    if (data.lastName !== undefined) updateData.lastName = data.lastName;
+    if (data.email !== undefined) updateData.email = data.email;
+    if (data.phone !== undefined) updateData.phone = data.phone;
+    if (data.timezone !== undefined) updateData.timezone = data.timezone;
+
+    if (data.newPassword) {
+        const hashPassword = await bcrypt.hash(data.newPassword, 10);
+        updateData.password = hashPassword;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { $set: updateData },
+        { new: true, runValidators: true }
+    );
+
+    console.log("Données mises à jour dans Mongo:", updateData);
+
+    return updatedUser;
+};
+
+
+/**
+ * Supprime un utilisateur et tous ses calendriers associés.
+ * @param {string} userId - L'ID de l'utilisateur à supprimer.
+ * @returns {Promise<Object>} L'utilisateur supprimé.
+ */
+exports.supprimerProfile = async function (userId) {
+    await Calendar.deleteMany({ userId });
+    const deletedUser = await User.findByIdAndDelete(userId);
+    return deletedUser;
+};
+
+
+
+
 
 

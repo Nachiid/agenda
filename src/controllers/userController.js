@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const model = require("../models/model")
+const bcrypt = require('bcrypt');
+const model = require("../models/model");
 
 // Verification des donnees tous formulaire
 exports.register = async (req, res) => {
@@ -85,13 +86,128 @@ exports.login = async (req, res) => {
 };
 
 
-exports.getuser = async (req , res) => {
+exports.getuser = async (req, res) => {
     const id = req.user.id;
     try {
         const profil_inforamation = await model.getProfil(id);
+        console.log("txt controlleur  ");
         return res.status(200).json({ user: profil_inforamation });
     } catch (error) {
         return res.status(500).json({ error: 'Erreur interne du serveur.' });
 
     }
 }
+
+/**
+ * Met à jour les informations de profil de l'utilisateur.
+ */
+
+exports.modifierProfile = async (req, res) => {
+    const userId = req.user.id;
+    const { firstName, lastName, email, phone, timezone } = req.body;
+
+    // Validation de base
+    if (!firstName || !lastName || !email) {
+        return res.status(400).json({ error: 'Le prénom, le nom et l\'email sont requis.' });
+    }
+
+    // Validation des noms
+    const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+$/;
+    if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
+        return res.status(400).json({ error: 'Le prénom et le nom doivent contenir uniquement des lettres.' });
+    }
+
+    // Validation email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: 'Adresse email invalide.' });
+    }
+
+    // Validation téléphone
+    const phoneRegex = /^\+?\d+$/;
+    if (phone && !phoneRegex.test(phone)) {
+        return res.status(400).json({ error: 'Numéro de téléphone invalide.' });
+    }
+
+
+
+    console.log("Contenu reçu :", req.body);
+
+    try {
+        const updatePayload = { firstName, lastName, email, phone, timezone };
+
+
+        const updatedUser = await model.modifierProfile(userId, updatePayload);
+        if (!updatedUser) {
+            return res.status(404).json({ error: 'Utilisateur non trouvé.' });
+        }
+
+        return res.status(200).json({ message: 'Profil mis à jour avec succès.', user: updatedUser });
+    } catch (error) {
+        console.error('Erreur lors de la modification du profil:', error);
+        return res.status(500).json({ error: 'Erreur interne du serveur.' });
+    }
+};
+
+
+exports.changePassword = async (req, res) => {
+    const userId = req.user.id;
+    const { currentPassword, newPassword, confirmNewPassword } = req.body;
+
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
+        return res.status(400).json({ error: 'Veuillez remplir tous les champs de mot de passe.' });
+    }
+
+    if (newPassword !== confirmNewPassword) {
+        return res.status(400).json({ error: 'Les nouveaux mots de passe ne correspondent pas.' });
+    }
+
+    try {
+        const user = await model.getProfil(userId);
+        if (!user) {
+            return res.status(404).json({ error: 'Utilisateur non trouvé.' });
+        }
+
+        const validPassword = await bcrypt.compare(currentPassword, user.password);
+        if (!validPassword) {
+            return res.status(401).json({ error: 'Mot de passe actuel incorrect.' });
+        }
+
+        const hashPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashPassword;
+        await user.save();
+
+        return res.status(200).json({ message: 'Mot de passe mis à jour avec succès.' });
+    } catch (error) {
+        console.error('Erreur lors du changement de mot de passe:', error);
+        return res.status(500).json({ error: 'Erreur interne du serveur.' });
+    }
+};
+
+/**
+ * Supprime le profil de l'utilisateur et tous ses agendas.
+ */
+exports.supprimerProfile = async (req, res) => {
+    const userId = req.user.id;
+
+    try {
+        const deletedUser = await model.supprimerProfile(userId);
+
+        if (!deletedUser) {
+            return res.status(404).json({ error: 'Utilisateur non trouvé.' });
+        }
+
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict'
+        });
+
+        return res.status(200).json({ message: 'Profil et agendas associés supprimés avec succès.' });
+    } catch (error) {
+        console.error('Erreur lors de la suppression du profil:', error);
+        return res.status(500).json({ error: 'Erreur interne du serveur.' });
+    }
+};
+
+

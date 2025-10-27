@@ -20,15 +20,25 @@ router.get('/login', (req, res) => {
 });
 
 
+
 // === ROUTES API (utilisateurs) === //
 router.post('/user/register', userController.register);
 router.post('/user/login', userController.login);
 
 // === ROUTES PAGE PRIVE === //
 router.post('/appointment',appointmentController.rajouteAppointment);
-router.delete('/deletAppointment',appointmentController.deletAppointment);
+router.delete('/deletAppointment/:rendezvousId',appointmentController.deletAppointment);
 router.put('/updateAppointment',appointmentController.updateAppointment);
 router.get('/user/profile', auth,  userController.getuser);
+router.get('/profile', auth, (req, res) => {
+    res.sendFile(path.join(__dirname, '../views/profile.html'));
+});
+// --- Route pour modifier le profil ---
+router.put('/user/profile', auth, userController.modifierProfile);
+// --- Route pour changer le mot de passe ---
+router.put('/user/password', auth, userController.changePassword);
+// --- Route pour supprimer le profil ---
+router.delete('/user/profile', auth, userController.supprimerProfile);
 
 router.get('/user/agenda', auth,  calendarController.showFirstCalendar);
 router.get('/agenda', auth, (req, res) => {
@@ -44,8 +54,6 @@ router.get('/user/logout', (req, res) => {
     res.clearCookie('token');  
     res.status(200).json({ message: 'Déconnecté avec succès' });
 });
-
-
 
 
 module.exports = router;

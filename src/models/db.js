@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema({
     lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    phone: { type: String }, 
+    timezone: { type: String, default: 'Europe/Paris' } 
 });
 
 // Schéma pour les rendez-vous (Appointment) — sous-document uniquement
