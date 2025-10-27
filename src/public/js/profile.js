@@ -39,10 +39,10 @@ document.addEventListener('DOMContentLoaded',async()=> {
             document.querySelector('.profile-name').textContent = firstName + ' ' + lastName;
             document.querySelector('.avatar-circle').textContent = initials; // <
         }else{
-            alert(data.error);
+            showMessage(data.error || 'Erreur lors du chargement du profil', 'error');
         }
     } catch (error) {
-        alert("il y a une erreur 2 ");
+        showMessage("Il y a une erreur lors de la récupération du profil", 'error');
         
     }
 })

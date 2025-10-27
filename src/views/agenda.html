@@ -47,28 +47,46 @@
             <div class="sidebar-section">
                 <h3 class="sidebar-title">Événements à venir</h3>
                 <div id="upcomingEvents" class="upcoming-events">
-                    <div class="event-item">
+                <div class="event-item">
+                    <div class="event-left">
                         <div class="event-date">15 Oct</div>
                         <div class="event-info">
                             <div class="event-title">Réunion d’équipe</div>
                             <div class="event-time">14:00 – 15:30</div>
                         </div>
                     </div>
-                    <div class="event-item">
+                    <button class="btn-icon delete-btn" title="Supprimer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 7h12M9 7V4h6v3m2 0v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7h12z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="event-item">
+                    <div class="event-left">
                         <div class="event-date">17 Oct</div>
                         <div class="event-info">
                             <div class="event-title">Rendez-vous médical</div>
                             <div class="event-time">10:00 – 11:00</div>
                         </div>
                     </div>
+                    <button class="btn-icon delete-btn" title="Supprimer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 7h12M9 7V4h6v3m2 0v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7h12z" />
+                        </svg>
+                    </button>
                 </div>
+            </div>
+
             </div>
 
             <!-- Liste des calendriers -->
             <div class="sidebar-section calendars-list">
                 <div class="sidebar-section">
-                    <h3 class="sidebar-title">Mes calendrier</h3>
-                    <button class="btn btn-primary btn-full" id="btnNewEvent">+ Nouvel Calendrier</button>
+                    <h3 class="sidebar-title">Mes calendriers</h3>
+                    <button class="btn btn-primary btn-full" id="btnNewCalendar">+ Nouvel Calendrier</button>
                 </div>
                 <label class="calendar-option">
                     <input type="checkbox" checked>
@@ -108,9 +126,72 @@
 
     </div>
 
+    <!-- === POPUP NOUVEL ÉVÉNEMENT === -->
+    <div id="eventModal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="modal-title">Créer un nouvel événement</h2>
+            <form id="eventForm" class="event-form">
+
+                <div class="form-group">
+                    <label for="eventTitle">Nom de l’événement</label>
+                    <input type="text" id="eventTitle" placeholder="Ex : Réunion d’équipe" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="eventDateStart">Date début</label>
+                        <input type="date" id="eventDateStart" required>
+                    </div>
+                    <div class="form-group half">
+                        <label for="eventTimeStart">Heure début</label>
+                        <input type="time" id="eventTimeStart" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="eventDateEnd">Date fin</label>
+                        <input type="date" id="eventDateEnd" required>
+                    </div>
+                    <div class="form-group half">
+                        <label for="eventTimeEnd">Heure fin</label>
+                        <input type="time" id="eventTimeEnd" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventComment">Commentaire</label>
+                    <textarea id="eventComment" rows="3" placeholder="Détails de l’événement..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="btnCancel">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- === POPUP NOUVEL CALENDRIER === -->
+    <div id="calendarModal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="modal-title">Modifier le calendrier</h2>
+            <form id="calendarForm" class="event-form">
+                <div class="form-group">
+                    <label for="calendarTitle">Nom du calendrier</label>
+                    <input type="text" id="calendarTitle" placeholder="Ex : Travail, Famille..." required>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Modifier</button>
+                    <button type="button" class="btn btn-secondary" id="btnCancelCalendar">Annuler</button>
+                    <button type="button" class="btn btn-danger" id="btnDeleteCalendar">Supprimer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="js/agenda.js"></script>
     <script src="js/logout.js"></script>
-
 </body>
 
 </html>

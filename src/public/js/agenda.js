@@ -1,44 +1,69 @@
-
-
-
 document.addEventListener('DOMContentLoaded', async function() {
     const calendarEl = document.getElementById('calendar');
 
+    // === Initialisation du calendrier ===
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'fr',
-        headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' },
+        headerToolbar: { 
+            left: 'prev,next today', 
+            center: 'title', 
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' 
+        },
         navLinks: true,
         selectable: true,
         editable: true,
-        events: [] // on va les ajouter après
+        events: []
     });
 
     calendar.render();
 
-    // --- Afficher les RDV dans le calendrier ---
-   /* const userId = localStorage.getItem('userId');
-    if (!userId) return;
+    // === POPUP NOUVEL ÉVÉNEMENT ===
+    const btnNewEvent = document.getElementById('btnNewEvent');
+    const eventModal = document.getElementById('eventModal');
+    const btnCancel = document.getElementById('btnCancel');
+    const eventForm = document.getElementById('eventForm');
 
-    try {
-        const res = await fetch(`http://localhost:5000/user/${userId}`);
-        const rdvs = await res.json();
+    btnNewEvent.addEventListener('click', () => {
+        eventModal.classList.remove('hidden');
+    });
 
-        // Transformer les RDV pour FullCalendar
-        const events = rdvs.map(r => ({
-            id: r._id,
-            title: r.titre,
-            start: r.dateDebut,
-            end: r.dateFin,
-            extendedProps: { description: r.comment || '' }
-        }));
+    btnCancel.addEventListener('click', () => {
+        eventModal.classList.add('hidden');
+        eventForm.reset();
+    });
 
-        // Ajouter les événements au calendrier
-        events.forEach(ev => calendar.addEvent(ev));
+    eventModal.addEventListener('click', (e) => {
+        if (e.target === eventModal) {
+            eventModal.classList.add('hidden');
+            eventForm.reset();
+        }
+    });
 
-    } catch (error) {
-        console.error('Erreur en récupérant les RDV :', error);
-    }*/
+    // === POPUP NOUVEL CALENDRIER ===
+    const btnNewCalendar = document.getElementById('btnNewCalendar');
+    const calendarModal = document.getElementById('calendarModal');
+    const calendarForm = document.getElementById('calendarForm');
+    const btnCancelCalendar = document.getElementById('btnCancelCalendar');
+    const btnDeleteCalendar = document.getElementById('btnDeleteCalendar');
+
+    btnNewCalendar.addEventListener('click', () => {
+        calendarModal.classList.remove('hidden');
+    });
+
+    btnCancelCalendar.addEventListener('click', () => {
+        calendarModal.classList.add('hidden');
+        calendarForm.reset();
+    });
+
+    calendarModal.addEventListener('click', (e) => {
+        if (e.target === calendarModal) {
+            calendarModal.classList.add('hidden');
+            calendarForm.reset();
+        }
+    });
+
+    
 });
 
 
