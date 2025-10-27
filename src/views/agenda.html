@@ -86,7 +86,8 @@
             <div class="sidebar-section calendars-list">
                 <div class="sidebar-section">
                     <h3 class="sidebar-title">Mes calendriers</h3>
-                    <button class="btn btn-primary btn-full" id="btnNewCalendar">+ Nouvel Calendrier</button>
+                    <button class="btn btn-primary btn-full" id="btnNewCalendar">+ Nouveau calendrier</button>
+                    <button class="btn btn-primary btn-full" id="btnModCalendar">Modifier Calendrier</button>
                 </div>
                 <label class="calendar-option">
                     <input type="checkbox" checked>
@@ -189,6 +190,23 @@
             </form>
         </div>
     </div>
+    <!-- === POPUP NOUVEAU CALENDRIER === -->
+    <div id="newCalendarModal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="modal-title">Créer un nouveau calendrier</h2>
+            <form id="newCalendarForm" class="event-form">
+                <div class="form-group">
+                    <label for="newCalendarTitle">Nom du calendrier</label>
+                    <input type="text" id="newCalendarTitle" placeholder="Ex : Projets, Loisirs..." required>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Créer</button>
+                    <button type="button" class="btn btn-secondary" id="btnCancelNewCalendar">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <script src="js/agenda.js"></script>
     <script src="js/logout.js"></script>

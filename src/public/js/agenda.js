@@ -41,13 +41,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
 
     // === POPUP NOUVEL CALENDRIER ===
-    const btnNewCalendar = document.getElementById('btnNewCalendar');
+    const btnModCalendar = document.getElementById('btnModCalendar');
     const calendarModal = document.getElementById('calendarModal');
     const calendarForm = document.getElementById('calendarForm');
     const btnCancelCalendar = document.getElementById('btnCancelCalendar');
     const btnDeleteCalendar = document.getElementById('btnDeleteCalendar');
 
-    btnNewCalendar.addEventListener('click', () => {
+    btnModCalendar.addEventListener('click', () => {
         calendarModal.classList.remove('hidden');
     });
 
@@ -66,4 +66,23 @@ document.addEventListener('DOMContentLoaded', async function() {
     
 });
 
+
+    // === POPUP NOUVEAU CALENDRIER ===
+    const btnNewCalendar = document.getElementById('btnNewCalendar');
+    const newCalendarModal = document.getElementById('newCalendarModal');
+    const btnCancelNewCalendar = document.getElementById('btnCancelNewCalendar');
+
+    btnNewCalendar.addEventListener('click', () => {
+        newCalendarModal.classList.remove('hidden');
+    });
+
+    btnCancelNewCalendar.addEventListener('click', () => {
+        newCalendarModal.classList.add('hidden');
+    });
+
+    newCalendarModal.addEventListener('click', (e) => {
+        if (e.target === newCalendarModal) {
+            newCalendarModal.classList.add('hidden');
+        }
+    });
 

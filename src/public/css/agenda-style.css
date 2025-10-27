@@ -461,3 +461,7 @@ body.dashboard-body {
     margin-bottom: 0.4rem;
     display: block;
 }
+
+#btnNewCalendar {
+    margin-bottom: 0.5rem;
+}
