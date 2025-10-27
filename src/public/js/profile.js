@@ -35,12 +35,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             // --- Mise à jour de l'affichage ---
             document.querySelector('.profile-email').textContent = email;
             document.querySelector('.profile-name').textContent = firstName + ' ' + lastName;
-            document.querySelector('.avatar-circle').textContent = initials;
-        } else {
-            alert(data.error);
+            document.querySelector('.avatar-circle').textContent = initials; // <
+        }else{
+            showMessage(data.error || 'Erreur lors du chargement du profil', 'error');
         }
     } catch (error) {
-        alert("il y a une erreur 2 ");
+        showMessage("Il y a une erreur lors de la récupération du profil", 'error');
+        
     }
 })
 
