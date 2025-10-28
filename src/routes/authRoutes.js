@@ -27,7 +27,7 @@ router.post('/user/login', userController.login);
 
 // === ROUTES PAGE PRIVE === //
 router.post('/appointment',appointmentController.rajouteAppointment);
-router.delete('/deletAppointment/:rendezvousId',appointmentController.deletAppointment);
+router.delete('/deletAppointment/:id',appointmentController.deletAppointment);
 router.put('/updateAppointment',appointmentController.updateAppointment);
 router.get('/user/profile', auth,  userController.getuser);
 router.get('/profile', auth, (req, res) => {
@@ -45,7 +45,7 @@ router.get('/agenda', auth, (req, res) => {
     res.sendFile(path.join(__dirname, '../views/agenda.html'));
 });
 router.get('/user/calendars', auth, calendarController.getAllCalendarsIdsTitles);
-router.delete('/user/calendar/:calendarId', auth, calendarController.deleteCalendar);
+router.delete('/user/calendar/delete/:id', auth, calendarController.deleteCalendar);
 router.put('/user/calendar/updateTitle', auth, calendarController.updateCalendarTitle);
 router.post('/user/calendar/create', auth, calendarController.addCalendar);
 

@@ -196,7 +196,7 @@ exports.deleteCalendar = async function (userId, calendarId) {
         userId: userId
     });
 
-    return deletedCalendar;
+    return deletedCalendar ? true : false;
 };
 
 

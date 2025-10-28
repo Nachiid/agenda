@@ -34,9 +34,8 @@ exports.getAllCalendarsIdsTitles = async (req, res) => {
 exports.deleteCalendar = async (req, res) => {
     try {
         const userID = req.user.id;
-        const { calendarId } = req.params;
-
-        if (!calendarId) {
+        const { id } = req.params;
+        if (!id) {
             return res.status(400).json({ error: 'calendarId est requis' });
         }
 
@@ -46,15 +45,14 @@ exports.deleteCalendar = async (req, res) => {
             return res.status(400).json({ error: 'Impossible de supprimer le dernier calendrier' });
         }
 
-        const deleted = await model.deleteCalendar(userID, calendarId);
+        const deleted = await model.deleteCalendar(userID, id);
 
         if (!deleted) {
             return res.status(404).json({ error: 'Calendrier introuvable ou non autorisé' });
         }
 
-        return res.status(200).json({ message: 'Calendrier supprimé avec succès', calendar: deleted });
+        return res.status(200).json({ message: 'Calendrier supprimé avec succès' });
     } catch (error) {
-        console.error('Erreur deleteCalendar:', error);
         return res.status(500).json({ error: 'Erreur serveur lors de la suppression du calendrier' });
     }
 };
@@ -98,10 +96,10 @@ exports.addCalendar = async (req, res) => {
             return res.status(400).json({ error: 'Le titre du calendrier est requis' });
         }
 
-        const newCalendar = await model.createCalendar(userId, title,[]);
+        const newCalendar = await model.createCalendar(userId, title, []);
 
         return res.status(201).json({
-            message: 'Calendrier créé avec succès',
+            message: title + 'a été créé ',
             calendar: newCalendar
         });
 
