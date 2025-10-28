@@ -186,6 +186,72 @@ body.dashboard-body {
     color: rgba(255,255,255,0.8);
 }
 
+
+
+
+
+
+.event-item2 {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255,255,255,0.15);
+    border-radius: 0.6rem;
+    border-left: 3px solid #fff;
+    transition: 0.3s;
+}
+
+.event-item2:hover {
+    background: rgba(255,255,255,0.25);
+    transform: translateX(5px);
+}
+
+
+.event-info2 .event-title2 {
+    font-weight: 600;
+    color: white;
+}
+
+.event-item2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    transition: background 0.2s ease;
+}
+
+.event-item2:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.event-left2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.delete-btn-cal {
+    background: transparent;
+    color: #fff;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+}
+
+.delete-btn-cal:hover {
+    color: #ff5b5b;
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+
+
+
 /* ====== CALENDAR CHECKLIST ====== */
 .calendars-list label {
     display: flex;

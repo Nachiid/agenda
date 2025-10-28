@@ -4,7 +4,7 @@
 function renderCalendarListUI(calendarListDiv) {
   const MAX_VISIBLE = 4;
 
-  const allItems = Array.from(calendarListDiv.querySelectorAll(".event-item"));
+  const allItems = Array.from(calendarListDiv.querySelectorAll(".event-item2"));
 
   // Retirer tout hiddenDiv et toggleBtn existants
   const existingHidden = calendarListDiv.querySelector(".hidden-calendars");
@@ -111,12 +111,12 @@ document.addEventListener("DOMContentLoaded", async function () {
       // Boucle sur tous les calendriers pour créer les éléments
       allData.calendars.forEach((cal) => {
         const calDiv = document.createElement("div");
-        calDiv.classList.add("event-item");
+        calDiv.classList.add("event-item2");
         calDiv.dataset.id = cal._id;
 
         // Partie gauche : checkbox + couleur + titre
         const leftDiv = document.createElement("div");
-        leftDiv.classList.add("event-left");
+        leftDiv.classList.add("event-left2");
 
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
@@ -128,14 +128,14 @@ document.addEventListener("DOMContentLoaded", async function () {
         colorDiv.style.background = cal.color;
 
         const titleDiv = document.createElement("div");
-        titleDiv.classList.add("event-info");
+        titleDiv.classList.add("event-info2");
         const titleSpan = document.createElement("div");
-        titleSpan.classList.add("event-title");
+        titleSpan.classList.add("event-title2");
         titleSpan.textContent = cal.title;
         titleSpan.dataset.calendarId = cal._id;
 
         const timeSpan = document.createElement("div");
-        timeSpan.classList.add("event-time");
+        timeSpan.classList.add("event-time2");
 
         titleDiv.appendChild(titleSpan);
         titleDiv.appendChild(timeSpan);
@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         leftDiv.appendChild(titleDiv);
 
         const deleteBtn = document.createElement("button");
-        deleteBtn.classList.add("btn-icon", "delete-btn");
+        deleteBtn.classList.add("btn-icon", "delete-btn-cal");
         deleteBtn.dataset.id = cal._id;
         deleteBtn.title = "Supprimer";
         deleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i>`;
@@ -253,7 +253,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.querySelector(".calendar-title").textContent = newTitle;
         document.querySelector(".calendar-title").textContent = newTitle;
         const titleSpan = document.querySelector(
-          `.event-title[data-calendar-id="${calendarId}"]`
+          `.event-title2[data-calendar-id="${calendarId}"]`
         );
         titleSpan.textContent = newTitle;
 
@@ -272,10 +272,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
 
     // === Écouteur de suppression d'un calendrier===
-    document.querySelectorAll(".delete-btn").forEach((btn) => {
+    document.querySelectorAll(".delete-btn-cal").forEach((btn) => {
       btn.addEventListener("click", async (e) => {
         e.stopPropagation();
-        const button = e.target.closest("button.delete-btn");
+        const button = e.target.closest("button.delete-btn-cal");
         if (!button) return;
 
         const calendarId = button.dataset.id;
@@ -296,7 +296,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             return;
           }
 
-          button.closest(".event-item").remove();
+          button.closest(".event-item2").remove();
           showMessage(data.message, "success");
         } catch (err) {
           showMessage(data.error, "error");
@@ -332,7 +332,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (!calendarListDiv) return;
 
         const MAX_VISIBLE = 4;
-        const allVisible = calendarListDiv.querySelectorAll(".event-item");
+        const allVisible = calendarListDiv.querySelectorAll(".event-item2");
         let hiddenDiv = calendarListDiv.querySelector(".hidden-calendars");
 
         // Crée hiddenDiv si nécessaire
@@ -347,11 +347,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         // --- Création du nouvel élément calendrier ---
         const calDiv = document.createElement("div");
-        calDiv.classList.add("event-item");
+        calDiv.classList.add("event-item2");
         calDiv.dataset.id = cal._id;
 
         const leftDiv = document.createElement("div");
-        leftDiv.classList.add("event-left");
+        leftDiv.classList.add("event-left2");
 
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
@@ -363,15 +363,15 @@ document.addEventListener("DOMContentLoaded", async function () {
         colorDiv.style.background = cal.color || "#ccc";
 
         const titleDiv = document.createElement("div");
-        titleDiv.classList.add("event-info");
+        titleDiv.classList.add("event-info2");
 
         const titleSpan = document.createElement("div");
-        titleSpan.classList.add("event-title");
+        titleSpan.classList.add("event-title2");
         titleSpan.textContent = cal.title;
         titleSpan.dataset.calendarId = cal._id;
 
         const timeSpan = document.createElement("div");
-        timeSpan.classList.add("event-time");
+        timeSpan.classList.add("event-time2");
 
         titleDiv.appendChild(titleSpan);
         titleDiv.appendChild(timeSpan);
@@ -380,7 +380,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         leftDiv.appendChild(titleDiv);
 
         const deleteBtn = document.createElement("button");
-        deleteBtn.classList.add("btn-icon", "delete-btn");
+        deleteBtn.classList.add("btn-icon", "delete-btn-cal");
         deleteBtn.dataset.id = cal._id;
         deleteBtn.title = "Supprimer";
         deleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i>`;
