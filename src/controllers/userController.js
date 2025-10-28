@@ -90,7 +90,6 @@ exports.getuser = async (req, res) => {
     const id = req.user.id;
     try {
         const profil_inforamation = await model.getProfil(id);
-        console.log("txt controlleur  ");
         return res.status(200).json({ user: profil_inforamation });
     } catch (error) {
         return res.status(500).json({ error: 'Erreur interne du serveur.' });

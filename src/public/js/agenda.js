@@ -1,3 +1,54 @@
+/**
+ * Gère l'affichage des calendriers avec max 4 visibles et un bouton "Afficher plus / moins"
+ */
+function renderCalendarListUI(calendarListDiv) {
+  const MAX_VISIBLE = 4;
+
+  const allItems = Array.from(calendarListDiv.querySelectorAll(".event-item"));
+
+  // Retirer tout hiddenDiv et toggleBtn existants
+  const existingHidden = calendarListDiv.querySelector(".hidden-calendars");
+  if (existingHidden) existingHidden.remove();
+  const existingToggle = calendarListDiv.querySelector(".btn-toggle-hidden");
+  if (existingToggle) existingToggle.remove();
+
+  // Créer un nouveau hiddenDiv si nécessaire
+  const hiddenDiv = document.createElement("div");
+  hiddenDiv.classList.add("hidden-calendars");
+  hiddenDiv.style.display = "none";
+
+  allItems.forEach((item, index) => {
+    if (index >= MAX_VISIBLE) {
+      hiddenDiv.appendChild(item);
+    }
+  });
+
+  // Ajouter le hiddenDiv et le bouton si besoin
+  if (allItems.length > MAX_VISIBLE) {
+    const toggleBtn = document.createElement("button");
+    toggleBtn.classList.add(
+      "btn",
+      "btn-secondary",
+      "btn-full",
+      "btn-toggle-hidden"
+    );
+    toggleBtn.textContent = "Afficher plus";
+
+    toggleBtn.addEventListener("click", () => {
+      if (hiddenDiv.style.display === "none") {
+        hiddenDiv.style.display = "block";
+        toggleBtn.textContent = "Afficher moins";
+      } else {
+        hiddenDiv.style.display = "none";
+        toggleBtn.textContent = "Afficher plus";
+      }
+    });
+
+    calendarListDiv.appendChild(hiddenDiv);
+    calendarListDiv.appendChild(toggleBtn);
+  }
+}
+
 // === Initialisation de la page d'accueil avec les données de l'utilisateur ===
 //
 //
@@ -57,12 +108,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     // === La liste des calendriers ===
     const calendarListDiv = document.querySelector(".calendars-list");
     if (calendarListDiv) {
-      const MAX_VISIBLE = 4; // Nombre de calendriers visibles
-      const hiddenDiv = document.createElement("div");
-      hiddenDiv.classList.add("hidden-calendars");
-      hiddenDiv.style.display = "none"; // Caché par défaut
-
-      allData.calendars.forEach((cal, index) => {
+      // Boucle sur tous les calendriers pour créer les éléments
+      allData.calendars.forEach((cal) => {
         const calDiv = document.createElement("div");
         calDiv.classList.add("event-item");
         calDiv.dataset.id = cal._id;
@@ -86,6 +133,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         titleSpan.classList.add("event-title");
         titleSpan.textContent = cal.title;
         titleSpan.dataset.calendarId = cal._id;
+
         const timeSpan = document.createElement("div");
         timeSpan.classList.add("event-time");
 
@@ -99,41 +147,17 @@ document.addEventListener("DOMContentLoaded", async function () {
         deleteBtn.classList.add("btn-icon", "delete-btn");
         deleteBtn.dataset.id = cal._id;
         deleteBtn.title = "Supprimer";
-        deleteBtn.innerHTML = `
-            <i class="fas fa-trash-alt"></i>
-
-        `;
+        deleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i>`;
 
         calDiv.appendChild(leftDiv);
         calDiv.appendChild(deleteBtn);
 
-        // Ajouter dans la liste visible ou cachée
-        if (index < MAX_VISIBLE) {
-          calendarListDiv.appendChild(calDiv);
-        } else {
-          hiddenDiv.appendChild(calDiv);
-        }
+        // Ajout direct dans la liste
+        calendarListDiv.appendChild(calDiv);
       });
 
-      // Si il y a plus de MAX_VISIBLE calendriers, ajout du bouton "Afficher plus"
-      if (allData.calendars.length > MAX_VISIBLE) {
-        const toggleBtn = document.createElement("button");
-        toggleBtn.classList.add("btn", "btn-secondary", "btn-full");
-        toggleBtn.textContent = "Afficher plus";
-
-        toggleBtn.addEventListener("click", () => {
-          if (hiddenDiv.style.display === "none") {
-            hiddenDiv.style.display = "block";
-            toggleBtn.textContent = "Afficher moins";
-          } else {
-            hiddenDiv.style.display = "none";
-            toggleBtn.textContent = "Afficher plus";
-          }
-        });
-
-        calendarListDiv.appendChild(hiddenDiv);
-        calendarListDiv.appendChild(toggleBtn);
-      }
+      // Appel de la fonction qui gère la limite à 4 et le bouton "Afficher plus / moins"
+      renderCalendarListUI(calendarListDiv);
     }
   } catch (err) {
     showMessage("Impossible de charger votre calendrier", "error");
@@ -286,6 +310,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       const titleInput = document.getElementById("newCalendarTitle");
       const title = titleInput.value.trim();
+      if (!title) return showMessage("Veuillez saisir un titre", "error");
 
       try {
         const res = await fetch("/user/calendar/create", {
@@ -296,18 +321,105 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
 
         const data = await res.json();
+        if (!res.ok) return showMessage(data.error, "error");
 
-        if (!res.ok) {
-          showMessage(data.error, "error");
-          return;
-        }
-
-        // Succès on peut fermer le modal et actualiser la liste
+        // --- Succès ---
+        showMessage(data.message, "success");
         newCalendarModal.classList.add("hidden");
         newCalendarForm.reset();
-        showMessage(data.message, "success");
-        // Rafraîchit la page ou recharge la liste des calendriers
-        location.reload();
+
+        const calendarListDiv = document.querySelector(".calendars-list");
+        if (!calendarListDiv) return;
+
+        const MAX_VISIBLE = 4;
+        const allVisible = calendarListDiv.querySelectorAll(".event-item");
+        let hiddenDiv = calendarListDiv.querySelector(".hidden-calendars");
+
+        // Crée hiddenDiv si nécessaire
+        if (!hiddenDiv) {
+          hiddenDiv = document.createElement("div");
+          hiddenDiv.classList.add("hidden-calendars");
+          hiddenDiv.style.display = "none";
+          calendarListDiv.appendChild(hiddenDiv);
+        }
+
+        const cal = data.calendar;
+
+        // --- Création du nouvel élément calendrier ---
+        const calDiv = document.createElement("div");
+        calDiv.classList.add("event-item");
+        calDiv.dataset.id = cal._id;
+
+        const leftDiv = document.createElement("div");
+        leftDiv.classList.add("event-left");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = false;
+        checkbox.value = cal._id;
+
+        const colorDiv = document.createElement("div");
+        colorDiv.classList.add("calendar-color");
+        colorDiv.style.background = cal.color || "#ccc";
+
+        const titleDiv = document.createElement("div");
+        titleDiv.classList.add("event-info");
+
+        const titleSpan = document.createElement("div");
+        titleSpan.classList.add("event-title");
+        titleSpan.textContent = cal.title;
+        titleSpan.dataset.calendarId = cal._id;
+
+        const timeSpan = document.createElement("div");
+        timeSpan.classList.add("event-time");
+
+        titleDiv.appendChild(titleSpan);
+        titleDiv.appendChild(timeSpan);
+        leftDiv.appendChild(checkbox);
+        leftDiv.appendChild(colorDiv);
+        leftDiv.appendChild(titleDiv);
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.classList.add("btn-icon", "delete-btn");
+        deleteBtn.dataset.id = cal._id;
+        deleteBtn.title = "Supprimer";
+        deleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i>`;
+
+        // --- Écouteur suppression ---
+        deleteBtn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          const confirmed = await showConfirm(
+            `Voulez-vous vraiment supprimer ce calendrier : ${cal.title} ?`
+          );
+          if (!confirmed) return;
+
+          try {
+            const resDel = await fetch(`/user/calendar/delete/${cal._id}`, {
+              method: "DELETE",
+              credentials: "include",
+            });
+            const dataDel = await resDel.json();
+            if (!resDel.ok) return showMessage(dataDel.error, "error");
+
+            calDiv.remove();
+            showMessage(dataDel.message, "success");
+          } catch {
+            showMessage("Erreur serveur lors de la suppression", "error");
+          }
+        });
+
+        calDiv.appendChild(leftDiv);
+        calDiv.appendChild(deleteBtn);
+
+        // --- Ajout dans la liste visible ou cachée ---
+        if (allVisible.length < MAX_VISIBLE) {
+          calendarListDiv.appendChild(calDiv);
+        } else {
+          hiddenDiv.appendChild(calDiv);
+        }
+
+        // --- Mise à jour du bouton "Afficher plus / moins" ---
+        renderCalendarListUI(calendarListDiv);
       } catch (err) {
         console.error(err);
         showMessage("Erreur serveur, réessayez plus tard.", "error");
