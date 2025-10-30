@@ -3,7 +3,7 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 const connectDB = require('./models/connexionDB');
 const dotenv = require('dotenv');
-const authRoutes = require('./routes/authRoutes');
+const routes = require('./routes/Routes');
 
 dotenv.config();
 
@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Utilisation du routeur
-app.use('/', authRoutes);
+app.use('/', routes);
 
 
 

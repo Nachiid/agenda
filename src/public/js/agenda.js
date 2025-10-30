@@ -37,11 +37,6 @@ function addActiveCalendarIdLocal(id) {
 function removeActiveCalendarIdLocal(id) {
   let ids = getActiveCalendarIdsLocal();
   ids = ids.filter((i) => i !== id);
-
-  if (ids.length === 0) {
-    return;
-  }
-
   setActiveCalendarIdsLocal(ids);
 }
 
@@ -152,7 +147,7 @@ function renderCalendarListUI(calendarListDiv) {
 /**
  * Crée un element dans la list des calendriers
  */
-function createCalendarElement(cal) {
+function createCalendarElement(cal, calendar) {
   const calendarListDiv = document.querySelector(".calendars-list");
   if (!calendarListDiv) return;
 
@@ -164,9 +159,64 @@ function createCalendarElement(cal) {
   const leftDiv = document.createElement("div");
   leftDiv.classList.add("event-left2");
 
+  // Création de la checkbox
   const checkbox = document.createElement("input");
   checkbox.type = "checkbox";
   checkbox.checked = false;
+
+  // Écouteur pour la sélection d'un calendrier
+  checkbox.addEventListener("change", async (e) => {
+    const selectedCheckbox = e.target;
+    const calDiv = selectedCheckbox.closest(".event-item2");
+    if (!calDiv) return;
+
+    const calendarId = calDiv.dataset.id;
+
+    if (!selectedCheckbox.checked) {
+      // Si on décoche, on ne fait rien a part gerer local pour le test (SPRINT 2)
+      let activeIds = getActiveCalendarIdsLocal();
+      if (activeIds.includes(calendarId)) {
+        removeActiveCalendarIdLocal(calendarId);
+      }
+      return;
+    }
+
+    try {
+      // Récupère les données du calendrier sélectionné
+      const res = await fetch(`/user/agenda/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ calendarId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        showMessage(
+          data.error || "Erreur lors du chargement du calendrier",
+          "error"
+        );
+        selectedCheckbox.checked = false;
+        return;
+      }
+
+      // Met à jour l'affichage du calendrier
+      updateCalendarView(data.calendar, calendar);
+      // Met à jour la liste des IDs actifs
+      setActiveCalendarIdsLocal([calendarId]);
+      // Met à jour les cases à cocher pour refléter la sélection
+      updateCalendarCheckboxes(getActiveCalendarIdsLocal());
+
+      showMessage("Calendrier sélectionné avec succès", "success");
+    } catch (err) {
+      console.error(err);
+      showMessage("Erreur serveur, réessayez plus tard.", "error");
+      selectedCheckbox.checked = false;
+    }
+  });
+
+  // Ajouter la checkbox au DOM
   leftDiv.appendChild(checkbox);
 
   const colorDiv = document.createElement("div");
@@ -253,6 +303,39 @@ function createCalendarElement(cal) {
       showMessage(data.message, "success");
     } catch (err) {
       showMessage(data.error, "error");
+    }
+
+    // --- Gérer le localStorage ---
+    let activeIds = getActiveCalendarIdsLocal();
+    if (activeIds.includes(calendarId)) {
+      removeActiveCalendarIdLocal(calendarId);
+    }
+
+    if (getActiveCalendarIdsLocal().length === 0) {
+      // Récupérer le premier calendrier restant dans la liste
+      const firstCalendarDiv = document.querySelector(".event-item2");
+      if (firstCalendarDiv) {
+        const newCalendarId = firstCalendarDiv.dataset.id;
+        setActiveCalendarIdsLocal([newCalendarId]);
+
+        // Récupérer les données du nouveau calendrier
+        const resNew = await fetch(`/user/agenda/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ calendarId: newCalendarId }),
+        });
+        const dataNew = await resNew.json();
+        if (resNew.ok && dataNew.calendar) {
+          updateCalendarView(dataNew.calendar, calendar);
+          updateCalendarCheckboxes(getActiveCalendarIdsLocal());
+        }
+      } else {
+        // Aucun calendrier restant → erreur cas impossible
+        console.error(
+          "Le formulaire ou la modale de calendrier est introuvable."
+        );
+      }
     }
   });
 
@@ -367,7 +450,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // --- Charger les calendriers de l'utilisateur ---
   const activeIds = getActiveCalendarIdsLocal();
-  console.log(activeIds[0]);
   if (activeIds.length === 0) {
     // On recupere le calendrier par default
     try {
@@ -387,7 +469,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       if (data.calendar) {
         updateCalendarView(data.calendar, calendar);
-        showMessage("Calendrier chargé avec succès", "success");
+        showMessage("Calendrier par default chargé avec succès", "success");
       } else {
         showMessage(data.error || "Aucun calendrier trouvé", "error");
       }
@@ -441,7 +523,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (calendarListDiv) {
       // Boucle sur tous les calendriers pour créer les éléments
       allData.calendars.forEach((cal) => {
-        createCalendarElement(cal);
+        createCalendarElement(cal, calendar);
       });
 
       // Appel de la fonction qui gère la limite à 4 et le bouton "Afficher plus / moins"
@@ -598,7 +680,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const cal = data.calendar;
 
         // --- Création du nouvel élément calendrier ---
-        createCalendarElement(cal);
+        createCalendarElement(cal, calendar);
         // --- Mise à jour du bouton "Afficher plus / moins" ---
         renderCalendarListUI(calendarListDiv);
       } catch (err) {
@@ -607,56 +689,4 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     });
   }
-  // Écouteur global sur toutes les checkboxes
-  document
-    .querySelectorAll(".event-item2 input[type='checkbox']")
-    .forEach((checkbox) => {
-      checkbox.addEventListener("change", async (e) => {
-        const selectedCheckbox = e.target;
-        const calDiv = selectedCheckbox.closest(".event-item2");
-        if (!calDiv) return;
-
-        const calendarId = calDiv.dataset.id;
-
-        if (!selectedCheckbox.checked) {
-          // Si on décoche la checkbox, on ne fait rien - SPRINT 2 on ne fais plus affichage de la de la calendrier concernée
-          return;
-        }
-        try {
-          // Récupère les données du calendrier sélectionné
-          const res = await fetch(`/user/agenda/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ calendarId }),
-          });
-
-          const data = await res.json();
-
-          if (!res.ok) {
-            showMessage(
-              data.error || "Erreur lors du chargement du calendrier",
-              "error"
-            );
-            selectedCheckbox.checked = false;
-            return;
-          }
-
-          // Met à jour l'affichage du calendrier
-          updateCalendarView(data.calendar, calendar);
-
-          // Met à jour la liste des IDs actifs * Normalement on vas utiliser add/remove SPRINT 2
-          setActiveCalendarIdsLocal([calendarId]);
-
-          // Décoche toutes les autres checkboxes
-          updateCalendarCheckboxes(getActiveCalendarIdsLocal());
-
-          showMessage("Calendrier sélectionné avec succès", "success");
-        } catch (err) {
-          console.error(err);
-          showMessage("Erreur serveur, réessayez plus tard.", "error");
-          selectedCheckbox.checked = false;
-        }
-      });
-    });
 });
