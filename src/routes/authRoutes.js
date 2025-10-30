@@ -41,6 +41,7 @@ router.put('/user/password', auth, userController.changePassword);
 router.delete('/user/profile', auth, userController.supprimerProfile);
 
 router.get('/user/agenda', auth,  calendarController.showFirstCalendar);
+router.post('/user/agenda', auth,  calendarController.showCalendar);
 router.get('/agenda', auth, (req, res) => {
     res.sendFile(path.join(__dirname, '../views/agenda.html'));
 });

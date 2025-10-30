@@ -209,7 +209,7 @@ exports.updateCalendarTitle = async function (userId, calendarId, newTitle) {
         { $set: { title: newTitle } },
         { new: true }
     );
-    return updatedCalendar;
+    return updatedCalendar._id;
 };
 
 /**

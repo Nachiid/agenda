@@ -15,6 +15,13 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
+    <!-- Tippy.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+
+    <!-- Tippy.js JS -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.js"></script>
   </head>
@@ -69,7 +76,7 @@
         <div class="nav-links">
           <a href="agenda" class="nav-link active">Agenda</a>
           <a href="/profile" class="nav-link">Profil</a>
-          <button onclick="logout()">Se déconnecter</button>
+          <button class="nav-link" onclick="logout()">Se déconnecter</button>
         </div>
       </div>
     </nav>
@@ -137,11 +144,6 @@
       <!-- Zone principale (calendrier à droite) -->
       <main class="main-content">
         <div class="calendar-header">
-          <div class="calendar-nav">
-            <button class="btn-icon" id="btnPrevMonth">◀</button>
-            <button class="btn btn-secondary" id="btnToday">Aujourd'hui</button>
-            <button class="btn-icon" id="btnNextMonth">▶</button>
-          </div>
           <h1 class="calendar-title"></h1>
         </div>
         <div id="calendar"></div>

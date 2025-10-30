@@ -1,14 +1,114 @@
 /**
+ * Met à jour le data-attribute avec la liste d'IDs
+ */
+function setActiveCalendarIdsLocal(ids) {
+  if (!Array.isArray(ids)) ids = [ids];
+  localStorage.setItem("activeCalendars", JSON.stringify(ids));
+}
+
+/**
+ * Recupere les id des calendriers actifs
+ */
+function getActiveCalendarIdsLocal() {
+  const data = localStorage.getItem("activeCalendars");
+  if (!data) return [];
+  try {
+    return JSON.parse(data);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Ajoute un ID à la liste des calendriers actifs
+ */
+function addActiveCalendarIdLocal(id) {
+  const ids = getActiveCalendarIdsLocal();
+  if (!ids.includes(id)) ids.push(id);
+  setActiveCalendarIdsLocal(ids);
+}
+
+/**
+ * Supprime un ID de la liste des calendriers actifs
+ * S'assure qu'il reste au moins un ID actif
+ * *****************************************
+ * Sprint 2
+ */
+function removeActiveCalendarIdLocal(id) {
+  let ids = getActiveCalendarIdsLocal();
+  ids = ids.filter((i) => i !== id);
+
+  if (ids.length === 0) {
+    return;
+  }
+
+  setActiveCalendarIdsLocal(ids);
+}
+
+/**
+ * Met à jour l'affichage du calendrier avec un nouveau jeu de données
+ */
+function updateCalendarView(calendarData, calendar) {
+  if (!calendarData || !calendar) return;
+
+  try {
+    // --- Met à jour le titre du calendrier ---
+    const titleDiv = document.querySelector(".calendar-title");
+    if (titleDiv) {
+      titleDiv.textContent = calendarData.title || "Sans titre";
+
+      // Ajoute ce calendrier à la liste des actifs
+      setActiveCalendarIdsLocal([calendarData._id]);
+      //Normalement on doit utiliser add mais c pour sprint 2
+      //addActiveCalendarIdLocal(calendarData._id);
+    }
+
+    // --- Réinitialise les événements actuels ---
+    calendar.removeAllEvents();
+
+    // Prépare et ajoute les nouveaux événements
+    if (Array.isArray(calendarData.appointments)) {
+      const events = calendarData.appointments.map((r) => ({
+        id: r._id,
+        title: r.name,
+        start: r.date_debut,
+        end: r.date_fin,
+        backgroundColor: calendarData.color,
+        borderColor: calendarData.color,
+        textColor: "#fff",
+        extendedProps: { description: r.description || "" },
+        display: "auto",
+      }));
+
+      events.forEach((ev) => calendar.addEvent(ev));
+    }
+
+    // --- Rendu final ---
+    calendar.render();
+  } catch (err) {
+    showMessage("Erreur lors de la mise à jour du calendrier", "error");
+    console.error(err);
+  }
+}
+
+/**
  * Gère l'affichage des calendriers avec max 4 visibles et un bouton "Afficher plus / moins"
  */
 function renderCalendarListUI(calendarListDiv) {
   const MAX_VISIBLE = 4;
 
+  // Récupère tous les items
   const allItems = Array.from(calendarListDiv.querySelectorAll(".event-item2"));
 
   // Retirer tout hiddenDiv et toggleBtn existants
   const existingHidden = calendarListDiv.querySelector(".hidden-calendars");
-  if (existingHidden) existingHidden.remove();
+  if (existingHidden) {
+    // Déplace les enfants vers calendarListDiv pour ne rien perdre
+    while (existingHidden.firstChild) {
+      calendarListDiv.appendChild(existingHidden.firstChild);
+    }
+    existingHidden.remove();
+  }
   const existingToggle = calendarListDiv.querySelector(".btn-toggle-hidden");
   if (existingToggle) existingToggle.remove();
 
@@ -49,60 +149,291 @@ function renderCalendarListUI(calendarListDiv) {
   }
 }
 
-// === Initialisation de la page d'accueil avec les données de l'utilisateur ===
-//
-//
-//
+/**
+ * Crée un element dans la list des calendriers
+ */
+function createCalendarElement(cal) {
+  const calendarListDiv = document.querySelector(".calendars-list");
+  if (!calendarListDiv) return;
+
+  const calDiv = document.createElement("div");
+  calDiv.classList.add("event-item2");
+  calDiv.dataset.id = cal._id;
+
+  // Partie gauche
+  const leftDiv = document.createElement("div");
+  leftDiv.classList.add("event-left2");
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = false;
+  leftDiv.appendChild(checkbox);
+
+  const colorDiv = document.createElement("div");
+  colorDiv.classList.add("calendar-color");
+  colorDiv.style.background = cal.color || "#ccc";
+  leftDiv.appendChild(colorDiv);
+
+  const titleDiv = document.createElement("div");
+  titleDiv.classList.add("event-info2");
+
+  const titleSpan = document.createElement("div");
+  titleSpan.classList.add("event-title2");
+  titleSpan.textContent = cal.title;
+  titleDiv.appendChild(titleSpan);
+  leftDiv.appendChild(titleDiv);
+
+  calDiv.appendChild(leftDiv);
+
+  // --- Bouton modifier ---
+  const editBtn = document.createElement("button");
+  editBtn.classList.add("btn-icon", "edit-btn-cal");
+  editBtn.title = "Modifier";
+  editBtn.innerHTML = `<i class="fas fa-pen"></i>`;
+  calDiv.appendChild(editBtn);
+
+  document.addEventListener("click", (e) => {
+    const editBtn = e.target.closest(".edit-btn-cal");
+    if (!editBtn) return;
+
+    const calDiv = editBtn.closest(".event-item2");
+    const calendarId = calDiv?.dataset.id;
+
+    const calendarModal = document.getElementById("calendarModal");
+    const calendarForm = document.getElementById("calendarForm");
+    const titleInput = document.getElementById("calendarTitle");
+
+    if (!calendarModal || !calendarForm || !titleInput) {
+      console.error(
+        "Le formulaire ou la modale de calendrier est introuvable."
+      );
+      return;
+    }
+
+    // Afficher la modale
+    calendarModal.classList.remove("hidden");
+
+    // Stocker temporairement l'ID dans la modale pour savoir quoi modifier
+    calendarForm.dataset.editingId = calendarId;
+  });
+
+  // --- Bouton supprimer ---
+  const deleteBtn = document.createElement("button");
+  deleteBtn.classList.add("btn-icon", "delete-btn-cal");
+  deleteBtn.title = "Supprimer";
+  deleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i>`;
+  calDiv.appendChild(deleteBtn);
+
+  // --- Événement de suppression ---
+  deleteBtn.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    const button = e.target.closest("button.delete-btn-cal");
+    if (!button) return;
+
+    const calendarId = calDiv.dataset.id;
+
+    const confirmed = await showConfirm(
+      `Voulez-vous vraiment supprimer ce calendrier ?`
+    );
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/user/calendar/delete/${calendarId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showMessage(data.error, "error");
+        return;
+      }
+
+      button.closest(".event-item2").remove();
+      renderCalendarListUI(calendarListDiv);
+      showMessage(data.message, "success");
+    } catch (err) {
+      showMessage(data.error, "error");
+    }
+  });
+
+  calendarListDiv.appendChild(calDiv);
+}
+
+/**
+ * Met à jour les cases à cocher des calendriers
+ * en fonction des IDs stockés dans le localStorage
+ */
+function updateCalendarCheckboxes() {
+  const selectedIds = getActiveCalendarIdsLocal();
+
+  const allCheckboxes = document.querySelectorAll(
+    ".event-item2 input[type='checkbox']"
+  );
+
+  allCheckboxes.forEach((checkbox) => {
+    const parentDiv = checkbox.closest(".event-item2");
+    if (!parentDiv) return;
+
+    const calendarId = parentDiv.dataset.id;
+    checkbox.checked = selectedIds.includes(calendarId);
+  });
+}
+
+/**  === Initialisation de la page d'accueil avec les données de l'utilisateur ===
+ */
 
 document.addEventListener("DOMContentLoaded", async function () {
   // === Initialisation du calendrier ===
   const calendarEl = document.getElementById("calendar");
   const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: "dayGridMonth",
+    initialView: "timeGridWeek", // Vue principale : semaine horaire
+    allDaySlot: false, // pas de créneaux "toute la journée"
+    slotEventOverlap: false, // interdit chevauchement visuel
+    eventOverlap: false, // interdit drag & drop sur événements chevauchants
+    eventOrder: "start,-duration", // tri par début, puis durée
     locale: "fr",
+    themeSystem: "standard",
+    nowIndicator: true,
+    slotMinTime: "07:00:00",
+    slotMaxTime: "20:00:00",
+    slotDuration: "00:30:00",
+    slotLabelInterval: "01:00",
+    slotLabelFormat: { hour: "2-digit", minute: "2-digit", hour12: false },
+
     headerToolbar: {
       left: "prev,next today",
       center: "title",
       right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
     },
+
     navLinks: true,
     selectable: true,
     editable: true,
+    dayMaxEvents: true,
+    height: "auto",
+    eventTimeFormat: { hour: "2-digit", minute: "2-digit", hour12: false },
+
+    // Événements dynamiques
     events: [],
+
+    // Tooltip pro avec tippy.js
+    eventDidMount: function (info) {
+      const isListView = info.view.type.startsWith("list");
+
+      if (isListView) {
+        // Garder le background color mais rendre le texte de l'heure noir
+        info.el.style.backgroundColor = info.event.backgroundColor;
+        info.el.style.borderColor = info.event.borderColor;
+
+        const timeEl = info.el.querySelector(".fc-list-event-time");
+        if (timeEl) timeEl.style.color = "#000"; // heure en noir
+
+        const titleEl = info.el.querySelector(".fc-list-event-title");
+        if (titleEl) titleEl.style.color = "#fff"; // titre en blanc
+      } else {
+        // vues grid/time → texte blanc complet
+        info.el.style.backgroundColor = info.event.backgroundColor;
+        info.el.style.borderColor = info.event.borderColor;
+        info.el.style.color = "#fff";
+      }
+
+      // Tooltip pro sur hover
+      tippy(info.el, {
+        content: info.event.extendedProps.description || info.event.title,
+        placement: "top",
+        theme: "light",
+      });
+    },
+
+    // Clic sur un événement
+    eventClick: function (info) {
+      // youness event SPRINT 2
+      console.log(info.event.title, info.event.start, info.event.extendedProps);
+    },
+
+    // Ajuste la couleur des événements en fonction du calendrier
+    eventContent: function (arg) {
+      const backgroundColor = arg.event.backgroundColor || "#4f46e5";
+      const textColor = "#fff";
+
+      return {
+        html: `<div class="fc-event-custom" style="background:${backgroundColor};color:${textColor};padding:2px 5px;border-radius:5px;">
+                ${arg.event.title}
+             </div>`,
+      };
+    },
   });
   calendar.render();
 
   // --- Charger les calendriers de l'utilisateur ---
-  try {
-    const res = await fetch("/user/agenda", { credentials: "include" });
-    if (!res.ok) throw new Error("Erreur récupération calendrier");
-    const data = await res.json();
-    const calendarData = data.calendar;
+  const activeIds = getActiveCalendarIdsLocal();
+  console.log(activeIds[0]);
+  if (activeIds.length === 0) {
+    // On recupere le calendrier par default
+    try {
+      const res = await fetch("/user/agenda", {
+        method: "GET",
+        credentials: "include",
+      });
 
-    // --- Affiche le titre du calendrier ---
-    if (calendarData) {
-      const titleDiv = document.querySelector(".calendar-title");
-      if (titleDiv) {
-        titleDiv.textContent = calendarData.title;
-        titleDiv.dataset.calendarId = calendarData._id;
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(
+          `Erreur récupération calendrier : ${res.status} - ${errText}`
+        );
       }
 
-      // --- Affiche les événements du calendrier ---
-      const events = calendarData.appointments.map((r) => ({
-        id: r._id,
-        title: r.name,
-        start: r.date_debut,
-        end: r.date_fin,
-        color: calendarData.color,
-        extendedProps: { description: r.description || "" },
-      }));
+      const data = await res.json();
 
-      events.forEach((ev) => calendar.addEvent(ev));
+      if (data.calendar) {
+        updateCalendarView(data.calendar, calendar);
+        showMessage("Calendrier chargé avec succès", "success");
+      } else {
+        showMessage(data.error || "Aucun calendrier trouvé", "error");
+      }
+    } catch (err) {
+      showMessage(
+        "Impossible de charger votre calendrier - Update View",
+        "error"
+      );
+    }
+  } else {
+    // On recupere les calendriers actifs
+    const calendarId = activeIds[0]; // pour l’instant, on affiche que le premier => SPRINT 2
+    try {
+      const res = await fetch(`/user/agenda`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ calendarId }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        return showMessage(
+          data.error || "Impossible de charger votre calendrier actif",
+          "error"
+        );
+      }
+
+      updateCalendarView(data.calendar, calendar);
+      updateCalendarCheckboxes(activeIds);
+    } catch (err) {
+      console.error(err);
+      showMessage("Erreur lors du chargement du calendrier actif", "error");
+    }
+  }
+  try {
+    // --- Récupération de tous les calendriers ---
+    const allRes = await fetch("/user/calendars", {
+      method: "GET",
+      credentials: "include",
+    });
+    if (!allRes.ok) {
+      showMessage("Erreur récupération des calendriers", "error");
+      return;
     }
 
-    // --- Récupération de tous les calendriers ---
-    const allRes = await fetch("/user/calendars", { credentials: "include" });
-    if (!allRes.ok) throw new Error("Erreur récupération des calendriers");
     const allData = await allRes.json();
 
     // === La liste des calendriers ===
@@ -110,59 +441,16 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (calendarListDiv) {
       // Boucle sur tous les calendriers pour créer les éléments
       allData.calendars.forEach((cal) => {
-        const calDiv = document.createElement("div");
-        calDiv.classList.add("event-item2");
-        calDiv.dataset.id = cal._id;
-
-        // Partie gauche : checkbox + couleur + titre
-        const leftDiv = document.createElement("div");
-        leftDiv.classList.add("event-left2");
-
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.checked = cal._id === calendarData._id;
-        checkbox.value = cal._id;
-
-        const colorDiv = document.createElement("div");
-        colorDiv.classList.add("calendar-color");
-        colorDiv.style.background = cal.color;
-
-        const titleDiv = document.createElement("div");
-        titleDiv.classList.add("event-info2");
-        const titleSpan = document.createElement("div");
-        titleSpan.classList.add("event-title2");
-        titleSpan.textContent = cal.title;
-        titleSpan.dataset.calendarId = cal._id;
-
-        const timeSpan = document.createElement("div");
-        timeSpan.classList.add("event-time2");
-
-        titleDiv.appendChild(titleSpan);
-        titleDiv.appendChild(timeSpan);
-        leftDiv.appendChild(checkbox);
-        leftDiv.appendChild(colorDiv);
-        leftDiv.appendChild(titleDiv);
-
-        const deleteBtn = document.createElement("button");
-        deleteBtn.classList.add("btn-icon", "delete-btn-cal");
-        deleteBtn.dataset.id = cal._id;
-        deleteBtn.title = "Supprimer";
-        deleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i>`;
-
-        calDiv.appendChild(leftDiv);
-        calDiv.appendChild(deleteBtn);
-
-        // Ajout direct dans la liste
-        calendarListDiv.appendChild(calDiv);
+        createCalendarElement(cal);
       });
 
       // Appel de la fonction qui gère la limite à 4 et le bouton "Afficher plus / moins"
+      updateCalendarCheckboxes(getActiveCalendarIdsLocal());
       renderCalendarListUI(calendarListDiv);
     }
   } catch (err) {
     showMessage("Impossible de charger votre calendrier", "error");
   }
-
   // === Gestion des Popups ===
   //
   //
@@ -226,8 +514,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       const newTitle = document.getElementById("calendarTitle").value.trim();
 
+      //modif le bouton s'affiche que si 1 seul calendrier est actif a faire apres
       const calendarId =
-        document.querySelector(".calendar-title").dataset.calendarId;
+        calendarForm.dataset.editingId || getActiveCalendarIdsLocal()[0];
 
       const confirmed = await showConfirm(
         `Confirmer le changement du titre en "${newTitle}" ?`
@@ -250,12 +539,20 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
 
         // Met à jour le titre dans le DOM
-        document.querySelector(".calendar-title").textContent = newTitle;
-        document.querySelector(".calendar-title").textContent = newTitle;
-        const titleSpan = document.querySelector(
-          `.event-title2[data-calendar-id="${calendarId}"]`
+
+        if (data._id === getActiveCalendarIdsLocal()[0]) {
+          document.querySelector(".calendar-title").textContent = newTitle;
+        }
+        // Récupère la div parent qui correspond au calendrier
+        const parentDiv = document.querySelector(
+          `.event-item2[data-id="${calendarId}"]`
         );
-        titleSpan.textContent = newTitle;
+        if (parentDiv) {
+          const titleSpan = parentDiv.querySelector(".event-title2");
+          if (titleSpan) {
+            titleSpan.textContent = newTitle;
+          }
+        }
 
         const newCalendarModal = document.getElementById("newCalendarModal");
         const CalendarForm = document.getElementById("newCalendarForm");
@@ -269,39 +566,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.error(err);
         showMessage("Erreur serveur, réessayez plus tard", "error");
       }
-    });
-
-    // === Écouteur de suppression d'un calendrier===
-    document.querySelectorAll(".delete-btn-cal").forEach((btn) => {
-      btn.addEventListener("click", async (e) => {
-        e.stopPropagation();
-        const button = e.target.closest("button.delete-btn-cal");
-        if (!button) return;
-
-        const calendarId = button.dataset.id;
-
-        const confirmed = await showConfirm(
-          `Voulez-vous vraiment supprimer ce calendrier ?`
-        );
-        if (!confirmed) return;
-
-        try {
-          const res = await fetch(`/user/calendar/delete/${calendarId}`, {
-            method: "DELETE",
-            credentials: "include",
-          });
-          const data = await res.json();
-          if (!res.ok) {
-            showMessage(data.error, "error");
-            return;
-          }
-
-          button.closest(".event-item2").remove();
-          showMessage(data.message, "success");
-        } catch (err) {
-          showMessage(data.error, "error");
-        }
-      });
     });
 
     // Quand on clique sur "Créer"
@@ -331,93 +595,10 @@ document.addEventListener("DOMContentLoaded", async function () {
         const calendarListDiv = document.querySelector(".calendars-list");
         if (!calendarListDiv) return;
 
-        const MAX_VISIBLE = 4;
-        const allVisible = calendarListDiv.querySelectorAll(".event-item2");
-        let hiddenDiv = calendarListDiv.querySelector(".hidden-calendars");
-
-        // Crée hiddenDiv si nécessaire
-        if (!hiddenDiv) {
-          hiddenDiv = document.createElement("div");
-          hiddenDiv.classList.add("hidden-calendars");
-          hiddenDiv.style.display = "none";
-          calendarListDiv.appendChild(hiddenDiv);
-        }
-
         const cal = data.calendar;
 
         // --- Création du nouvel élément calendrier ---
-        const calDiv = document.createElement("div");
-        calDiv.classList.add("event-item2");
-        calDiv.dataset.id = cal._id;
-
-        const leftDiv = document.createElement("div");
-        leftDiv.classList.add("event-left2");
-
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.checked = false;
-        checkbox.value = cal._id;
-
-        const colorDiv = document.createElement("div");
-        colorDiv.classList.add("calendar-color");
-        colorDiv.style.background = cal.color || "#ccc";
-
-        const titleDiv = document.createElement("div");
-        titleDiv.classList.add("event-info2");
-
-        const titleSpan = document.createElement("div");
-        titleSpan.classList.add("event-title2");
-        titleSpan.textContent = cal.title;
-        titleSpan.dataset.calendarId = cal._id;
-
-        const timeSpan = document.createElement("div");
-        timeSpan.classList.add("event-time2");
-
-        titleDiv.appendChild(titleSpan);
-        titleDiv.appendChild(timeSpan);
-        leftDiv.appendChild(checkbox);
-        leftDiv.appendChild(colorDiv);
-        leftDiv.appendChild(titleDiv);
-
-        const deleteBtn = document.createElement("button");
-        deleteBtn.classList.add("btn-icon", "delete-btn-cal");
-        deleteBtn.dataset.id = cal._id;
-        deleteBtn.title = "Supprimer";
-        deleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i>`;
-
-        // --- Écouteur suppression ---
-        deleteBtn.addEventListener("click", async (e) => {
-          e.stopPropagation();
-          const confirmed = await showConfirm(
-            `Voulez-vous vraiment supprimer ce calendrier : ${cal.title} ?`
-          );
-          if (!confirmed) return;
-
-          try {
-            const resDel = await fetch(`/user/calendar/delete/${cal._id}`, {
-              method: "DELETE",
-              credentials: "include",
-            });
-            const dataDel = await resDel.json();
-            if (!resDel.ok) return showMessage(dataDel.error, "error");
-
-            calDiv.remove();
-            showMessage(dataDel.message, "success");
-          } catch {
-            showMessage("Erreur serveur lors de la suppression", "error");
-          }
-        });
-
-        calDiv.appendChild(leftDiv);
-        calDiv.appendChild(deleteBtn);
-
-        // --- Ajout dans la liste visible ou cachée ---
-        if (allVisible.length < MAX_VISIBLE) {
-          calendarListDiv.appendChild(calDiv);
-        } else {
-          hiddenDiv.appendChild(calDiv);
-        }
-
+        createCalendarElement(cal);
         // --- Mise à jour du bouton "Afficher plus / moins" ---
         renderCalendarListUI(calendarListDiv);
       } catch (err) {
@@ -426,26 +607,56 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     });
   }
+  // Écouteur global sur toutes les checkboxes
+  document
+    .querySelectorAll(".event-item2 input[type='checkbox']")
+    .forEach((checkbox) => {
+      checkbox.addEventListener("change", async (e) => {
+        const selectedCheckbox = e.target;
+        const calDiv = selectedCheckbox.closest(".event-item2");
+        if (!calDiv) return;
 
-  // --- Popup Nouvel Événement ---
-  const btnNewEvent = document.getElementById("btnNewEvent");
-  const eventModal = document.getElementById("eventModal");
-  const btnCancel = document.getElementById("btnCancel");
-  const eventForm = document.getElementById("eventForm");
+        const calendarId = calDiv.dataset.id;
 
-  if (btnNewEvent && eventModal && btnCancel && eventForm) {
-    btnNewEvent.addEventListener("click", () =>
-      eventModal.classList.remove("hidden")
-    );
-    btnCancel.addEventListener("click", () => {
-      eventModal.classList.add("hidden");
-      eventForm.reset();
+        if (!selectedCheckbox.checked) {
+          // Si on décoche la checkbox, on ne fait rien - SPRINT 2 on ne fais plus affichage de la de la calendrier concernée
+          return;
+        }
+        try {
+          // Récupère les données du calendrier sélectionné
+          const res = await fetch(`/user/agenda/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ calendarId }),
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            showMessage(
+              data.error || "Erreur lors du chargement du calendrier",
+              "error"
+            );
+            selectedCheckbox.checked = false;
+            return;
+          }
+
+          // Met à jour l'affichage du calendrier
+          updateCalendarView(data.calendar, calendar);
+
+          // Met à jour la liste des IDs actifs * Normalement on vas utiliser add/remove SPRINT 2
+          setActiveCalendarIdsLocal([calendarId]);
+
+          // Décoche toutes les autres checkboxes
+          updateCalendarCheckboxes(getActiveCalendarIdsLocal());
+
+          showMessage("Calendrier sélectionné avec succès", "success");
+        } catch (err) {
+          console.error(err);
+          showMessage("Erreur serveur, réessayez plus tard.", "error");
+          selectedCheckbox.checked = false;
+        }
+      });
     });
-    eventModal.addEventListener("click", (e) => {
-      if (e.target === eventModal) {
-        eventModal.classList.add("hidden");
-        eventForm.reset();
-      }
-    });
-  }
 });
