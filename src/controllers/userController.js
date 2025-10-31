@@ -23,7 +23,7 @@ exports.register = async (req, res) => {
   if (password !== confirmPassword) {
     return res.status(400).json({ error: "Les mot de passe sont differents" });
   }
-  const userExists = await model.exists(email);
+  const userExists = await model.exists({ email });
 
   if (userExists !== null) {
     return res.status(400).json({ error: "Email déjà utilisé" });

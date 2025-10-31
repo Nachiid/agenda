@@ -1,13 +1,13 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const connectDB = async () => {
   const uri = process.env.MONGO_URI;
   if (!uri) throw new Error("MONGO_URI non défini dans .env !");
   await mongoose.connect(uri, {
-    dbName: 'agenda',
+    dbName: "agenda",
     serverSelectionTimeoutMS: 50000,
   });
-  console.log('MongoDB connectée sur : agenda');
+  console.log("MongoDB connectée sur : agenda");
 };
 
 module.exports = connectDB;

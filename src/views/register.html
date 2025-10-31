@@ -1,113 +1,150 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inscription - Mon Agenda</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="css/global-style.css" />
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <header class="header">
-            <div class="logo">
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="40" height="40" rx="8" fill="#4F46E5"/>
-                    <path d="M12 10H28C29.1046 10 30 10.8954 30 12V28C30 29.1046 29.1046 30 28 30H12C10.8954 30 10 29.1046 10 28V12C10 10.8954 10.8954 10 12 10Z" stroke="white" stroke-width="2"/>
-                    <line x1="10" y1="16" x2="30" y2="16" stroke="white" stroke-width="2"/>
-                    <line x1="16" y1="8" x2="16" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                    <line x1="24" y1="8" x2="24" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-                <a href="/" class="logo-text">Mon Agenda</a>
+      <header class="header">
+        <div class="logo">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 40 40"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect width="40" height="40" rx="8" fill="#4F46E5" />
+            <path
+              d="M12 10H28C29.1046 10 30 10.8954 30 12V28C30 29.1046 29.1046 30 28 30H12C10.8954 30 10 29.1046 10 28V12C10 10.8954 10.8954 10 12 10Z"
+              stroke="white"
+              stroke-width="2"
+            />
+            <line
+              x1="10"
+              y1="16"
+              x2="30"
+              y2="16"
+              stroke="white"
+              stroke-width="2"
+            />
+            <line
+              x1="16"
+              y1="8"
+              x2="16"
+              y2="12"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+            <line
+              x1="24"
+              y1="8"
+              x2="24"
+              y2="12"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+          <a href="/" class="logo-text">Mon Agenda</a>
+        </div>
+      </header>
+
+      <div id="messageBox" class="message-box" style="display: none"></div>
+
+      <main class="form-container">
+        <div class="form-card">
+          <h1 class="form-title">Inscription</h1>
+          <p class="form-subtitle">Créez votre compte gratuitement</p>
+
+          <form id="signupForm" class="form" method="post">
+            <div class="form-group">
+              <label for="firstname" class="form-label">Nom </label>
+              <input
+                type="text"
+                id="firstname"
+                name="firstname"
+                class="form-input"
+                placeholder="Jean"
+                required
+              />
             </div>
-        </header>
-
-    <div id="messageBox" class="message-box" style="display:none;"></div>
-
-        <main class="form-container">
-            <div class="form-card">
-                <h1 class="form-title">Inscription</h1>
-                <p class="form-subtitle">Créez votre compte gratuitement</p>
-
-                <form id="signupForm" class="form" method="post">
-                    <div class="form-group">
-                        <label for="firstname" class="form-label">Nom </label>
-                        <input 
-                            type="text" 
-                            id="firstname" 
-                            name="firstname" 
-                            class="form-input" 
-                            placeholder="Jean"
-                            required
-                        >
-                    </div>
-                    <div class="form-group">
-                        <label for="lastname" class="form-label">prénom </label>
-                        <input 
-                            type="text" 
-                            id="lastname" 
-                            name="lastname" 
-                            class="form-input" 
-                            placeholder=" Dupont"
-                            required
-                        >
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email" class="form-label">Adresse email</label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            name="email" 
-                            class="form-input" 
-                            placeholder="exemple@email.com"
-                            required
-                        >
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password" class="form-label">Mot de passe</label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
-                            class="form-input" 
-                            placeholder="••••••••"
-                            required
-                            minlength="8"
-                        >
-                        <small class="form-hint">Au moins 8 caractères</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="confirmPassword" class="form-label">Confirmer le mot de passe</label>
-                        <input 
-                            type="password" 
-                            id="confirmPassword" 
-                            name="confirmPassword" 
-                            class="form-input" 
-                            placeholder="••••••••"
-                            required>
-                    </div>
-
-
-                    <button type="submit" class="btn btn-primary btn-full">S'inscrire</button>
-                </form>
-
-                <div class="form-footer">
-                    <p>Vous avez déjà un compte ? <a href="login" class="link">Se connecter</a></p>
-                </div>
+            <div class="form-group">
+              <label for="lastname" class="form-label">prénom </label>
+              <input
+                type="text"
+                id="lastname"
+                name="lastname"
+                class="form-input"
+                placeholder=" Dupont"
+                required
+              />
             </div>
-        </main>
 
-        <footer class="footer">
-            <p>&copy; 2025 Mon Agenda. Tous droits réservés.</p>
-        </footer>
+            <div class="form-group">
+              <label for="email" class="form-label">Adresse email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-input"
+                placeholder="exemple@email.com"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="password" class="form-label">Mot de passe</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-input"
+                placeholder="••••••••"
+                required
+                minlength="8"
+              />
+              <small class="form-hint">Au moins 8 caractères</small>
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword" class="form-label"
+                >Confirmer le mot de passe</label
+              >
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                class="form-input"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">
+              S'inscrire
+            </button>
+          </form>
+
+          <div class="form-footer">
+            <p>
+              Vous avez déjà un compte ?
+              <a href="login" class="link">Se connecter</a>
+            </p>
+          </div>
+        </div>
+      </main>
+
+      <footer class="footer">
+        <p>&copy; 2025 Mon Agenda. Tous droits réservés.</p>
+      </footer>
     </div>
     <script src="js/global.js"></script>
     <script src="/js/register.js"></script>
-
-
- 
-</body>
+  </body>
 </html>

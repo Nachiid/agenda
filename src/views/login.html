@@ -1,73 +1,109 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Connexion - Mon Agenda</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="css/global-style.css" />
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <header class="header">
-            <div class="logo">
-              
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="40" height="40" rx="8" fill="#4F46E5"/>
-                    <path d="M12 10H28C29.1046 10 30 10.8954 30 12V28C30 29.1046 29.1046 30 28 30H12C10.8954 30 10 29.1046 10 28V12C10 10.8954 10.8954 10 12 10Z" stroke="white" stroke-width="2"/>
-                    <line x1="10" y1="16" x2="30" y2="16" stroke="white" stroke-width="2"/>
-                    <line x1="16" y1="8" x2="16" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                    <line x1="24" y1="8" x2="24" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-                <a href="../index.html" class="logo-text">Mon Agenda</a>
+      <header class="header">
+        <div class="logo">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 40 40"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect width="40" height="40" rx="8" fill="#4F46E5" />
+            <path
+              d="M12 10H28C29.1046 10 30 10.8954 30 12V28C30 29.1046 29.1046 30 28 30H12C10.8954 30 10 29.1046 10 28V12C10 10.8954 10.8954 10 12 10Z"
+              stroke="white"
+              stroke-width="2"
+            />
+            <line
+              x1="10"
+              y1="16"
+              x2="30"
+              y2="16"
+              stroke="white"
+              stroke-width="2"
+            />
+            <line
+              x1="16"
+              y1="8"
+              x2="16"
+              y2="12"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+            <line
+              x1="24"
+              y1="8"
+              x2="24"
+              y2="12"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+          <a href="../index.html" class="logo-text">Mon Agenda</a>
+        </div>
+      </header>
+
+      <main class="form-container">
+        <div class="form-card">
+          <h1 class="form-title">Connexion</h1>
+          <p class="form-subtitle">Accédez à votre agenda personnel</p>
+
+          <form id="loginForm" class="form" method="post">
+            <div class="form-group">
+              <label for="email" class="form-label">Adresse email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-input"
+                placeholder="exemple@email.com"
+                required
+              />
             </div>
-        </header>
 
-        <main class="form-container">
-            <div class="form-card">
-                <h1 class="form-title">Connexion</h1>
-                <p class="form-subtitle">Accédez à votre agenda personnel</p>
-
-                <form id="loginForm" class="form" method="post">
-                    <div class="form-group">
-                        <label for="email" class="form-label">Adresse email</label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            name="email" 
-                            class="form-input" 
-                            placeholder="exemple@email.com"
-                            required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password" class="form-label">Mot de passe</label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
-                            class="form-input" 
-                            placeholder="••••••••"
-                            required
-                        >
-                    </div>
-
-
-                    <button type="submit" class="btn btn-primary btn-full">Se connecter</button>
-                </form>
-
-                <div class="form-footer">
-                    <p>Vous n'avez pas de compte ? <a href="register" class="link">S'inscrire</a></p>
-                </div>
+            <div class="form-group">
+              <label for="password" class="form-label">Mot de passe</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-input"
+                placeholder="••••••••"
+                required
+              />
             </div>
-        </main>
 
-        <footer class="footer">
-            <p>&copy; 2025 Mon Agenda. Tous droits réservés.</p>
-        </footer>
+            <button type="submit" class="btn btn-primary btn-full">
+              Se connecter
+            </button>
+          </form>
+
+          <div class="form-footer">
+            <p>
+              Vous n'avez pas de compte ?
+              <a href="register" class="link">S'inscrire</a>
+            </p>
+          </div>
+        </div>
+      </main>
+
+      <footer class="footer">
+        <p>&copy; 2025 Mon Agenda. Tous droits réservés.</p>
+      </footer>
     </div>
     <script src="js/global.js"></script>
-	<script src="/js/login.js"></script>
-    
-</body>
+    <script src="/js/login.js"></script>
+  </body>
 </html>
