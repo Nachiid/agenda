@@ -430,7 +430,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Clic sur un événement
     eventClick: function (info) {
-      // youness event SPRINT 2
+      // event SPRINT 2
       console.log(info.event.title, info.event.start, info.event.extendedProps);
     },
 
