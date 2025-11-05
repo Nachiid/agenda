@@ -2,7 +2,7 @@ const model = require("../models/model");
 
 /*
  *
- * user est dans req.user.id pas besoin de const userId = await model.getProfilCal(calendarId); ( on verifie si celui connecté peut faire x pas l'inverse hhhhhhhhhhhhhh 
+ * user est dans req.user.id pas besoin de const userId = await model.getProfilCal(calendarId); ( on verifie si celui connecté peut faire x pas l'inverse hhhhhhhhhhhhhh
  * bug ( n'importe qu'elle user du site vas appartenir a getUserCalendar vus que getProfilCal recupere le user qui a creer cal id ! )
  * *
  *
@@ -169,9 +169,9 @@ exports.updateAppointment = async (req, res) => {
 
 /*
  *
- * s'assurer que c le bon user qui cherche a avoir les rdv donc model.getCalandar(calendarId, userId) donc 
+ * s'assurer que c le bon user qui cherche a avoir les rdv donc model.getCalandar(calendarId, userId) donc
  * il faut methode dans model qui verifie si user a droit de faire updateAppointment a cet calendrier - et donc le controlleur verifie ca avant d'appeler model.updateAppointment
- * 
+ *
  * + recupere les rendez vous de tous les calendiers dans tab et envoie a l'ecouteur
  * *
  * *
@@ -192,13 +192,21 @@ exports.getAppointments = async (req, res) => {
   try {
     const { calendarId } = req.params;
 
-    //model.getCalendar(calendarId, userId)
     const calendar = await model.getCalandar(calendarId);
     if (!calendar) {
       return res.status(404).json({ error: "Calendrier introuvable" });
     }
+    const now = new Date();
+    const upcoming = calendar.appointments.filter(
+      (a) => new Date(a.date_debut) >= now
+    );
+    const sortedAppointments = upcoming.sort(
+      (a, b) => new Date(a.date_debut) - new Date(b.date_debut)
+    );
 
-    return res.status(200).json(calendar.appointments);
+    const firstFive = sortedAppointments.slice(0, 5);
+
+    return res.status(200).json(firstFive);
   } catch (err) {
     console.error("Erreur getAppointments:", err);
     return res.status(500).json({ error: "Erreur serveur" });

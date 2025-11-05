@@ -168,41 +168,47 @@ eventForm.addEventListener("submit", async (e) => {
  * */
 async function fetchAppointments(calendarId) {
   const upcomingEvents = document.getElementById("upcomingEvents");
+  let cpt =0;
   try {
     const res = await fetch(`/appointment/${calendarId}`, {      credentials: "include",
     });
     const data = await res.json();
     upcomingEvents.innerHTML = "";
 
-    data.forEach((evt) => {
-      const start = new Date(evt.date_debut);
-      const end = new Date(evt.date_fin || evt.date_debut);
 
-      const day = start.getDate().toString().padStart(2, "0");
-      const month = start.toLocaleString("fr-FR", { month: "short" });
-      const timeStart = start.toTimeString().slice(0, 5);
-      const timeEnd = end.toTimeString().slice(0, 5);
+    
+        while(cpt < 5){
+            const start = new Date(data[cpt].date_debut);
+            const end = new Date(data[cpt].date_fin || data[cpt].date_debut);
 
-      const div = document.createElement("div"); 
-      div.className = "event-item";
+            const day = start.getDate().toString().padStart(2, "0");
+            const month = start.toLocaleString("fr-FR", { month: "short" });
+            const timeStart = start.toTimeString().slice(0, 5);
+            const timeEnd = end.toTimeString().slice(0, 5);
 
-      div.dataset.start = evt.date_debut;
-      div.dataset.end = evt.date_fin || evt.date_debut;
-      div.dataset.description = evt.description || "";
+            const div = document.createElement("div"); 
+            div.className = "event-item";
 
-      div.innerHTML = `
-                <div class="event-left">
-                    <div class="event-date">${day} ${month}</div>
-                    <div class="event-info">
-                        <div class="event-title">${evt.name}</div>
-                        <div class="event-time">${timeStart} – ${timeEnd}</div>
-                    </div>
-                </div>
-                <button class="btn-icon delete-btn" title="Supprimer" data-id="${evt._id}">🗑️</button>
-            `;
+            div.dataset.start = data[cpt].date_debut;
+            div.dataset.end = data[cpt].date_fin || data[cpt].date_debut;
+            div.dataset.description = data[cpt].description || "";
 
-      upcomingEvents.appendChild(div);
-    });
+            div.innerHTML = `
+                      <div class="event-left">
+                          <div class="event-date">${day} ${month}</div>
+                          <div class="event-info">
+                              <div class="event-title">${data[cpt].name}</div>
+                              <div class="event-time">${timeStart} – ${timeEnd}</div>
+                          </div>
+                      </div>
+                      <button class="btn-icon delete-btn" title="Supprimer" data-id="${data[cpt]._id}">🗑️</button>
+                  `;
+
+            upcomingEvents.appendChild(div);
+            cpt++;
+      
+      };
+
   } catch (err) {
     console.error(err);
     upcomingEvents.innerHTML = "<p>Erreur de chargement des rendez-vous.</p>";
@@ -221,19 +227,7 @@ document.getElementById("upcomingEvents").addEventListener("click", (e) => {
     // Suppression
     const id_rdv = btnDelete.getAttribute("data-id");
     if (!confirm("Voulez-vous vraiment supprimer ce rendez-vous ?")) return;
-    /*
-    *
-    *
-    * *
-    * *
-    * *
-    * *
-    * *
-    * *
-    * *
-    * *
-    * id en parametre direct pas besoin de body
-    * */
+
     fetch(`http://localhost:5000/deletAppointment`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
