@@ -190,25 +190,6 @@ document.querySelector('#btnDeleteAccount').addEventListener('click', async (e) 
          *
          *
          * *
-         * *
-         * *
-         * *
-         * *
-         * *
-         * *
-         * *
-         * *
-         * Apres merge Apres merge Apres merge Apres merge
-         *
-         * *
-         * *
-         * *
-         * *
-         * *
-         * *
-         * *
-         * *
-         * *
          *
             window.location.href = '/';
 

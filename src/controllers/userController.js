@@ -212,25 +212,6 @@ exports.supprimerProfile = async (req, res) => {
      *
      *
      * *
-     * *
-     * *
-     * *
-     * *
-     * *
-     * *
-     * *
-     * *
-     * Apres merge
-     *
-     * *
-     * *
-     * *
-     * *
-     * *
-     * *
-     * *
-     * *
-     * *
      */
 
     res.clearCookie("token", {

@@ -1,0 +1,25 @@
+# Sprint 1 Review – Application Web Agenda
+
+##  Période du Sprint
+
+* Sprint 1 : Affichage et gestion des calendriers
+
+---
+
+## Objectifs du Sprint
+
+* Implémenter l’affichage des calendriers et la gestion complète des calendriers utilisateurs (création, modification, suppression).
+* Assurer la gestion du profil utilisateur et la suppression de compte.
+---
+
+## Fonctionnalités réalisées et validées
+
+| # | Fonctionnalité                                | Statut      | Commentaire                                                                                   |
+| - | --------------------------------------------- | --------    | --------------------------------------------------------------------------------------------- |
+| 1 | Affichage du calendrier (jour, semaine, mois) |  Validé     | Les rendez-vous s’affichent correctement selon le calendrier sélectionné.                     |
+| 2 | Création de calendrier                        |  Validé     | L’utilisateur peut créer un calendrier avec un titre et une couleur.                          |
+| 3 | Modification de calendrier                    |  Validé     | L’utilisateur peut modifier le nom et la couleur d’un calendrier existant.                    |
+| 4 | Suppression de calendrier                     |  Validé     | Les calendriers peuvent être supprimés et le calendrier actif est mis à jour automatiquement. |
+| 5 | Affichage de la liste des calendriers         |  Validé     | La liste des calendriers est correctement affichée et la sélection fonctionne.                |
+| 6 | Modification du profil                        |  Validé     | Les informations personnelles (nom, email, mot de passe) peuvent être mises à jour.           |
+| 7 | Suppression de compte                         |  Non Validé | L’utilisateur peut supprimer son compte et toutes les données associées sont supprimées.      |
