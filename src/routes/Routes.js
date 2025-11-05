@@ -42,7 +42,7 @@ router.delete("/user/profile", auth, userController.supprimerProfile);
 /* Routes Evenements
  **
  */
-
+router.get('/appointment/:calendarId', auth, appointmentController.getAppointments);
 router.post("/appointment", appointmentController.rajouteAppointment);
 router.delete("/deletAppointment/:id", appointmentController.deletAppointment);
 router.put("/updateAppointment", appointmentController.updateAppointment);

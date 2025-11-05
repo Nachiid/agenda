@@ -94,6 +94,20 @@ exports.addAppointment = async function (calendarId, appointmentData) {
  * Supprime un rendez-vous d'un calendrier.
  * Cherche le calendrier contenant le RDV, supprime le RDV et sauvegarde le calendrier.
  */
+/*
+ *passage par user_id pour voir si on peut supprimer ou pas
+ * *
+ * *
+ * * on verifie directment avec user_id puis cal_id puis supp rdv id
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * */
+
 exports.deleteAppointment = async function (id_rdv) {
   const calendar = await Calendar.findOne({ "appointments._id": id_rdv });
   if (!calendar) return null;
@@ -105,7 +119,12 @@ exports.deleteAppointment = async function (id_rdv) {
 
   const removed = calendar.appointments.splice(index, 1)[0];
   await calendar.save();
-
+  /* delete sur mongo
+  const result = await Calendar.deleteOne({ _id: calendarId });
+  if (result.deletedCount === 0) {
+    console.log("Aucun document supprimé");
+  }
+*/
   return removed;
 };
 
@@ -123,7 +142,7 @@ exports.updateAppointment = async function (id_rdv, data) {
   if (index === -1) return null;
 
   const rdv = calendar.appointments[index];
-  if (data.titre !== undefined) rdv.name = data.titre;
+  if (data.name !== undefined) rdv.name = data.name;
   if (data.date_debut !== undefined) rdv.date_debut = new Date(data.date_debut);
   if (data.date_fin !== undefined) rdv.date_fin = new Date(data.date_fin);
   if (data.description !== undefined) rdv.description = data.description;
@@ -166,6 +185,23 @@ exports.getAllCalendarsIdsTitles = async function (userId) {
     "_id title color"
   );
   return calendars;
+};
+
+/*
+ *changement total, Parcours de tous les ids  + envoie tous les calendrier concerné
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * */
+exports.getCalandar = async function (id_cal) {
+  return await Calendar.findById(id_cal);
 };
 
 /**
