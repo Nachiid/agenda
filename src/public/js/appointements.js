@@ -11,7 +11,6 @@ function getActiveCalendarIdsLocal() {
   }
 }
 
-
 // ==========================
 // Observer pour récupérer le calendarId
 // ==========================
@@ -133,15 +132,11 @@ eventForm.addEventListener("submit", async (e) => {
     eventModal.classList.add("hidden");
     delete eventForm.dataset.editingId;
 
-    alert(
-      id_rdv
-        ? "✅ RDV modifié avec succès"
-        : "✅ Rendez-vous ajouté avec succès"
-    );
-    console.log(data.rdv);
+    window.location.reload();
+
+    showMessage(id_rdv, "succes");
   } catch (err) {
-    console.error(err);
-    alert("Erreur lors de l’opération");
+    showMessage("Erreur lors de l’opération", "error");
   }
 });
 
@@ -149,66 +144,46 @@ eventForm.addEventListener("submit", async (e) => {
 // Liste RDV
 // ==========================
 
-/*
- *
- * modif pour que la fonction fetchAppointments prends un tableau des ids ( dans notre cas on vas supposer qu'il y'as un seul elements -> id dans tab[0] -
- *  pour le prochain sprint ca seras plusieurs id) -> donc modif controll + modif model pour parcourir tab qui contient des cal_id et recuperer tous les rdv
- * *
- * *( info - pour les ids ils seront stocké dans un localstorage (regarde mon agenda.js))
- * * 
- * *
- * *
- * *
- * *Methode simple, fonction  fetchAppointments qui recup les 5 objets de cette forme (calendar_id, calendar_color, appoint ) , les tries et affiche les 5 rdv en html
- * * les division reste sur le meme systeme qu'avant mais faut ajouter ca avant chaque titre de rdv : 
- * *<span class="calendar-color" style="background:#4F46E5"></span>
- * un petit cercle qui porte la couleur du calendrier d'ou on a recup le rendez vous
- * *
- * *
- * */
+
 async function fetchAppointments(calendarId) {
   const upcomingEvents = document.getElementById("upcomingEvents");
-  let cpt =0;
+  let cpt = 0;
   try {
-    const res = await fetch(`/appointment/${calendarId}`, {      credentials: "include",
+    const res = await fetch(`/appointment/${calendarId}`, {
+      credentials: "include",
     });
     const data = await res.json();
     upcomingEvents.innerHTML = "";
 
+    data.forEach((evt) => {
+      const start = new Date(evt.date_debut);
+      const end = new Date(evt.date_fin || evt.date_debut);
 
-    
-        while(cpt < 5){
-            const start = new Date(data[cpt].date_debut);
-            const end = new Date(data[cpt].date_fin || data[cpt].date_debut);
+      const day = start.getDate().toString().padStart(2, "0");
+      const month = start.toLocaleString("fr-FR", { month: "short" });
+      const timeStart = start.toTimeString().slice(0, 5);
+      const timeEnd = end.toTimeString().slice(0, 5);
 
-            const day = start.getDate().toString().padStart(2, "0");
-            const month = start.toLocaleString("fr-FR", { month: "short" });
-            const timeStart = start.toTimeString().slice(0, 5);
-            const timeEnd = end.toTimeString().slice(0, 5);
+      const div = document.createElement("div");
+      div.className = "event-item";
 
-            const div = document.createElement("div"); 
-            div.className = "event-item";
+      div.dataset.start = evt.date_debut;
+      div.dataset.end = evt.date_fin || evt.date_debut;
+      div.dataset.description = evt.description || "";
 
-            div.dataset.start = data[cpt].date_debut;
-            div.dataset.end = data[cpt].date_fin || data[cpt].date_debut;
-            div.dataset.description = data[cpt].description || "";
+      div.innerHTML = `
+                <div class="event-left">
+                    <div class="event-date">${day} ${month}</div>
+                    <div class="event-info">
+                        <div class="event-title">${evt.name}</div>
+                        <div class="event-time">${timeStart} – ${timeEnd}</div>
+                    </div>
+                </div>
+                <button class="btn-icon delete-btn" title="Supprimer" data-id="${evt._id}">🗑️</button>
+            `;
 
-            div.innerHTML = `
-                      <div class="event-left">
-                          <div class="event-date">${day} ${month}</div>
-                          <div class="event-info">
-                              <div class="event-title">${data[cpt].name}</div>
-                              <div class="event-time">${timeStart} – ${timeEnd}</div>
-                          </div>
-                      </div>
-                      <button class="btn-icon delete-btn" title="Supprimer" data-id="${data[cpt]._id}">🗑️</button>
-                  `;
-
-            upcomingEvents.appendChild(div);
-            cpt++;
-      
-      };
-
+      upcomingEvents.appendChild(div);
+    });
   } catch (err) {
     console.error(err);
     upcomingEvents.innerHTML = "<p>Erreur de chargement des rendez-vous.</p>";
@@ -244,6 +219,7 @@ document.getElementById("upcomingEvents").addEventListener("click", (e) => {
         console.error(err);
         alert("Erreur lors de la suppression");
       });
+    window.location.reload();
     return;
   }
 

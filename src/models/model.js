@@ -92,20 +92,6 @@ exports.addAppointment = async function (calendarId, appointmentData) {
 
 /**
  * Supprime un rendez-vous d'un calendrier.
- * Cherche le calendrier contenant le RDV, supprime le RDV et sauvegarde le calendrier.
- */
-/*
- *passage par user_id pour voir si on peut supprimer ou pas
- * *
- * *
- * * on verifie directment avec user_id puis cal_id puis supp rdv id
- * *
- * *
- * *
- * *
- * *
- * *
- * *
  * */
 
 exports.deleteAppointment = async function (id_rdv) {
@@ -187,19 +173,6 @@ exports.getAllCalendarsIdsTitles = async function (userId) {
   return calendars;
 };
 
-/*
- *changement total, Parcours de tous les ids  + envoie tous les calendrier concerné
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * */
 exports.getCalandar = async function (id_cal) {
   return await Calendar.findById(id_cal);
 };

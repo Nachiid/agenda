@@ -2,19 +2,6 @@ const model = require("../models/model");
 
 /*
  *
- * user est dans req.user.id pas besoin de const userId = await model.getProfilCal(calendarId); ( on verifie si celui connecté peut faire x pas l'inverse hhhhhhhhhhhhhh
- * bug ( n'importe qu'elle user du site vas appartenir a getUserCalendar vus que getProfilCal recupere le user qui a creer cal id ! )
- * *
- *
- *
- *
- *
- *
- *
- *
- * *
- * *
- * *
  * */
 exports.rajouteAppointment = async (req, res) => {
   try {
@@ -53,19 +40,6 @@ exports.rajouteAppointment = async (req, res) => {
     }
 
     /*
-     *a faire : il faut methode dans model qui verifie si user a droit de faire ajouter a cet calendrier - et donc le controlleur verifie ca avant d'appeler addAppointment
-     * ne pas toucher a getUserCalendar on vas l'adapter pour chercher si user est owner ou il a droit de creer des rdv  - apres merge
-     * *
-     *
-     *
-     *
-     * Sprint 2 : on vas donner droit au users en mode editor a faire ce qu'il veulent
-     *
-     *
-     *
-     * *
-     * *
-     * *
      * */
     const calendar = await model.getUserCalendar(calendarId, userId);
     if (!calendar) {
@@ -93,21 +67,6 @@ exports.rajouteAppointment = async (req, res) => {
 };
 
 /*
- *passage par user_id pour voir si on peut supprimer ou pas -> model.deleteAppointment(id_rdv, user_id) donc 
- a faire : il faut methode dans model qui verifie si user a droit de suppa cet rvd - et donc le controlleur verifie ca avant d'appeler addAppointment
-     * ne pas toucher a getUserCalendar on vas l'adapter pour chercher si user est owner ou il a droit de creer des rdv  - apres merge
- * *
- * *
- * *
- * *
- * *
- * *dans le sprint prochain on vas ajouter un autre parcours pour savoir si user_id peut faire l'action
- * ------> c'est soit cest le owner du calendrier ou y'as le rdv, soit il existe dans la table shared avec cal_id ( chaque rdv auras comme dataset son id + cal_id)
- *
- * *
- * *
- * *
- * *
  * */
 exports.deletAppointment = async (req, res) => {
   try {
@@ -125,21 +84,6 @@ exports.deletAppointment = async (req, res) => {
 };
 
 /*
- *
- * s'assurer que c le bon user qui cherche a updateAppointment les rdv donc model.updateAppointment(id_rdv, data, userId)
- * il faut methode dans model qui verifie si user a droit de faire updateAppointment a cet calendrier - et donc le controlleur verifie ca avant d'appeler model.updateAppointment
- * *
- * * ( c pour eviter ce bug - si calendrier partagé, un autre utilisateur en mode viewer peut recuperer l'id rdv
- * et modifier les rdv d'autre calendrier dont il n'as pas droit) donc on force qu'il soit user_id (pour l'instant) et calendar_id pour faire update rdv_id
- * *
- * *
- * *
- * *dans le sprint prochain on vas ajouter un autre parcours pour savoir si user_id peut faire l'action
- * ------> c'est soit cest le owner du calendrier ou y'as le rdv, soit il existe dans la table shared avec cal_id ( chaque rdv auras comme dataset son id + cal_id)
- * *
- * *
- * *
- * *
  * */
 
 exports.updateAppointment = async (req, res) => {
@@ -167,27 +111,6 @@ exports.updateAppointment = async (req, res) => {
   }
 };
 
-/*
- *
- * s'assurer que c le bon user qui cherche a avoir les rdv donc model.getCalandar(calendarId, userId) donc
- * il faut methode dans model qui verifie si user a droit de faire updateAppointment a cet calendrier - et donc le controlleur verifie ca avant d'appeler model.updateAppointment
- *
- * + recupere les rendez vous de tous les calendiers dans tab et envoie a l'ecouteur
- * *
- * *
- * *
- * *
- * *tu peux gerer la logique pour recuperer que 5 rdv les plus proché entre les calendriers selectionnées et envoyé un objet qui contient 5 object (cal_id, cal_color, appointement)
- * *
- * *
- * *methode , fonction model qui recupere tous les  calendriers dont id est en parametre
- * * puis faire un flattening -> donc la t'as un tableau avec les colonnes cal_id, cal_titre, cal_color, rdv (1 seul rdv par ligne donc tranquille)
- * * puis trie simple pour garder que les lignes dont les dates sont au futur puis trie par appointement.data...
- * envoie de objet qui contient 5 objet(cal_id, cal_color, appoint) ->   les 5 dates les plus proches - les 5 premiere dans le tableau
- * *
- * * 07 49 13 03 19 pour des renseignement, appeler apres 13h
- * */
-
 exports.getAppointments = async (req, res) => {
   try {
     const { calendarId } = req.params;
@@ -204,7 +127,7 @@ exports.getAppointments = async (req, res) => {
       (a, b) => new Date(a.date_debut) - new Date(b.date_debut)
     );
 
-    const firstFive = sortedAppointments.slice(0, 5);
+    const firstFive = sortedAppointments.slice(0, 3);
 
     return res.status(200).json(firstFive);
   } catch (err) {
