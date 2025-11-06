@@ -170,37 +170,44 @@ document.getElementById("closeModal").addEventListener("click", () => {
   document.getElementById("passwordForm").reset();
 });
 
-/*
 // Gestion de la suppression du profil (bouton "Supprimer le compte")
-document.querySelector('#btnDeleteAccount').addEventListener('click', async (e) => {
+document
+  .querySelector("#btnDeleteAccount")
+  .addEventListener("click", async (e) => {
     e.preventDefault();
 
     if (!confirm("Êtes-vous sûr de vouloir supprimer votre compte ?")) return;
 
     try {
-        const res = await fetch(`http://localhost:5000/user/profile`, {
-            method: 'DELETE',
-            credentials: 'include'
-        });
+      const res = await fetch(`http://localhost:5000/user/profile`, {
+        method: "DELETE",
+        credentials: "include",
+      });
 
-        const data = await res.json();
-        if (res.ok) {
-
-         /*on vas faire un fetch vers deconnexion au lieu de / - a faire apres le merge
+      const data = await res.json();
+      if (res.ok) {
+        /*on vas faire un fetch vers deconnexion au lieu de / - a faire apres le merge
          *
          *
          * *
-         *
-            window.location.href = '/';
-
-        } else {
-            showMessage('Erreur: ' + data.error);
-        }
+         */
+        fetch("/user/logout", {
+          method: "GET",
+          credentials: "include",
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            localStorage.clear();
+            window.location.href = "/";
+          })
+          .catch((err) => showMessage(err, "error"));
+      } else {
+        showMessage("Erreur: " + data.error);
+      }
     } catch (err) {
-        showMessage('Erreur réseau lors de la suppression du compte.');
+      showMessage("Erreur réseau lors de la suppression du compte.");
     }
-});
-*/
+  });
 
 // === SUPPRESSION DU COMPTE AVEC MODALE ===
 const deleteBtn = document.querySelector("#btnDeleteAccount");

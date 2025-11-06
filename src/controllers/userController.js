@@ -208,17 +208,6 @@ exports.supprimerProfile = async (req, res) => {
     if (!deletedUser) {
       return res.status(404).json({ error: "Utilisateur non trouvé." });
     }
-    /*on modifie apres -> on redirige vers deconnexion dans ecouteur et tout seras clean apres
-     *
-     *
-     * *
-     */
-
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-    });
 
     return res
       .status(200)

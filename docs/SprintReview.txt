@@ -22,4 +22,4 @@
 | 4 | Suppression de calendrier                     |  Validé     | Les calendriers peuvent être supprimés et le calendrier actif est mis à jour automatiquement. |
 | 5 | Affichage de la liste des calendriers         |  Validé     | La liste des calendriers est correctement affichée et la sélection fonctionne.                |
 | 6 | Modification du profil                        |  Validé     | Les informations personnelles (nom, email, mot de passe) peuvent être mises à jour.           |
-| 7 | Suppression de compte                         |  Non Validé | L’utilisateur peut supprimer son compte et toutes les données associées sont supprimées.      |
+| 7 | Suppression de compte                         |  Validé     | L’utilisateur peut supprimer son compte et toutes les données associées sont supprimées.      |

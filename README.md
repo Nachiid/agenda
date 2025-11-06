@@ -58,7 +58,7 @@ agenda/
 ### 1️⃣ Cloner le projet
 
 ```bash
-git clone https://github.com/ton-utilisateur/agenda.git
+git clone https://gitlab.univ-lorraine.fr/e80624u/agenda.git
 cd agenda
 ```
 
@@ -138,7 +138,6 @@ Le serveur sera disponible sur :
 * 🔁 Répétition intelligente des rendez-vous (récurrence personnalisée).
 * 👥 Partage de calendriers entre utilisateurs.
 * 🔔 Notifications (email / push) avant les rendez-vous.
-* 📱 Application mobile (React Native ou Flutter).
 * 🌓 Mode sombre / clair dynamique.
 * 📊 Statistiques et suivi du temps.
 * 🔍 Recherche avancée dans les événements.
