@@ -43,9 +43,9 @@ router.delete("/user/profile", auth, userController.supprimerProfile);
  **
  */
 router.get('/appointment/:calendarId', auth, appointmentController.getAppointments);
-router.post("/appointment", appointmentController.rajouteAppointment);
-router.delete("/deletAppointment", appointmentController.deletAppointment);
-router.put("/updateAppointment", appointmentController.updateAppointment);
+router.post("/appointment",auth, appointmentController.rajouteAppointment);
+router.delete("/deletAppointment",auth, appointmentController.deletAppointment);
+router.put("/updateAppointment",auth, appointmentController.updateAppointment);
 
 /* Routes Calendrier
  **

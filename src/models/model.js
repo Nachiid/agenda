@@ -136,6 +136,16 @@ exports.updateAppointment = async function (id_rdv, data) {
   await calendar.save();
   return rdv;
 };
+/**
+ * vérifier si le rdv appartien a un utilisateur donneé 
+ */
+exports.getUserAppointment = async function(idUser , idAppointement){
+    const calandar = await Calendar.findOne({
+      userId: idUser,
+      "appointments._id": idAppointement
+    });
+    return calandar ? true : false;
+};
 
 /**
  * Récupère l'ID de l'utilisateur associé à un calendrier donné.

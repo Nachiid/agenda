@@ -56,10 +56,14 @@ exports.deletAppointment = async (req, res) => {
   try {
     const { id_rdv } = req.body;
     const userID = req.user.id;
-    console.log("userID " + userID);
+    console.log("userID " + userID + " rdv " + id_rdv ) ;
+    const cldr = await model.getUserAppointment(userID , id_rdv);
+    console.log(cldr);
    const rdv = await model.deleteAppointment(id_rdv);
     if (!rdv) {
       return res.status(404).json({ error: "RDV pas trouvé" });
+    }else if(!cldr){
+       return res.status(500).json({ error: "RDV n'appartient pas a ce utilisateur " });
     }
     return res.status(200).json({ rdv });
   } catch (error) {
