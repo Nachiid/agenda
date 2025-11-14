@@ -163,10 +163,8 @@ async function fetchAppointments(calendarId) {
       const month = start.toLocaleString("fr-FR", { month: "short" });
       const timeStart = start.toTimeString().slice(0, 5);
       const timeEnd = end.toTimeString().slice(0, 5);
-
       const div = document.createElement("div");
       div.className = "event-item";
-
       div.dataset.start = evt.date_debut;
       div.dataset.end = evt.date_fin || evt.date_debut;
       div.dataset.description = evt.description || "";
@@ -181,7 +179,6 @@ async function fetchAppointments(calendarId) {
                 </div>
                 <button class="btn-icon delete-btn" title="Supprimer" data-id="${evt._id}">🗑️</button>
             `;
-
       upcomingEvents.appendChild(div);
     });
   } catch (err) {

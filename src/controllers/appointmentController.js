@@ -1,26 +1,10 @@
 const model = require("../models/model");
 
-/*
- *
- * */
 exports.rajouteAppointment = async (req, res) => {
   try {
     const { calendarId, name, date_debut, date_fin, description } = req.body;
     //const calendare = await Calendar.findById(calendarId);
     const userId = await model.getProfilCal(calendarId);
-
-    console.log(
-      "1 " +
-        calendarId +
-        " " +
-        name +
-        " " +
-        date_debut +
-        " " +
-        date_fin +
-        " " +
-        userId
-    );
 
     if (!calendarId || !name || !date_debut || !date_fin) {
       console.log(calendarId + " " + name + " " + date_debut + " " + date_fin);
@@ -71,8 +55,9 @@ exports.rajouteAppointment = async (req, res) => {
 exports.deletAppointment = async (req, res) => {
   try {
     const { id_rdv } = req.body;
-    const rdv = await model.deleteAppointment(id_rdv);
-    console.log(rdv);
+    const userID = req.user.id;
+    console.log("userID " + userID);
+   const rdv = await model.deleteAppointment(id_rdv);
     if (!rdv) {
       return res.status(404).json({ error: "RDV pas trouvé" });
     }
@@ -114,11 +99,8 @@ exports.updateAppointment = async (req, res) => {
 exports.getAppointments = async (req, res) => {
   try {
     const { calendarId } = req.params;
-
+    
     const calendar = await model.getCalandar(calendarId);
-    if (!calendar) {
-      return res.status(404).json({ error: "Calendrier introuvable" });
-    }
     const now = new Date();
     const upcoming = calendar.appointments.filter(
       (a) => new Date(a.date_debut) >= now
@@ -126,9 +108,7 @@ exports.getAppointments = async (req, res) => {
     const sortedAppointments = upcoming.sort(
       (a, b) => new Date(a.date_debut) - new Date(b.date_debut)
     );
-
     const firstFive = sortedAppointments.slice(0, 3);
-
     return res.status(200).json(firstFive);
   } catch (err) {
     console.error("Erreur getAppointments:", err);
