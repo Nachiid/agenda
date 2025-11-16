@@ -9,7 +9,7 @@ signupForm.addEventListener("submit", async (e) => {
   const confirmPassword = document.querySelector("#confirmPassword").value;
 
   try {
-    const res = await fetch("http://localhost:5000/user/register", {
+    const res = await fetch("http://localhost:3000/user/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

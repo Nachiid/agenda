@@ -126,7 +126,8 @@ body.dashboard-body {
   padding: 1rem;
   color: #1f2937;
   height: 75vh;
-  overflow: hidden;
+  overflow-y: auto; 
+  overflow-x: hidden; 
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
@@ -140,6 +141,25 @@ body.dashboard-body {
   border-radius: 6px !important;
   padding: 3px 5px !important;
   font-size: 0.8rem !important;
+}
+
+#calendar {
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af #e5e7eb;
+}
+
+#calendar::-webkit-scrollbar {
+  width: 8px;
+}
+
+#calendar::-webkit-scrollbar-track {
+  background: #e5e7eb;
+  border-radius: 10px;
+}
+
+#calendar::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 10px;
 }
 
 /* ====== SIDEBAR ====== */

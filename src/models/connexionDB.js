@@ -5,7 +5,7 @@ const connectDB = async () => {
   if (!uri) throw new Error("MONGO_URI non défini dans .env !");
   await mongoose.connect(uri, {
     dbName: "agenda",
-    serverSelectionTimeoutMS: 50000,
+    serverSelectionTimeoutMS: 30000,
   });
   console.log("MongoDB connectée sur : agenda");
 };

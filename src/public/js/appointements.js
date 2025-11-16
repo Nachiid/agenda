@@ -98,7 +98,7 @@ eventForm.addEventListener("submit", async (e) => {
     let res;
     if (id_rdv) {
       rdv.id_rdv = id_rdv;
-      res = await fetch("http://localhost:5000/UpdateAppointment", {
+      res = await fetch("http://localhost:3000/UpdateAppointment", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -106,7 +106,7 @@ eventForm.addEventListener("submit", async (e) => {
       });
     } else {
       // erreur cas impossible -> return; ? avoir apres le merge
-      res = await fetch("http://localhost:5000/appointment", {
+      res = await fetch("http://localhost:3000/appointment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -202,7 +202,7 @@ document.getElementById("upcomingEvents").addEventListener("click", (e) => {
     const id_rdv = btnDelete.getAttribute("data-id");
     if (!confirm("Voulez-vous vraiment supprimer ce rendez-vous ?")) return;
 
-    fetch(`http://localhost:5000/deletAppointment`, {
+    fetch(`http://localhost:3000/deletAppointment`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

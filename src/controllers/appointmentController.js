@@ -7,7 +7,6 @@ exports.rajouteAppointment = async (req, res) => {
     const userId = await model.getProfilCal(calendarId);
 
     if (!calendarId || !name || !date_debut || !date_fin) {
-      console.log(calendarId + " " + name + " " + date_debut + " " + date_fin);
       return res
         .status(400)
         .json({ error: "manque d'inforamtion pour créer un rdv" });
@@ -56,7 +55,6 @@ exports.deletAppointment = async (req, res) => {
   try {
     const { id_rdv } = req.body;
     const userID = req.user.id;
-    console.log("userID " + userID + " rdv " + id_rdv ) ;
     const cldr = await model.getUserAppointment(userID , id_rdv);
     //console.log(cldr);
    const rdv = await model.deleteAppointment(id_rdv);
@@ -67,7 +65,6 @@ exports.deletAppointment = async (req, res) => {
     }
     return res.status(200).json({ rdv });
   } catch (error) {
-    console.error("Erreur deleteAppointment:", error);
     return res.status(500).json({ error });
   }
 };
@@ -123,12 +120,6 @@ exports.getAppointmentss = async (req, res) => {
 exports.getAppointments = async (req, res) => {
   try {
     const { calendarIds } = req.body;
-
-    console.log(calendarIds);
-
-    /*if (!Array.isArray(calendarIds) || calendarIds.length === 0) {
-      return res.status(400).json({ error: "calendarIds doit être un tableau" });
-    }*/
 
     // Récupération de tous les calendriers
     const calendars = await model.getCalendars(calendarIds);

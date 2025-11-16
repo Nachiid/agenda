@@ -377,8 +377,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     locale: "fr",
     themeSystem: "standard",
     nowIndicator: true,
-    slotMinTime: "07:00:00",
-    slotMaxTime: "20:00:00",
+    slotMinTime: "00:00:00",
+    slotMaxTime: "24:00:00",
     slotDuration: "00:30:00",
     slotLabelInterval: "01:00",
     slotLabelFormat: { hour: "2-digit", minute: "2-digit", hour12: false },
@@ -394,6 +394,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     editable: true,
     dayMaxEvents: true,
     height: "auto",
+    contentHeight: "auto",
+    expandRows: true,
+
     eventTimeFormat: { hour: "2-digit", minute: "2-digit", hour12: false },
 
     // Événements dynamiques

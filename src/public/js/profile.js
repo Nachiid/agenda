@@ -1,7 +1,7 @@
 //  FONCTION DE RECHARGEMENT DU PROFIL
 async function chargerProfil() {
   try {
-    const res = await fetch(`http://localhost:5000/user/profile`, {
+    const res = await fetch(`http://localhost:3000/user/profile`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -62,7 +62,7 @@ document.querySelector("#profileForm").addEventListener("submit", async (e) => {
   const timezone = document.querySelector("#timezone").value.trim();
 
   try {
-    const res = await fetch(`http://localhost:5000/user/profile`, {
+    const res = await fetch(`http://localhost:3000/user/profile`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -109,7 +109,7 @@ passwordForm.addEventListener("submit", async (e) => {
     document.getElementById("confirmNewPassword").value;
 
   try {
-    const res = await fetch("http://localhost:5000/user/password", {
+    const res = await fetch("http://localhost:3000/user/password", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -179,7 +179,7 @@ document
     if (!confirm("Êtes-vous sûr de vouloir supprimer votre compte ?")) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/user/profile`, {
+      const res = await fetch(`http://localhost:3000/user/profile`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -231,7 +231,7 @@ confirmDelete.addEventListener("click", async () => {
   deleteModal.classList.add("hidden");
 
   try {
-    const res = await fetch(`http://localhost:5000/user/profile`, {
+    const res = await fetch(`http://localhost:3000/user/profile`, {
       method: "DELETE",
       credentials: "include",
     });

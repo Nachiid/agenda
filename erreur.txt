@@ -11,3 +11,7 @@ changer l'alert par des messages normeaux
 
 
 faire sortir 10 rendez vous et afficher 5, ne pas faire fetsh a chaque suppression
+
+verification userid update
+
+3 boutons - tolower

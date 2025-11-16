@@ -73,7 +73,7 @@ npm install
 ```bash
 SECRET_KEY=ton_secret_jwt
 MONGODB_URI=mongodb://localhost:27017/agenda
-PORT=5000
+PORT=3000
 ```
 
 ### 4️⃣ Lancer le serveur
@@ -91,7 +91,7 @@ npm start
 ```
 
 Le serveur sera disponible sur :
-👉 [http://localhost:5000](http://localhost:5000)
+👉 [http://localhost:3000](http://localhost:3000)
 
 ---
 
