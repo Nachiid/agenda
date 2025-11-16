@@ -30,7 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const interval = setInterval(() => {
     const calendarTitle = document.querySelector(".calendar-title");
     if (calendarTitle) {
-      //alert(getActiveCalendarIdsLocal()[0]);
       fetchAppointments(getActiveCalendarIdsLocal()[0]);
       clearInterval(interval);
     }
@@ -137,6 +136,7 @@ eventForm.addEventListener("submit", async (e) => {
     showMessage(id_rdv, "succes");
   } catch (err) {
     showMessage("Erreur lors de l’opération", "error");
+    
   }
 });
 
@@ -145,12 +145,14 @@ eventForm.addEventListener("submit", async (e) => {
 // ==========================
 
 
-async function fetchAppointments(calendarId) {
+async function fetchAppointments(calendarIds) {
   const upcomingEvents = document.getElementById("upcomingEvents");
-  let cpt = 0;
   try {
-    const res = await fetch(`/appointment/${calendarId}`, {
+    const res = await fetch('/appointments/multiple', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
+      body: JSON.stringify({ calendarIds })
     });
     const data = await res.json();
     upcomingEvents.innerHTML = "";
@@ -209,7 +211,10 @@ document.getElementById("upcomingEvents").addEventListener("click", (e) => {
       .then((res) => {
         if (res.ok) {
           btnDelete.closest(".event-item").remove();
-          alert("✅ Rendez-vous supprimé");
+          // alert 
+          showToast("✅ Rendez-vous supprimé", "success");
+          showMessage("✅ Rendez-vous supprimé", "success");
+
         } else alert("Erreur lors de la suppression");
       })
       .catch((err) => {

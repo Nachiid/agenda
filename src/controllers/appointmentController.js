@@ -58,7 +58,7 @@ exports.deletAppointment = async (req, res) => {
     const userID = req.user.id;
     console.log("userID " + userID + " rdv " + id_rdv ) ;
     const cldr = await model.getUserAppointment(userID , id_rdv);
-    console.log(cldr);
+    //console.log(cldr);
    const rdv = await model.deleteAppointment(id_rdv);
     if (!rdv) {
       return res.status(404).json({ error: "RDV pas trouvé" });
@@ -100,7 +100,7 @@ exports.updateAppointment = async (req, res) => {
   }
 };
 
-exports.getAppointments = async (req, res) => {
+exports.getAppointmentss = async (req, res) => {
   try {
     const { calendarId } = req.params;
     
@@ -114,6 +114,38 @@ exports.getAppointments = async (req, res) => {
     );
     const firstFive = sortedAppointments.slice(0, 3);
     return res.status(200).json(firstFive);
+  } catch (err) {
+    console.error("Erreur getAppointments:", err);
+    return res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
+exports.getAppointments = async (req, res) => {
+  try {
+    const { calendarIds } = req.body;
+
+    console.log(calendarIds);
+
+    /*if (!Array.isArray(calendarIds) || calendarIds.length === 0) {
+      return res.status(400).json({ error: "calendarIds doit être un tableau" });
+    }*/
+
+    // Récupération de tous les calendriers
+    const calendars = await model.getCalendars(calendarIds);
+
+    const now = new Date();
+
+    // ========= VERSION AVEC MAP =========
+    const allAppointments = calendars
+      .map(cal => cal.appointments || [])  // récupère les rdv de chaque calendrier
+      .flat()                              // fusionne tout en un seul tableau
+      .filter(a => new Date(a.date_debut) >= now)  // rdv futurs
+      .sort((a, b) => new Date(a.date_debut) - new Date(b.date_debut)); // tri
+
+    const firstThree = allAppointments.slice(0, 10);
+
+    return res.status(200).json(firstThree);
+
   } catch (err) {
     console.error("Erreur getAppointments:", err);
     return res.status(500).json({ error: "Erreur serveur" });

@@ -147,6 +147,11 @@ exports.getUserAppointment = async function(idUser , idAppointement){
     return calandar ? true : false;
 };
 
+// plusieur calandars
+exports.getCalendars = async function (ids) {
+  return await Calendar.find({ _id: { $in: ids } });
+};
+
 /**
  * Récupère l'ID de l'utilisateur associé à un calendrier donné.
  */

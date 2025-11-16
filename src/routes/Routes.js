@@ -46,6 +46,9 @@ router.get('/appointment/:calendarId', auth, appointmentController.getAppointmen
 router.post("/appointment",auth, appointmentController.rajouteAppointment);
 router.delete("/deletAppointment",auth, appointmentController.deletAppointment);
 router.put("/updateAppointment",auth, appointmentController.updateAppointment);
+router.post("/appointments/multiple", auth, appointmentController.getAppointments);
+
+
 
 /* Routes Calendrier
  **
