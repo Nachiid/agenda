@@ -155,14 +155,19 @@ async function fetchAppointments(calendarIds) {
       body: JSON.stringify({ calendarIds })
     });
     const data = await res.json();
+
+    // garder SEULEMENT les 5 premiers rdv
+    const firstFive = data.slice(0, 5);
+
     upcomingEvents.innerHTML = "";
 
-    data.forEach((evt) => {
+    firstFive.forEach((evt) => {
       const start = new Date(evt.date_debut);
       const end = new Date(evt.date_fin || evt.date_debut);
 
       const day = start.getDate().toString().padStart(2, "0");
       const month = start.toLocaleString("fr-FR", { month: "short" });
+      
       const timeStart = start.toTimeString().slice(0, 5);
       const timeEnd = end.toTimeString().slice(0, 5);
       const div = document.createElement("div");
@@ -179,8 +184,18 @@ async function fetchAppointments(calendarIds) {
                         <div class="event-time">${timeStart} – ${timeEnd}</div>
                     </div>
                 </div>
-                <button class="btn-icon delete-btn" title="Supprimer" data-id="${evt._id}">🗑️</button>
+                <div class="menu-wrapper">
+                  <button class="dots-btn">⋮</button>
+                  <div class="menu hidden">
+                    <button class="menu-edit btn-icon delete-btn" data-id="${evt._id}">✏️ Modifier</button>
+                    <button class="menu-delete btn-icon delete-btn" data-id="${evt._id}">🗑️ Supprimer</button>
+                  </div>
+                </div>
+
+                
             `;
+
+            //<button class="btn-icon delete-btn" title="Supprimer" data-id="${evt._id}">🗑️</button>
       upcomingEvents.appendChild(div);
     });
   } catch (err) {
@@ -192,15 +207,20 @@ async function fetchAppointments(calendarIds) {
 // ==========================
 // Popup édition + suppression
 // ==========================
-document.getElementById("upcomingEvents").addEventListener("click", (e) => {
-  const btnDelete = e.target.closest(".delete-btn");
+document.getElementById("upcomingEvents").addEventListener("click", async (e) => {
+  //const btnDelete = e.target.closest(".delete-btn");
+  const btnDelete = e.target.closest(".menu-delete");
   const eventItem = e.target.closest(".event-item");
   if (!eventItem) return;
 
   if (btnDelete) {
     // Suppression
     const id_rdv = btnDelete.getAttribute("data-id");
-    if (!confirm("Voulez-vous vraiment supprimer ce rendez-vous ?")) return;
+          // alert 
+        // ⬇️ ON ATTEND la confirmation
+    const confirmed = await showConfirm("Voulez-vous vraiment supprimer ce rendez-vous ?");
+    if (!confirmed) return;
+
 
     fetch(`http://localhost:3000/deletAppointment`, {
       method: "DELETE",
@@ -210,20 +230,28 @@ document.getElementById("upcomingEvents").addEventListener("click", (e) => {
     })
       .then((res) => {
         if (res.ok) {
-          btnDelete.closest(".event-item").remove();
-          // alert 
-          showToast("✅ Rendez-vous supprimé", "success");
+
+          // ✔️ Recharge les 5 prochains RDV
+          const calendarIds = getActiveCalendarIdsLocal()[0]; // tu l'as déjà
+          fetchAppointments(calendarIds);
+
           showMessage("✅ Rendez-vous supprimé", "success");
 
-        } else alert("Erreur lors de la suppression");
+        }else {
+            alert("Erreur lors de la suppression");
+        }
       })
       .catch((err) => {
         console.error(err);
         alert("Erreur lors de la suppression");
       });
-    window.location.reload();
     return;
   }
+
+  const btnEdit = e.target.closest(".menu-edit");
+
+    if (btnEdit) {
+    const eventItem = btnEdit.closest(".event-item");
 
   // Edition
   const rdv = {
@@ -255,4 +283,23 @@ document.getElementById("upcomingEvents").addEventListener("click", (e) => {
   document.getElementById("eventTimeEnd").value = end
     .toTimeString()
     .slice(0, 5);
+}
+});
+
+const upcoming = document.getElementById("upcomingEvents");
+
+upcoming.addEventListener("mouseover", (e) => {
+    const wrapper = e.target.closest(".menu-wrapper");
+    if (wrapper) {
+        const menu = wrapper.querySelector(".menu");
+        menu.classList.remove("hidden");
+    }
+});
+
+upcoming.addEventListener("mouseout", (e) => {
+    const wrapper = e.target.closest(".menu-wrapper");
+    if (wrapper && !wrapper.contains(e.relatedTarget)) {
+        const menu = wrapper.querySelector(".menu");
+        menu.classList.add("hidden");
+    }
 });

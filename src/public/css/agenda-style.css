@@ -372,6 +372,47 @@ body.dashboard-body {
   background: rgba(255, 255, 255, 0.4);
 }
 
+/*------------------------------------------------------------------*/
+.menu-wrapper {
+  position: relative;
+    z-index: 10; /* important */
+}
+
+.dots-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.menu {
+  position: absolute;
+  top: 25px;
+  background: black;
+  border: 1px solid #ccc;
+  padding: 5px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  z-index: 9999; /* 🔥 toujours au-dessus de tout */
+    pointer-events: auto;
+}
+
+.menu.hidden {
+  display: none;
+}
+
+.menu button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  padding: 5px;
+  width: 100%;
+}
+/*--------------------------------------------------------------*/
 /* ====== RESPONSIVE ====== */
 @media (max-width: 1200px) {
   .dashboard-container {
@@ -651,3 +692,4 @@ body.dashboard-body {
   transform: none !important;
   box-shadow: none !important;
 }
+

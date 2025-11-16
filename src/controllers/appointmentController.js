@@ -3,7 +3,6 @@ const model = require("../models/model");
 exports.rajouteAppointment = async (req, res) => {
   try {
     const { calendarId, name, date_debut, date_fin, description } = req.body;
-    //const calendare = await Calendar.findById(calendarId);
     const userId = await model.getProfilCal(calendarId);
 
     if (!calendarId || !name || !date_debut || !date_fin) {
@@ -21,9 +20,6 @@ exports.rajouteAppointment = async (req, res) => {
         .status(400)
         .json({ error: "date de debut doit etre avent la date de fin !" });
     }
-
-    /*
-     * */
     const calendar = await model.getUserCalendar(calendarId, userId);
     if (!calendar) {
       return res
@@ -49,14 +45,11 @@ exports.rajouteAppointment = async (req, res) => {
   }
 };
 
-/*
- * */
 exports.deletAppointment = async (req, res) => {
   try {
     const { id_rdv } = req.body;
     const userID = req.user.id;
     const cldr = await model.getUserAppointment(userID , id_rdv);
-    //console.log(cldr);
    const rdv = await model.deleteAppointment(id_rdv);
     if (!rdv) {
       return res.status(404).json({ error: "RDV pas trouvé" });
@@ -69,29 +62,29 @@ exports.deletAppointment = async (req, res) => {
   }
 };
 
-/*
- * */
-
 exports.updateAppointment = async (req, res) => {
   try {
-    const { id_rdv, name, date_debut, date_fin, description } = req.body;
-    if (!id_rdv) {
-      return res.status(400).json({ error: "L'ID du RDV est requis" });
-    }
-    const updatedRdv = await model.updateAppointment(id_rdv, {
-      name,
-      date_debut,
-      date_fin,
-      description,
-    });
-    if (!updatedRdv) {
-      return res.status(404).json({ error: "RDV pas trouvé" });
-    }
-
-    return res
-      .status(200)
-      .json({ message: "RDV mis à jour avec succès", rdv: updatedRdv });
-  } catch (error) {
+      const { id_rdv, name, date_debut, date_fin, description } = req.body;
+      const userID = req.user.id;
+      const cldr = await model.getUserAppointment(userID , id_rdv);
+      if (!id_rdv) {
+        return res.status(400).json({ error: "L'ID du RDV est requis" });
+      }else if(!cldr){
+       return res.status(500).json({ error: "RDV n'appartient pas a ce utilisateur " });
+      }
+      const updatedRdv = await model.updateAppointment(id_rdv, {
+        name,
+        date_debut,
+        date_fin,
+        description,
+      });
+      if (!updatedRdv) {
+        return res.status(404).json({ error: "RDV pas trouvé" });
+      }
+      return res
+        .status(200)
+        .json({ message: "RDV mis à jour avec succès", rdv: updatedRdv });
+  }catch (error) {
     console.error("Erreur updateAppointment:", error);
     return res.status(500).json({ error: error.message });
   }

@@ -7,7 +7,7 @@ signupForm.addEventListener("submit", async (e) => {
   const email = document.querySelector("#email").value.trim();
   const password = document.querySelector("#password").value;
   const confirmPassword = document.querySelector("#confirmPassword").value;
-
+  const normalizedEmail = email.trim().toLowerCase();
   try {
     const res = await fetch("http://localhost:3000/user/register", {
       method: "POST",
@@ -15,7 +15,7 @@ signupForm.addEventListener("submit", async (e) => {
       body: JSON.stringify({
         firstName,
         lastName,
-        email,
+        email: normalizedEmail,
         password,
         confirmPassword,
       }),
