@@ -65,6 +65,14 @@ En tant qu'utilisateur, je veux pouvoir supprimer mon compte de manière défini
 - Sprint 2 :
 ============
 
+
+
+1 - 2 - 3 - ajout reccurent 
+
+partage calendar - rdv 
+
+import export - recherche rdv partout - deplacer rendez vous depuis full calendar
+
 1. Affichage des calendriers en parallèle 
 -----------------------------------------
 En tant qu'utilisateur, je veux pouvoir voir plusieurs calendriers affichés simultanément dans FullCalendar, afin de comparer rapidement les rendez-vous de différents calendriers.
