@@ -572,6 +572,10 @@ body.dashboard-body {
   transition: background 0.2s ease;
 }
 
+.event-item.hidden {
+  display: none;
+}
+
 .event-item:hover {
   background: rgba(255, 255, 255, 0.15);
 }

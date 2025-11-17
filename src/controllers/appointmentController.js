@@ -28,7 +28,7 @@ exports.rajouteAppointment = async (req, res) => {
     }
 
     // Ajouter le rendez-vous
-    const updatedCalendar = await model.addAppointment(calendarId, {
+    const insertedAppointment = await model.addAppointment(calendarId, {
       name,
       date_debut,
       date_fin,
@@ -37,10 +37,9 @@ exports.rajouteAppointment = async (req, res) => {
 
     return res.status(200).json({
       message: "Rendez-vous ajouté avec succès",
-      calendar: updatedCalendar,
+      rdv: insertedAppointment,
     });
   } catch (error) {
-    console.error("Erreur addAppointment:", error);
     return res.status(500).json({ error });
   }
 };
@@ -90,25 +89,6 @@ exports.updateAppointment = async (req, res) => {
   }
 };
 
-exports.getAppointmentss = async (req, res) => {
-  try {
-    const { calendarId } = req.params;
-    
-    const calendar = await model.getCalandar(calendarId);
-    const now = new Date();
-    const upcoming = calendar.appointments.filter(
-      (a) => new Date(a.date_debut) >= now
-    );
-    const sortedAppointments = upcoming.sort(
-      (a, b) => new Date(a.date_debut) - new Date(b.date_debut)
-    );
-    const firstFive = sortedAppointments.slice(0, 3);
-    return res.status(200).json(firstFive);
-  } catch (err) {
-    console.error("Erreur getAppointments:", err);
-    return res.status(500).json({ error: "Erreur serveur" });
-  }
-};
 
 exports.getAppointments = async (req, res) => {
   try {

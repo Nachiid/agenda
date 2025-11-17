@@ -85,9 +85,15 @@ exports.addAppointment = async function (calendarId, appointmentData) {
   // Ajouter au calendrier
   calendar.appointments.push(newAppointment);
 
+  // Le rdv inséré est le dernier élément du tableau
+  const insertedAppointment =
+    calendar.appointments[calendar.appointments.length - 1];
+
   // Sauvegarder le calendrier
   await calendar.save();
-  return calendar;
+
+  // Retourner le rendez-vous inséré avec son _id
+  return insertedAppointment;
 };
 
 /**
@@ -137,14 +143,14 @@ exports.updateAppointment = async function (id_rdv, data) {
   return rdv;
 };
 /**
- * vérifier si le rdv appartien a un utilisateur donneé 
+ * vérifier si le rdv appartien a un utilisateur donneé
  */
-exports.getUserAppointment = async function(idUser , idAppointement){
-    const calandar = await Calendar.findOne({
-      userId: idUser,
-      "appointments._id": idAppointement
-    });
-    return calandar ? true : false;
+exports.getUserAppointment = async function (idUser, idAppointement) {
+  const calandar = await Calendar.findOne({
+    userId: idUser,
+    "appointments._id": idAppointement,
+  });
+  return calandar ? true : false;
 };
 
 // plusieur calandars

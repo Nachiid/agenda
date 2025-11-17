@@ -209,7 +209,7 @@ function createCalendarElement(cal, calendar) {
       setActiveCalendarIdsLocal([calendarId]);
       // Met à jour les cases à cocher pour refléter la sélection
       updateCalendarCheckboxes(getActiveCalendarIdsLocal());
-
+      await window.fetchAppointments(getActiveCalendarIdsLocal());
       showMessage("Calendrier sélectionné avec succès", "success");
     } catch (err) {
       console.error(err);
@@ -373,7 +373,6 @@ function openEventDetailsPopup(event) {
     date_fin: event.end,
   };
 
-  // Elements HTML
   const popup = document.getElementById("eventDetailsModal");
   popup.classList.remove("hidden");
 
@@ -386,24 +385,78 @@ function openEventDetailsPopup(event) {
     " → " +
     new Date(rdv.date_fin).toLocaleString();
 
-  // Bouton Modifier → ouvre ta popup actuelle
+  const btnDelete = popup.querySelector(".btn-delete");
+  btnDelete.dataset.id = rdv._id;
+
+  // Dispatch custom event au clic
+  btnDelete.onclick = () => {
+    document.dispatchEvent(
+      new CustomEvent("deleteAppointmentFromPopup", { detail: { id: rdv._id } })
+    );
+    popup.classList.add("hidden");
+  };
+
+  // Bouton Modifier
   popup.querySelector(".btn-edit").onclick = () => {
     popup.classList.add("hidden");
-    openEditPopup(rdv);
-  };
+    const eventModal = document.getElementById("eventModal");
+    eventModal.classList.remove("hidden");
+    eventForm.dataset.editingId = rdv._id;
+    // Modifier le titre DU popup ouvert
+    eventModal.querySelector(".modal-title").textContent = "Modifier le RDV";
+    eventModal.querySelector(".btn.btn-primary").textContent = "Modifier";
+    const start = new Date(rdv.date_debut);
+    const end = new Date(rdv.date_fin);
 
-  // Bouton Supprimer
-  popup.querySelector(".btn-delete").onclick = async () => {
-    popup.classList.add("hidden");
-
-    const ok = await deleteAppointment(rdv._id);
-
-    if (ok) {
-      EventSync.deleteUpcomingEvent(rdv._id);
-      EventSync.removeFromCalendar(rdv._id);
-    }
+    document.getElementById("eventTitle").value = rdv.name;
+    document.getElementById("eventComment").value = rdv.description;
+    document.getElementById("eventDateStart").value = start
+      .toISOString()
+      .slice(0, 10);
+    document.getElementById("eventTimeStart").value = start
+      .toTimeString()
+      .slice(0, 5);
+    document.getElementById("eventDateEnd").value = end
+      .toISOString()
+      .slice(0, 10);
+    document.getElementById("eventTimeEnd").value = end
+      .toTimeString()
+      .slice(0, 5);
   };
 }
+
+// Fonction pour gérer les mises à jour du calendrier
+function updateCalendar({ type, eventData }) {
+  switch (type) {
+    case "delete":
+      const event = calendar.getEventById(eventData._id);
+      if (event) event.remove();
+      break;
+
+    case "update":
+      const eventToUpdate = calendar.getEventById(eventData._id);
+      if (eventToUpdate) {
+        eventToUpdate.setProp("title", eventData.name);
+        eventToUpdate.setStart(eventData.date_debut);
+        eventToUpdate.setEnd(eventData.date_fin);
+        eventToUpdate.setExtendedProp("description", eventData.description);
+      }
+      break;
+
+    case "add":
+      calendar.addEvent({
+        id: eventData._id,
+        title: eventData.name,
+        start: eventData.date_debut,
+        end: eventData.date_fin,
+        description: eventData.description,
+      });
+      break;
+  }
+}
+
+// Rendre la fonction accessible depuis appointments.js etc
+window.updateCalendar = updateCalendar;
 
 /**  === Initialisation de la page d'accueil avec les données de l'utilisateur ===
  */
@@ -445,7 +498,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Événements dynamiques
     events: [],
 
-    // Tooltip pro avec tippy.js
+    // Tooltip
     eventDidMount: function (info) {
       const isListView = info.view.type.startsWith("list");
 
@@ -466,12 +519,18 @@ document.addEventListener("DOMContentLoaded", async function () {
         info.el.style.color = "#fff";
       }
 
-      // Tooltip pro sur hover
-      tippy(info.el, {
-        content: info.event.extendedProps.description || info.event.title,
-        placement: "top",
-        theme: "light",
-      });
+      // Tooltip sur hover
+      info.el.removeAttribute("title");
+
+      // Active Tippy seulement si une description existe
+      const desc = info.event.extendedProps.description;
+      if (desc && desc.trim() !== "") {
+        tippy(info.el, {
+          content: desc,
+          placement: "top",
+          theme: "light",
+        });
+      }
     },
 
     // Clic sur un événement
@@ -546,6 +605,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       showMessage("Erreur lors du chargement du calendrier actif", "error");
     }
   }
+
   try {
     // --- Récupération de tous les calendriers ---
     const allRes = await fetch("/user/calendars", {
@@ -570,6 +630,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       // Appel de la fonction qui gère la limite à 4 et le bouton "Afficher plus / moins"
       updateCalendarCheckboxes(getActiveCalendarIdsLocal());
       renderCalendarListUI(calendarListDiv);
+      await window.fetchAppointments(getActiveCalendarIdsLocal());
     }
   } catch (err) {
     showMessage("Impossible de charger votre calendrier", "error");
