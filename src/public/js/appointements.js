@@ -1,3 +1,8 @@
+const btnNewEvent = document.getElementById("btnNewEvent");
+const eventModal = document.getElementById("eventModal");
+const btnCancel = document.getElementById("btnCancel");
+const eventForm = document.getElementById("eventForm");
+
 /**
  * Recupere les id des calendriers actifs
  */
@@ -11,20 +16,6 @@ function getActiveCalendarIdsLocal() {
   }
 }
 
-// ==========================
-// Observer pour récupérer le calendarId
-// ==========================
-const observer = new MutationObserver((mutations, obs) => {
-  const calendarTitle = document.querySelector(".calendar-title");
-  if (calendarTitle) {
-    const calendarId = getActiveCalendarIdsLocal()[0];
-    console.log("✅ calendarId récupéré dynamiquement :", calendarId);
-    fetchAppointments(calendarId);
-    obs.disconnect();
-  }
-});
-
-observer.observe(document.body, { childList: true, subtree: true });
 
 document.addEventListener("DOMContentLoaded", () => {
   const interval = setInterval(() => {
@@ -39,16 +30,15 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==========================
 // Popup nouvel événement
 // ==========================
-const btnNewEvent = document.getElementById("btnNewEvent");
-const eventModal = document.getElementById("eventModal");
-const btnCancel = document.getElementById("btnCancel");
-const eventForm = document.getElementById("eventForm");
 
-if (btnNewEvent && eventModal && btnCancel && eventForm) {
-  btnNewEvent.addEventListener("click", () => {
+
+if(btnNewEvent && eventModal && btnCancel && eventForm) {
+    btnNewEvent.addEventListener("click", () => {
     eventModal.classList.remove("hidden");
     delete eventForm.dataset.editingId; // mode ajout
     eventForm.reset();
+      // Remettre le bon titre
+  eventModal.querySelector(".modal-title").textContent = "Créer un nouvel événement";
   });
 
   btnCancel.addEventListener("click", () => {
@@ -59,6 +49,7 @@ if (btnNewEvent && eventModal && btnCancel && eventForm) {
 
   eventModal.addEventListener("click", (e) => {
     if (e.target === eventModal) {
+      console.log("hi3")
       eventModal.classList.add("hidden");
       eventForm.reset();
       delete eventForm.dataset.editingId;
@@ -69,34 +60,21 @@ if (btnNewEvent && eventModal && btnCancel && eventForm) {
 // ==========================
 // Ajout / Update RDV
 // ==========================
-// ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 eventForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const calendarId = getActiveCalendarIdsLocal()[0];
-  if (!calendarId) {
-    alert(
-      "Impossible d’ajouter le rendez-vous : aucun calendrier sélectionné."
-    );
-    return;
-  }
-
   const id_rdv = eventForm.dataset.editingId; // si existe → update
   const rdv = {
     name: document.getElementById("eventTitle").value.trim(),
-    date_debut: `${document.getElementById("eventDateStart").value}T${
-      document.getElementById("eventTimeStart").value
-    }`,
-    date_fin: `${document.getElementById("eventDateEnd").value}T${
-      document.getElementById("eventTimeEnd").value
-    }`,
+    date_debut: `${document.getElementById("eventDateStart").value}T${ document.getElementById("eventTimeStart").value }`,
+    date_fin: `${document.getElementById("eventDateEnd").value}T${ document.getElementById("eventTimeEnd").value}`,
     description: document.getElementById("eventComment").value.trim(),
     calendarId,
   };
-
   try {
     let res;
-    if (id_rdv) {
+    if(id_rdv){
       rdv.id_rdv = id_rdv;
       res = await fetch("http://localhost:3000/UpdateAppointment", {
         method: "PUT",
@@ -104,9 +82,8 @@ eventForm.addEventListener("submit", async (e) => {
         credentials: "include",
         body: JSON.stringify(rdv),
       });
-    } else {
-      // erreur cas impossible -> return; ? avoir apres le merge
-      res = await fetch("http://localhost:3000/appointment", {
+    }else{
+        res = await fetch("http://localhost:3000/appointment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -118,21 +95,13 @@ eventForm.addEventListener("submit", async (e) => {
       const error = await res.json();
       throw new Error(error.message || "Erreur lors de l’opération");
     }
+    console.log("ID récupéré depuis localStorage =", calendarId);
 
-    //a revoir apres merge pour les afficher dans full calendar avec ecouteur agendas - apres merge
-
-    // Pas besoin de faire un fetch, data doit contenir le nouveau rdv et ses données -> insertion direct dans les divisions
-
-    //affichage max 5 evenement a gerer apres le merge ( j'ai deja le code de ca ) - - apres merge
-
-    alert(calendarId);
     fetchAppointments(calendarId);
+    document.dispatchEvent(new CustomEvent("appointmentsUpdated"));
     eventForm.reset();
     eventModal.classList.add("hidden");
     delete eventForm.dataset.editingId;
-
-    window.location.reload();
-
     showMessage(id_rdv, "succes");
   } catch (err) {
     showMessage("Erreur lors de l’opération", "error");
@@ -190,10 +159,7 @@ async function fetchAppointments(calendarIds) {
                     <button class="menu-edit btn-icon delete-btn" data-id="${evt._id}">✏️ Modifier</button>
                     <button class="menu-delete btn-icon delete-btn" data-id="${evt._id}">🗑️ Supprimer</button>
                   </div>
-                </div>
-
-                
-            `;
+                </div>`;
 
             //<button class="btn-icon delete-btn" title="Supprimer" data-id="${evt._id}">🗑️</button>
       upcomingEvents.appendChild(div);
@@ -216,8 +182,6 @@ document.getElementById("upcomingEvents").addEventListener("click", async (e) =>
   if (btnDelete) {
     // Suppression
     const id_rdv = btnDelete.getAttribute("data-id");
-          // alert 
-        // ⬇️ ON ATTEND la confirmation
     const confirmed = await showConfirm("Voulez-vous vraiment supprimer ce rendez-vous ?");
     if (!confirmed) return;
 
@@ -234,12 +198,9 @@ document.getElementById("upcomingEvents").addEventListener("click", async (e) =>
           // ✔️ Recharge les 5 prochains RDV
           const calendarIds = getActiveCalendarIdsLocal()[0]; // tu l'as déjà
           fetchAppointments(calendarIds);
-
           showMessage("✅ Rendez-vous supprimé", "success");
 
-        }else {
-            alert("Erreur lors de la suppression");
-        }
+        }else {showMessage("Erreur lors de la suppression","error");}
       })
       .catch((err) => {
         console.error(err);
@@ -253,36 +214,29 @@ document.getElementById("upcomingEvents").addEventListener("click", async (e) =>
     if (btnEdit) {
     const eventItem = btnEdit.closest(".event-item");
 
-  // Edition
-  const rdv = {
-    _id: eventItem.querySelector(".delete-btn").getAttribute("data-id"),
-    name: eventItem.querySelector(".event-title").textContent,
-    description: eventItem.dataset.description || "",
-    date_debut: eventItem.dataset.start,
-    date_fin: eventItem.dataset.end,
-  };
-
-  // Ouvrir le popup
+const rdv = {
+  _id: eventItem.querySelector(".delete-btn").getAttribute("data-id"),
+  name: eventItem.querySelector(".event-title").textContent,
+  description: eventItem.dataset.description || "",
+  date_debut: eventItem.dataset.start,
+  date_fin: eventItem.dataset.end,
+};
   eventModal.classList.remove("hidden");
   eventForm.dataset.editingId = rdv._id;
 
+  // Modifier le titre DU popup ouvert
+  eventModal.querySelector(".modal-title").textContent = "Modifier le RDV";
   const start = new Date(rdv.date_debut);
   const end = new Date(rdv.date_fin);
 
   document.getElementById("eventTitle").value = rdv.name;
   document.getElementById("eventComment").value = rdv.description;
-  document.getElementById("eventDateStart").value = start
-    .toISOString()
-    .slice(0, 10);
-  document.getElementById("eventTimeStart").value = start
-    .toTimeString()
-    .slice(0, 5);
-  document.getElementById("eventDateEnd").value = end
-    .toISOString()
-    .slice(0, 10);
-  document.getElementById("eventTimeEnd").value = end
-    .toTimeString()
-    .slice(0, 5);
+  document.getElementById("eventDateStart").value = start.toISOString().slice(0, 10);
+  document.getElementById("eventTimeStart").value = start.toTimeString().slice(0, 5);
+  document.getElementById("eventDateEnd").value = end.toISOString().slice(0, 10);
+  document.getElementById("eventTimeEnd").value = end.toTimeString().slice(0, 5);
+
+
 }
 });
 

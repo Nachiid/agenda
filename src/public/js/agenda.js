@@ -1,7 +1,10 @@
+let calendar; // variable globale
+
 /**
  * Met à jour le data-attribute avec la liste d'IDs
  */
 function setActiveCalendarIdsLocal(ids) {
+  
   if (!Array.isArray(ids)) ids = [ids];
   localStorage.setItem("activeCalendars", JSON.stringify(ids));
 }
@@ -368,7 +371,7 @@ function updateCalendarCheckboxes() {
 document.addEventListener("DOMContentLoaded", async function () {
   // === Initialisation du calendrier ===
   const calendarEl = document.getElementById("calendar");
-  const calendar = new FullCalendar.Calendar(calendarEl, {
+  calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "timeGridWeek", // Vue principale : semaine horaire
     allDaySlot: false, // pas de créneaux "toute la journée"
     slotEventOverlap: false, // interdit chevauchement visuel
@@ -433,24 +436,42 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Clic sur un événement
     eventClick: function (info) {
-      // event SPRINT 2
-      console.log(info.event.title, info.event.start, info.event.extendedProps);
-    },
+        const rdv = {
+          _id: info.event.id, 
+          name: info.event.title,
+          description: info.event.extendedProps.description || "",
+          date_debut: info.event.start,
+          date_fin: info.event.end,
+        };
+        // Ouvrir popup
+        eventModal.classList.remove("hidden");
+        eventForm.dataset.editingId = rdv._id;
+        // Titre
+        eventModal.querySelector(".modal-title").textContent = "Modifier le RDV";
 
+        // Remplir
+        const start = new Date(rdv.date_debut);
+        const end = new Date(rdv.date_fin);
+
+        document.getElementById("eventTitle").value = rdv.name;
+        document.getElementById("eventComment").value = rdv.description;
+        document.getElementById("eventDateStart").value = start.toISOString().slice(0, 10);
+        document.getElementById("eventTimeStart").value = start.toTimeString().slice(0, 5);
+        document.getElementById("eventDateEnd").value = end.toISOString().slice(0, 10);
+        document.getElementById("eventTimeEnd").value = end.toTimeString().slice(0, 5);
+    },
+    
     // Ajuste la couleur des événements en fonction du calendrier
     eventContent: function (arg) {
       const backgroundColor = arg.event.backgroundColor || "#4f46e5";
       const textColor = "#fff";
 
       return {
-        html: `<div class="fc-event-custom" style="background:${backgroundColor};color:${textColor};padding:2px 5px;border-radius:5px;">
-                ${arg.event.title}
-             </div>`,
+        html: `<div class="fc-event-custom" style="background:${backgroundColor};color:${textColor};padding:2px 5px;border-radius:5px;"> ${arg.event.title} </div>`,
       };
     },
   });
   calendar.render();
-
   // --- Charger les calendriers de l'utilisateur ---
   const activeIds = getActiveCalendarIdsLocal();
   if (activeIds.length === 0) {
@@ -494,11 +515,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       });
 
       const data = await res.json();
-      if (!res.ok) {
-        return showMessage(
-          data.error || "Impossible de charger votre calendrier actif",
-          "error"
-        );
+      if(!res.ok) {
+        return showMessage( data.error || "Impossible de charger votre calendrier actif", "error" );
       }
 
       updateCalendarView(data.calendar, calendar);
@@ -693,3 +711,31 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   }
 });
+
+
+document.addEventListener("appointmentsUpdated", async () => {
+  const calendarId = getActiveCalendarIdsLocal()[0];
+  console.log("appointmentsUpdated → ID utilisé :", calendarId);
+
+  if (!calendarId) {
+    console.error("Aucun ID calendrier");
+    return;
+  }
+
+  const res = await fetch("http://localhost:3000/user/agenda", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ calendarId }),
+  });
+
+  if (!res.ok) {
+    console.error("Erreur backend :", res.status);
+    return;
+  }
+
+  const data = await res.json();
+  updateCalendarView(data.calendar, calendar);
+});
+
+
