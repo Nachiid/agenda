@@ -260,9 +260,25 @@
         </form>
       </div>
     </div>
-    <script src="js/global.js"></script>
-    <script src="js/agenda.js"></script>
-    <script src="js/appointements.js"></script>
-    <script src="js/logout.js"></script>
+
+    <div id="eventDetailsModal" class="modal hidden">
+      <div class="modal-content">
+        <h2 class="details-title"></h2>
+
+        <p class="details-date"></p>
+        <p class="details-description"></p>
+
+        <div class="btn-row">
+          <button class="btn-edit">Modifier</button>
+          <button class="btn-delete">Supprimer</button>
+        </div>
+
+        <button class="btn-close">Fermer</button>
+      </div>
+    </div>
   </body>
+  <script src="js/global.js"></script>
+  <script src="js/agenda.js"></script>
+  <script src="js/appointements.js"></script>
+  <script src="js/logout.js"></script>
 </html>

@@ -4,7 +4,6 @@ let calendar; // variable globale
  * Met à jour le data-attribute avec la liste d'IDs
  */
 function setActiveCalendarIdsLocal(ids) {
-  
   if (!Array.isArray(ids)) ids = [ids];
   localStorage.setItem("activeCalendars", JSON.stringify(ids));
 }
@@ -365,6 +364,47 @@ function updateCalendarCheckboxes() {
   });
 }
 
+function openEventDetailsPopup(event) {
+  const rdv = {
+    _id: event.id,
+    name: event.title,
+    description: event.extendedProps.description || "",
+    date_debut: event.start,
+    date_fin: event.end,
+  };
+
+  // Elements HTML
+  const popup = document.getElementById("eventDetailsModal");
+  popup.classList.remove("hidden");
+
+  popup.querySelector(".details-title").textContent = rdv.name;
+  popup.querySelector(".details-description").textContent =
+    rdv.description || "Aucune description";
+
+  popup.querySelector(".details-date").textContent =
+    new Date(rdv.date_debut).toLocaleString() +
+    " → " +
+    new Date(rdv.date_fin).toLocaleString();
+
+  // Bouton Modifier → ouvre ta popup actuelle
+  popup.querySelector(".btn-edit").onclick = () => {
+    popup.classList.add("hidden");
+    openEditPopup(rdv);
+  };
+
+  // Bouton Supprimer
+  popup.querySelector(".btn-delete").onclick = async () => {
+    popup.classList.add("hidden");
+
+    const ok = await deleteAppointment(rdv._id);
+
+    if (ok) {
+      EventSync.deleteUpcomingEvent(rdv._id);
+      EventSync.removeFromCalendar(rdv._id);
+    }
+  };
+}
+
 /**  === Initialisation de la page d'accueil avec les données de l'utilisateur ===
  */
 
@@ -436,31 +476,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Clic sur un événement
     eventClick: function (info) {
-        const rdv = {
-          _id: info.event.id, 
-          name: info.event.title,
-          description: info.event.extendedProps.description || "",
-          date_debut: info.event.start,
-          date_fin: info.event.end,
-        };
-        // Ouvrir popup
-        eventModal.classList.remove("hidden");
-        eventForm.dataset.editingId = rdv._id;
-        // Titre
-        eventModal.querySelector(".modal-title").textContent = "Modifier le RDV";
-
-        // Remplir
-        const start = new Date(rdv.date_debut);
-        const end = new Date(rdv.date_fin);
-
-        document.getElementById("eventTitle").value = rdv.name;
-        document.getElementById("eventComment").value = rdv.description;
-        document.getElementById("eventDateStart").value = start.toISOString().slice(0, 10);
-        document.getElementById("eventTimeStart").value = start.toTimeString().slice(0, 5);
-        document.getElementById("eventDateEnd").value = end.toISOString().slice(0, 10);
-        document.getElementById("eventTimeEnd").value = end.toTimeString().slice(0, 5);
+      openEventDetailsPopup(info.event);
     },
-    
     // Ajuste la couleur des événements en fonction du calendrier
     eventContent: function (arg) {
       const backgroundColor = arg.event.backgroundColor || "#4f46e5";
@@ -515,8 +532,11 @@ document.addEventListener("DOMContentLoaded", async function () {
       });
 
       const data = await res.json();
-      if(!res.ok) {
-        return showMessage( data.error || "Impossible de charger votre calendrier actif", "error" );
+      if (!res.ok) {
+        return showMessage(
+          data.error || "Impossible de charger votre calendrier actif",
+          "error"
+        );
       }
 
       updateCalendarView(data.calendar, calendar);
@@ -712,7 +732,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 });
 
-
 document.addEventListener("appointmentsUpdated", async () => {
   const calendarId = getActiveCalendarIdsLocal()[0];
   console.log("appointmentsUpdated → ID utilisé :", calendarId);
@@ -738,4 +757,31 @@ document.addEventListener("appointmentsUpdated", async () => {
   updateCalendarView(data.calendar, calendar);
 });
 
+// --- Gestion fermeture popup des détails ---
+(function () {
+  const modal = document.getElementById("eventDetailsModal");
+  if (!modal) return;
 
+  const content = modal.querySelector(".modal-content");
+  const btnClose = modal.querySelector(".btn-close");
+
+  // Bouton fermer
+  if (btnClose) {
+    btnClose.addEventListener("click", () => {
+      modal.classList.add("hidden");
+    });
+  }
+
+  // Clic extérieur
+  modal.addEventListener("click", (e) => {
+    // Si on clique directement sur le fond en arrière-plan
+    if (e.target === modal) {
+      modal.classList.add("hidden");
+    }
+  });
+
+  // Empêcher fermeture quand on clique dans la fenêtre
+  content.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+})();
