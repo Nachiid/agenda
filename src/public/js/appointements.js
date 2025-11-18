@@ -211,7 +211,8 @@ if (btnNewEvent && eventModal && btnCancel && eventForm) {
     eventModal.querySelector(".modal-title").textContent =
       "Créer un nouvel événement";
     eventModal.querySelector(".btn.btn-primary").textContent = "Créer";
-  });
+  }); 
+  
 
   btnCancel.addEventListener("click", () => {
     eventModal.classList.add("hidden");
