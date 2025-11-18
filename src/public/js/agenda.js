@@ -302,10 +302,10 @@ function createCalendarElement(cal, calendar) {
   deleteBtn.addEventListener("click", async (e) => {
     e.stopPropagation();
     const calendarId = calDiv.dataset.id;
-     if (getActiveCalendarIdsLocal().length === 1) {
-     showMessage("Vous devez garder au moins un calendrier.", "error");
-    return;
-     }
+    if (getActiveCalendarIdsLocal().length === 1) {
+      showMessage("Vous devez garder au moins un calendrier.", "error");
+      return;
+    }
     const confirmed = await showConfirm(
       `Voulez-vous vraiment supprimer ce calendrier ?`
     );
@@ -526,6 +526,37 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Événements dynamiques
     events: [],
+
+    viewDidMount: function (viewInfo) {
+      // ne scroller que pour les vues horaires (timeGridDay/timeGridWeek)
+      const type = viewInfo.view.type;
+      if (type.startsWith("timeGrid") || type === "dayGridDay") {
+        // méthode fournie par FullCalendar v5+/v6 : scrollToTime
+        // appelé avec un petit délai pour s'assurer que le DOM est rendu
+        setTimeout(() => {
+          if (calendar.scrollToTime) {
+            calendar.scrollToTime("06:00:00");
+          } else {
+            // fallback : scroll manuel si ancienne version
+            const scroller = viewInfo.el.querySelector(
+              ".fc-scroller, .fc-timegrid-slots"
+            );
+            if (scroller) {
+              // calcule position approximative (hauteur par heure)
+              const hourHeight = scroller.scrollHeight / 24;
+              scroller.scrollTop = Math.floor(6 * hourHeight);
+            }
+          }
+        }, 30);
+      }
+    },
+
+    // appelé quand les dates/vues changent (sécurité supplémentaire)
+    datesSet: function () {
+      setTimeout(() => {
+        if (calendar.scrollToTime) calendar.scrollToTime("06:00:00");
+      }, 30);
+    },
 
     // Tooltip
     eventDidMount: function (info) {
