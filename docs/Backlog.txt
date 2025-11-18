@@ -1,15 +1,15 @@
 Backlog Produit : Application Web Agenda
-===============================================
+========================================
 
 – Sprint 0 :
-=============
+============
 
 1. Création de compte
----------------------
+------------------------
 En tant que nouvel utilisateur, je veux créer un compte, afin d'accéder à mon agenda personnel.
 
 2. Connexion
-------------
+------------------------
 En tant qu'utilisateur inscrit, je veux me connecter à mon compte, afin d'accéder à mes rendez-vous.
 
 3. Ajout de rendez-vous
@@ -17,15 +17,15 @@ En tant qu'utilisateur inscrit, je veux me connecter à mon compte, afin d'accé
 En tant qu'utilisateur connecté, je veux ajouter un rendez-vous, afin de planifier mes événements.
 
 4. Modification de rendez-vous
-------------------------------
+------------------------
 En tant qu'utilisateur, je veux pouvoir modifier un rendez-vous existant, afin de mettre à jour les informations.
 
 5. Suppression de rendez-vous
------------------------------
+------------------------
 En tant qu'utilisateur, je veux pouvoir supprimer un rendez-vous, afin de gérer mon planning.
 
 6. Affichage d'une liste des rendez-vous
-----------------------------------------
+------------------------
 En tant qu'utilisateur, je veux afficher une liste de mes rendez-vous, afin de visualiser facilement les événements à venir.
 
 
@@ -33,62 +33,70 @@ En tant qu'utilisateur, je veux afficher une liste de mes rendez-vous, afin de v
 ============
 
 1. Affichage du calendrier
---------------------------
+------------------------
 En tant qu'utilisateur connecté, je veux afficher mes rendez-vous dans une vue calendrier (jour, semaine, mois), afin de visualiser mon planning de manière chronologique.
 
 2. Création de calendrier
---------------------------
+------------------------
 En tant qu'utilisateur, je veux pouvoir créer un nouveau calendrier, afin de catégoriser mes rendez-vous (personnel, professionnel, etc.).
 
 3. Modification de calendrier
------------------------------
+------------------------
 En tant qu'utilisateur, je veux pouvoir modifier un calendrier existant (nom, couleur, etc.), afin de maintenir mon organisation à jour.
 
 4. Suppression de calendrier
------------------------------
+------------------------
 En tant qu'utilisateur, je veux pouvoir supprimer un calendrier, afin de nettoyer ma liste de calendriers.
 
 5. Affichage de la liste des calendriers
-----------------------------------------
+------------------------
 En tant qu'utilisateur, je veux afficher une liste de mes calendriers, afin de pouvoir les gérer et les sélectionner.
 
 6. Modification du profil
--------------------------
+------------------------
 En tant qu'utilisateur, je veux pouvoir modifier les informations de mon profil (nom, email, mot de passe), afin de maintenir mes données personnelles à jour.
 
 7. Suppression de compte
 ------------------------
 En tant qu'utilisateur, je veux pouvoir supprimer mon compte de manière définitive, afin de garantir le droit à l'oubli de mes données personnelles.
 
-
-
-- Sprint 2 :
+- Sprint 2
 ============
 
+---
 
-
-1 - 2 - 3 - ajout reccurent 
-
-partage calendar - rdv 
-
-import export - recherche rdv partout - deplacer rendez vous depuis full calendar
-
-1. Affichage des calendriers en parallèle 
------------------------------------------
+1. Affichage des calendriers en parallèle
+------------------------
 En tant qu'utilisateur, je veux pouvoir voir plusieurs calendriers affichés simultanément dans FullCalendar, afin de comparer rapidement les rendez-vous de différents calendriers.
 
-2. Ajout de rendez-vous directement depuis FullCalendar 
--------------------------------------------------------
-En tant qu'utilisateur, je veux pouvoir créer un rendez-vous en cliquant directement sur un créneau horaire dans le calendrier, afin de gagner du temps dans la planification.
+2. Ajout de rendez-vous directement depuis FullCalendar
+------------------------
+   En tant qu'utilisateur, je veux pouvoir créer un rendez-vous en cliquant directement sur un créneau horaire dans le calendrier, afin de gagner du temps dans la planification.
 
-3. Vue par défaut du calendrier 
--------------------------------
-En tant qu'utilisateur, je veux que le calendrier s'ouvre sur une vue par défaut que je choisis depuis mes parametres profil, afin d'avoir un aperçu  de mes rendez-vous.
+3. Vue par défaut du calendrier
+------------------------
+En tant qu'utilisateur, je veux que le calendrier s'ouvre sur une vue par défaut que je choisis depuis mes paramètres profil, afin d'avoir un aperçu de mes rendez-vous.
 
-4. Statistiques profil 
-----------------------
-En tant qu'utilisateur, je veux voir des statistiques liées à mon profil et mes rendez-vous , afin de mieux analyser mon organisation.
-
-5. Affichage du fuseau horaire devant le titre du calendrier 
-------------------------------------------------------------
+4. Affichage du fuseau horaire devant le titre du calendrier
+------------------------
 En tant qu'utilisateur, je veux voir le fuseau horaire affiché à côté du titre du calendrier, afin de mieux gérer mes rendez-vous internationaux.
+
+5. Ajout de la récurrence des rendez-vous
+------------------------
+En tant qu'utilisateur, je veux pouvoir définir un rendez-vous récurrent, afin de planifier automatiquement des événements répétitifs.
+
+6. Partage de calendrier et rendez-vous
+------------------------
+En tant qu'utilisateur, je veux pouvoir partager un calendrier ou un rendez-vous avec d'autres utilisateurs, afin de faciliter la coordination.
+
+7. Import / Export des calendriers
+------------------------
+En tant qu'utilisateur, je veux pouvoir importer et exporter mes calendriers, afin de les sauvegarder ou les transférer vers d'autres applications.
+
+8. Recherche de rendez-vous partout
+------------------------
+En tant qu'utilisateur, je veux pouvoir rechercher un rendez-vous dans tous mes calendriers, afin de retrouver rapidement une information.
+
+9. Déplacement de rendez-vous depuis FullCalendar
+------------------------
+En tant qu'utilisateur, je veux pouvoir déplacer un rendez-vous directement dans FullCalendar par glisser-déposer, afin de modifier facilement son horaire.

@@ -22,9 +22,11 @@ const appointmentSchema = new mongoose.Schema({
 const calendarSchema = new mongoose.Schema({
   title: { type: String, required: true },
   color: { type: String, required: true },
-  appointments: [appointmentSchema], // Tableau de sous-documents
+  appointments: [appointmentSchema],
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  isShared: { type: Boolean, default: false },
 });
+
 
 // Shéma pour les Calendriers partagé
 const sharedCalendarSchema = new mongoose.Schema({
