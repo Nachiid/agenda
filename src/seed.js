@@ -58,6 +58,7 @@ async function seedAll() {
       { title: "perso", color: "#3498db" },
       { title: "amis", color: "#2ecc71" },
       { title: "famille", color: "#e74c3c" },
+      { title: "travail", color: "#34495e" },
     ];
 
     const calendars = [];

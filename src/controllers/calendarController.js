@@ -14,17 +14,27 @@ exports.showFirstCalendar = async (req, res) => {
 
 exports.showCalendar = async (req, res) => {
   try {
-    const { calendarId } = req.body;
-    const userID = req.user.id;
+    const { calendarIds } = req.body;
+    const userId = req.user.id;
 
-    const calendar = await model.getUserCalendar(calendarId, userID);
+    if (!Array.isArray(calendarIds) || calendarIds.length === 0) {
+      return res.status(400).json({ error: "Aucun calendrier demandé." });
+    }
 
-    return res.status(200).json({ calendar: calendar });
+    const calendars = [];
+    for (const id of calendarIds) {
+      //apres
+      const cal = await model.getUserCalendar(id, userId);
+      if (cal) calendars.push(cal);
+    }
+
+    return res.status(200).json({ calendars });
   } catch (error) {
     console.error("Erreur showCalendar:", error);
-    return res.status(500).json({ error });
+    return res.status(500).json({ error: "Erreur interne du serveur." });
   }
 };
+
 
 exports.getAllCalendarsIdsTitles = async (req, res) => {
   try {

@@ -34,58 +34,74 @@ function addActiveCalendarIdLocal(id) {
  * Supprime un ID de la liste des calendriers actifs
  * S'assure qu'il reste au moins un ID actif
  * *****************************************
- * Sprint 2
  */
 function removeActiveCalendarIdLocal(id) {
   let ids = getActiveCalendarIdsLocal();
-  ids = ids.filter((i) => i !== id);
+  ids = ids.filter((i) => i && i !== id);
   setActiveCalendarIdsLocal(ids);
 }
 
 /**
  * Met à jour l'affichage du calendrier avec un nouveau jeu de données
  */
-function updateCalendarView(calendarData, calendar) {
-  if (!calendarData || !calendar) return;
+function updateCalendarView(calendars, calendar) {
+  if (!Array.isArray(calendars) || !calendar) return;
 
   try {
-    // --- Met à jour le titre du calendrier ---
-    const titleDiv = document.querySelector(".calendar-title");
-    if (titleDiv) {
-      titleDiv.textContent = calendarData.title || "Sans titre";
+    calendars.forEach((cal) => {
+      // Mettre à jour le titre du calendrier affiché (ou afficher "Multi-calendriers")
+      //const titleDiv = document.querySelector(".calendar-title");
+      //if (titleDiv) {
+      //  titleDiv.textContent =
+      //    calendars.length === 1 ? cal.title : "Calendriers combinés";
+      //}
 
-      // Ajoute ce calendrier à la liste des actifs
-      setActiveCalendarIdsLocal([calendarData._id]);
-      //Normalement on doit utiliser add mais c pour sprint 2
-      //addActiveCalendarIdLocal(calendarData._id);
-    }
+      addActiveCalendarIdLocal(cal._id);
 
-    // --- Réinitialise les événements actuels ---
-    calendar.removeAllEvents();
+      // Ajouter chaque rendez-vous du calendrier
+      if (Array.isArray(cal.appointments)) {
+        cal.appointments.forEach((r) => {
+          calendar.addEvent({
+            id: r._id,
+            title: r.name,
+            start: r.date_debut,
+            end: r.date_fin,
+            backgroundColor: cal.color,
+            borderColor: cal.color,
+            textColor: "#fff",
+            extendedProps: {
+              description: r.description || "",
+              calendarId: cal._id,
+            },
+            display: "auto",
+          });
+        });
+      } else {
+        console.log(cal.appointments);
+      }
+    });
 
-    // Prépare et ajoute les nouveaux événements
-    if (Array.isArray(calendarData.appointments)) {
-      const events = calendarData.appointments.map((r) => ({
-        id: r._id,
-        title: r.name,
-        start: r.date_debut,
-        end: r.date_fin,
-        backgroundColor: calendarData.color,
-        borderColor: calendarData.color,
-        textColor: "#fff",
-        extendedProps: { description: r.description || "" },
-        display: "auto",
-      }));
-
-      events.forEach((ev) => calendar.addEvent(ev));
-    }
-
-    // --- Rendu final ---
     calendar.render();
   } catch (err) {
     showMessage("Erreur lors de la mise à jour du calendrier", "error");
     console.error(err);
   }
+}
+
+/**
+ * supprimer les événements d’un calendrier spécifique
+ */
+
+function removeCalendarEvents(calendarId, calendar) {
+  if (!calendar || !calendarId) return;
+
+  const events = calendar.getEvents();
+
+  events.forEach((ev) => {
+    if (ev.extendedProps?.calendarId === calendarId) {
+      ev.remove();
+    }
+  });
 }
 
 /**
@@ -174,8 +190,14 @@ function createCalendarElement(cal, calendar) {
 
     if (!selectedCheckbox.checked) {
       let activeIds = getActiveCalendarIdsLocal();
+      if (activeIds.length === 1) {
+        selectedCheckbox.checked = true;
+        showMessage("Vous devez garder au moins un calendrier actif.", "error");
+        return;
+      }
       if (activeIds.includes(calendarId)) {
         removeActiveCalendarIdLocal(calendarId);
+        removeCalendarEvents(calendarId, calendar);
       }
       return;
     }
@@ -185,7 +207,7 @@ function createCalendarElement(cal, calendar) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ calendarId }),
+        body: JSON.stringify({ calendarIds: [calendarId] }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -196,11 +218,9 @@ function createCalendarElement(cal, calendar) {
         selectedCheckbox.checked = false;
         return;
       }
-      updateCalendarView(data.calendar, calendar);
-      setActiveCalendarIdsLocal([calendarId]);
+      updateCalendarView(data.calendars, calendar);
       updateCalendarCheckboxes(getActiveCalendarIdsLocal());
       await window.fetchAppointments(getActiveCalendarIdsLocal());
-      showMessage("Calendrier sélectionné avec succès", "success");
     } catch (err) {
       console.error(err);
       showMessage("Erreur serveur, réessayez plus tard.", "error");
@@ -282,6 +302,10 @@ function createCalendarElement(cal, calendar) {
   deleteBtn.addEventListener("click", async (e) => {
     e.stopPropagation();
     const calendarId = calDiv.dataset.id;
+     if (getActiveCalendarIdsLocal().length === 1) {
+     showMessage("Vous devez garder au moins un calendrier.", "error");
+    return;
+     }
     const confirmed = await showConfirm(
       `Voulez-vous vraiment supprimer ce calendrier ?`
     );
@@ -297,32 +321,15 @@ function createCalendarElement(cal, calendar) {
         showMessage(data.error, "error");
         return;
       }
-
       calDiv.remove();
       renderCalendarListUI(calendarListDiv);
       showMessage(data.message, "success");
-
-      // LocalStorage
-      let activeIds = getActiveCalendarIdsLocal();
-      if (activeIds.includes(calendarId)) {
-        removeActiveCalendarIdLocal(calendarId);
-      }
       if (getActiveCalendarIdsLocal().length === 0) {
         const firstCalendarDiv = document.querySelector(".event-item2");
         if (firstCalendarDiv) {
           const newCalendarId = firstCalendarDiv.dataset.id;
+          console.log("test suppression : " + newCalendarId);
           setActiveCalendarIdsLocal([newCalendarId]);
-          const resNew = await fetch(`/user/agenda/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ calendarId: newCalendarId }),
-          });
-          const dataNew = await resNew.json();
-          if (resNew.ok && dataNew.calendar) {
-            updateCalendarView(dataNew.calendar, calendar);
-            updateCalendarCheckboxes(getActiveCalendarIdsLocal());
-          }
         }
       }
     } catch (err) {
@@ -487,9 +494,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const calendarEl = document.getElementById("calendar");
   const userPreference = await getUserPreference();
   calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: mapDefaultView(
-      userPreference?.defaultView || "Semaine"
-    ), // Vue principale : semaine horaire
+    initialView: mapDefaultView(userPreference?.defaultView || "Semaine"), // Vue principale : semaine horaire
     allDaySlot: false, // pas de créneaux "toute la journée"
     slotEventOverlap: false, // interdit chevauchement visuel
     eventOverlap: false, // interdit drag & drop sur événements chevauchants
@@ -592,8 +597,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const data = await res.json();
 
       if (data.calendar) {
-        updateCalendarView(data.calendar, calendar);
-        showMessage("Calendrier par default chargé avec succès", "success");
+        updateCalendarView([data.calendar], calendar);
       } else {
         showMessage(data.error || "Aucun calendrier trouvé", "error");
       }
@@ -605,13 +609,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   } else {
     // On recupere les calendriers actifs
-    const calendarId = activeIds[0]; // pour l’instant, on affiche que le premier => SPRINT 2
+    const calendarIds = activeIds;
     try {
       const res = await fetch(`/user/agenda`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ calendarId }),
+        body: JSON.stringify({ calendarIds }),
       });
 
       const data = await res.json();
@@ -622,7 +626,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         );
       }
 
-      updateCalendarView(data.calendar, calendar);
+      updateCalendarView(data.calendars, calendar);
       updateCalendarCheckboxes(activeIds);
     } catch (err) {
       console.error(err);
@@ -723,6 +727,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const newTitle = document.getElementById("calendarTitle").value.trim();
 
       //modif le bouton s'affiche que si 1 seul calendrier est actif a faire apres
+      //maj le bouton modif est supprimer ! mais faut adapter pour que modifier dans menu fonctionne
       const calendarId =
         calendarForm.dataset.editingId || getActiveCalendarIdsLocal()[0];
 
@@ -817,30 +822,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 });
 
-document.addEventListener("appointmentsUpdated", async () => {
-  const calendarId = getActiveCalendarIdsLocal()[0];
-
-  if (!calendarId) {
-    console.error("Aucun ID calendrier");
-    return;
-  }
-
-  const res = await fetch("http://localhost:3000/user/agenda", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ calendarId }),
-  });
-
-  if (!res.ok) {
-    console.error("Erreur backend :", res.status);
-    return;
-  }
-
-  const data = await res.json();
-  updateCalendarView(data.calendar, calendar);
-});
-
 // Gestion globale pour tous les boutons modifier
 document.addEventListener("click", (e) => {
   const editBtn = e.target.closest(".edit-btn-cal");
@@ -886,3 +867,33 @@ document.addEventListener("click", (e) => {
     e.stopPropagation();
   });
 })();
+
+// --- Réinitialise les événements actuels ---
+//calendar.removeAllEvents();
+/*
+
+
+document.addEventListener("appointmentsUpdated", async () => {
+  const calendarId = getActiveCalendarIdsLocal()[0];
+
+  if (!calendarId) {
+    console.error("Aucun ID calendrier");
+    return;
+  }
+
+  const res = await fetch("http://localhost:3000/user/agenda", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ calendarId }),
+  });
+
+  if (!res.ok) {
+    console.error("Erreur backend :", res.status);
+    return;
+  }
+
+  const data = await res.json();
+  updateCalendarView(data.calendar, calendar);
+});
+*/

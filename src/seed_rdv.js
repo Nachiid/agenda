@@ -40,8 +40,8 @@ async function addAppointmentsByEmail(email) {
       const newAppointments = [];
 
       // On génère des rendez-vous sur 3 mois différents
-      for (let monthOffset = -1; monthOffset <= 1; monthOffset++) {
-        for (let i = 0; i < 5; i++) {
+      for (let monthOffset = -1; monthOffset <= 5; monthOffset++) {
+        for (let i = 0; i < 10; i++) {
           const baseDate = new Date();
           baseDate.setMonth(baseDate.getMonth() + monthOffset);
           baseDate.setDate(Math.floor(Math.random() * 25) + 1);

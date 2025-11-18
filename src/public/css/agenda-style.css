@@ -715,3 +715,45 @@ body.dashboard-body {
   transform: none !important;
   box-shadow: none !important;
 }
+
+.calendar-title.hidden {
+  display: none;
+}
+.todo-container {
+  margin-top: 25px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+}
+
+.todo-title {
+  margin: 0 0 15px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.todo-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.todo-item {
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: #f4f6f9;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #444;
+  border-left: 4px solid #4a90e2;
+}
+
+.todo-item:last-child {
+  margin-bottom: 0;
+}
+
+.btn.btn-primary.btn-full.hidden{
+  display: none;
+}
