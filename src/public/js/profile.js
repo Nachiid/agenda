@@ -36,6 +36,21 @@ async function chargerProfil() {
         ".profile-name"
       ).textContent = `${firstName} ${lastName}`;
       document.querySelector(".avatar-circle").textContent = initials;
+
+      // --- Mise a jour du select
+      const defaultViewSelect = document.querySelector(
+        ".preference-item-view select"
+      );
+      if (defaultViewSelect && user.calendarPreferences) {
+        console.log(user.calendarPreferences.defaultView);
+        const userDefaultView = user.calendarPreferences.defaultView;
+
+        Array.from(defaultViewSelect.options).forEach((opt) => {
+          opt.selected = opt.value === userDefaultView;
+        });
+      }else{
+        console.log("default vide ou champs nom trouvé&");
+      }
     } else {
       showMessage(data.error || "Erreur lors du chargement du profil", "error");
     }
@@ -248,3 +263,40 @@ confirmDelete.addEventListener("click", async () => {
     console.error(err);
   }
 });
+
+// Sélection des preferences
+const defaultViewSelect = document.querySelector(
+  ".preference-item-view select"
+);
+
+if (defaultViewSelect) {
+  defaultViewSelect.addEventListener("change", async (e) => {
+    const selectedView = e.target.value;
+
+    try {
+      const res = await fetch("/user/preferences/defaultView", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ defaultView: selectedView }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        showMessage(
+          data.error || "Erreur lors de la sauvegarde des préférences",
+          "error"
+        );
+        return;
+      }
+
+      showMessage("Préférence sauvegardée avec succès", "success");
+    } catch (err) {
+      console.error(err);
+      showMessage("Erreur serveur, réessayez plus tard", "error");
+    }
+  });
+}

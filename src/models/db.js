@@ -7,7 +7,12 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   phone: { type: String },
-  timezone: { type: String, default: "Europe/Paris" },
+  calendarPreferences: {
+    defaultView: { type: String, default: "Semaine" },
+    weekStart: { type: String, default: "Monday" }, // Sprint 4
+    showWeekends: { type: Boolean, default: true }, // Sprint 4
+  },
+  timezone: { type: String, default: "Europe/Paris" }, // Sprint 4
 });
 
 // Schéma pour les rendez-vous (Appointment) — sous-document uniquement
@@ -26,7 +31,6 @@ const calendarSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   isShared: { type: Boolean, default: false },
 });
-
 
 // Shéma pour les Calendriers partagé
 const sharedCalendarSchema = new mongoose.Schema({

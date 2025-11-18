@@ -123,11 +123,11 @@
     <div class="profile-container">
       <div class="profile-header">
         <div class="profile-avatar">
-          <div class="avatar-circle">JD</div>
+          <div class="avatar-circle"></div>
         </div>
         <div class="profile-info">
-          <h1 class="profile-name">Jean Dupont</h1>
-          <p class="profile-email">jean.dupont@example.com</p>
+          <h1 class="profile-name"></h1>
+          <p class="profile-email"></p>
         </div>
       </div>
 
@@ -142,7 +142,7 @@
                 type="text"
                 id="firstName"
                 class="form-input"
-                value="Jean Dupont"
+                value=""
                 required
               />
             </div>
@@ -152,7 +152,7 @@
                 type="text"
                 id="lastName"
                 class="form-input"
-                value="Jean Dupont"
+                value=""
                 required
               />
             </div>
@@ -162,7 +162,7 @@
                 type="email"
                 id="email"
                 class="form-input"
-                value="jean.dupont@example.com"
+                value=""
                 required
               />
             </div>
@@ -219,33 +219,17 @@
                 <span class="toggle-slider"></span>
               </label>
             </div>
-            <div class="preference-item">
+            <div class="preference-item-view">
               <div class="preference-info">
                 <h3>Vue par defaut</h3>
                 <p>Choisir la vue d'affichage par defaut du calendrier</p>
               </div>
               <select class="form-input" style="width: 150px">
-                <option value="month" selected>Mois</option>
-                <option value="week">Semaine</option>
-                <option value="day">Jour</option>
+                <option value="Mois" >Mois</option>
+                <option value="Semaine">Semaine</option>
+                <option value="Jour">Jour</option>
+                <option value="Liste">Liste</option>
               </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- Section Statistiques -->
-        <div class="profile-section">
-          <h2 class="section-title">Statistiques</h2>
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-icon">📅</div>
-              <div class="stat-value">24</div>
-              <div class="stat-label">Evenements ce mois</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">⏰</div>
-              <div class="stat-value">6</div>
-              <div class="stat-label">Evenements a venir</div>
             </div>
           </div>
         </div>
@@ -268,7 +252,7 @@
     </div>
 
     <!-- Popup de confirmation de suppression -->
-    <!--
+    
     <div id="deleteConfirmModal" class="custom-modal hidden">
       <div class="custom-modal-content">
         <h3>Supprimer le compte</h3>
@@ -282,9 +266,9 @@
         </div>
       </div>
     </div>
-    -->
-    <script src="js/global.js"></script>
-    <script src="/js/profile.js"></script>
-    <script src="/js/logout.js"></script>
+    
+    <script src="js/global.js" defer></script>
+    <script src="/js/profile.js" defer></script>
+    <script src="/js/logout.js" defer></script>
   </body>
 </html>

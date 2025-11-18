@@ -89,9 +89,29 @@ exports.login = async (req, res) => {
 
 exports.getuser = async (req, res) => {
   const id = req.user.id;
+
+  try {
+    const profil = await model.getProfil(id);
+
+    if (!profil) {
+      return res.status(404).json({ error: "Utilisateur introuvable." });
+    }
+
+    const { password, ...profilSansMdp } = profil.toObject();
+    return res.status(200).json({ user: profilSansMdp });
+  } catch (error) {
+    return res.status(500).json({ error: "Erreur interne du serveur." });
+  }
+};
+
+// Contrôleur pour mettre à jour la vue par défaut du calendrier
+exports.getuserPreference = async (req, res) => {
+  const id = req.user.id;
   try {
     const profil_inforamation = await model.getProfil(id);
-    return res.status(200).json({ user: profil_inforamation });
+    return res
+      .status(200)
+      .json({ userPreference: profil_inforamation.calendarPreferences });
   } catch (error) {
     return res.status(500).json({ error: "Erreur interne du serveur." });
   }
@@ -214,6 +234,31 @@ exports.supprimerProfile = async (req, res) => {
       .json({ message: "Profil et agendas associés supprimés avec succès." });
   } catch (error) {
     console.error("Erreur lors de la suppression du profil:", error);
+    return res.status(500).json({ error: "Erreur interne du serveur." });
+  }
+};
+
+// Contrôleur pour mettre à jour la vue par défaut du calendrier
+exports.updatePreference = async (req, res) => {
+  const userId = req.user.id;
+  const { defaultView } = req.body;
+
+  if (!defaultView || !["Mois", "Semaine", "Jour"].includes(defaultView)) {
+    return res
+      .status(400)
+      .json({ error: "Valeur de vue par défaut invalide." });
+  }
+
+  try {
+    // Appel de la fonction du modèle pour mettre à jour la préférence
+    const updatedUser = await model.updateUserPreference(userId, defaultView);
+
+    return res.status(200).json({
+      message: "Préférence mise à jour avec succès.",
+      defaultView: updatedUser.defaultView,
+    });
+  } catch (error) {
+    console.error(error);
     return res.status(500).json({ error: "Erreur interne du serveur." });
   }
 };

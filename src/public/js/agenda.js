@@ -447,14 +447,49 @@ function updateCalendar({ type, eventData }) {
 // Rendre la fonction accessible depuis appointments.js etc
 window.updateCalendar = updateCalendar;
 
+async function getUserPreference() {
+  try {
+    const res = await fetch(`http://localhost:3000/user/preference`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+    const data = await res.json();
+    if (res.ok) return data.userPreference;
+    throw new Error(data.error || "Erreur lors du chargement du profil");
+  } catch (err) {
+    showMessage(err.message, "error");
+    return null;
+  }
+}
+
+// Fonction de mapping
+function mapDefaultView(viewFromDb) {
+  switch (viewFromDb) {
+    case "Semaine":
+      return "timeGridWeek";
+    case "Mois":
+      return "dayGridMonth";
+    case "Jour":
+      return "timeGridDay";
+    case "Liste":
+      return "listWeek";
+    default:
+      return "timeGridWeek"; // fallback
+  }
+}
+
 /**  === Initialisation de la page d'accueil avec les données de l'utilisateur ===
  */
 
 document.addEventListener("DOMContentLoaded", async function () {
   // === Initialisation du calendrier ===
   const calendarEl = document.getElementById("calendar");
+  const userPreference = await getUserPreference();
   calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: "timeGridWeek", // Vue principale : semaine horaire
+    initialView: mapDefaultView(
+      userPreference?.defaultView || "Semaine"
+    ), // Vue principale : semaine horaire
     allDaySlot: false, // pas de créneaux "toute la journée"
     slotEventOverlap: false, // interdit chevauchement visuel
     eventOverlap: false, // interdit drag & drop sur événements chevauchants

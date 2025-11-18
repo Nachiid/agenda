@@ -29,6 +29,7 @@ router.post("/user/login", userController.login);
  **
  */
 router.get("/user/profile", auth, userController.getuser);
+router.get("/user/preference", auth, userController.getuserPreference);
 router.get("/profile", auth, (req, res) => {
   res.sendFile(path.join(__dirname, "../views/profile.html"));
 });
@@ -38,6 +39,9 @@ router.put("/user/profile", auth, userController.modifierProfile);
 router.put("/user/password", auth, userController.changePassword);
 // --- Route pour supprimer le profil ---
 router.delete("/user/profile", auth, userController.supprimerProfile);
+// Route pour mettre à jour la vue par défaut du calendrier
+router.put("/user/preferences/defaultView", auth, userController.updatePreference);
+
 
 /* Routes Evenements
  **

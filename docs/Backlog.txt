@@ -77,26 +77,22 @@ En tant qu'utilisateur, je veux pouvoir voir plusieurs calendriers affichés sim
 ------------------------
 En tant qu'utilisateur, je veux que le calendrier s'ouvre sur une vue par défaut que je choisis depuis mes paramètres profil, afin d'avoir un aperçu de mes rendez-vous.
 
-4. Affichage du fuseau horaire devant le titre du calendrier
-------------------------
-En tant qu'utilisateur, je veux voir le fuseau horaire affiché à côté du titre du calendrier, afin de mieux gérer mes rendez-vous internationaux.
-
-5. Ajout de la récurrence des rendez-vous
+4. Ajout de la récurrence des rendez-vous
 ------------------------
 En tant qu'utilisateur, je veux pouvoir définir un rendez-vous récurrent, afin de planifier automatiquement des événements répétitifs.
 
-6. Partage de calendrier et rendez-vous
+5. Partage de calendrier et rendez-vous
 ------------------------
 En tant qu'utilisateur, je veux pouvoir partager un calendrier ou un rendez-vous avec d'autres utilisateurs, afin de faciliter la coordination.
 
-7. Import / Export des calendriers
+6. Import / Export des calendriers
 ------------------------
 En tant qu'utilisateur, je veux pouvoir importer et exporter mes calendriers, afin de les sauvegarder ou les transférer vers d'autres applications.
 
-8. Recherche de rendez-vous partout
+7. Recherche de rendez-vous partout
 ------------------------
 En tant qu'utilisateur, je veux pouvoir rechercher un rendez-vous dans tous mes calendriers, afin de retrouver rapidement une information.
 
-9. Déplacement de rendez-vous depuis FullCalendar
+8. Déplacement de rendez-vous depuis FullCalendar
 ------------------------
 En tant qu'utilisateur, je veux pouvoir déplacer un rendez-vous directement dans FullCalendar par glisser-déposer, afin de modifier facilement son horaire.

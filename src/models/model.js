@@ -306,3 +306,16 @@ exports.supprimerProfile = async function (userId) {
   const deletedUser = await User.findByIdAndDelete(userId);
   return deletedUser;
 };
+
+// mettre à jour la vue par défaut du calendrier d'un utilisateur
+exports.updateUserPreference = async function (userId, defaultView) {
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { "calendarPreferences.defaultView": defaultView },
+    { new: true, runValidators: true }
+  );
+  return updatedUser;
+};
+
+

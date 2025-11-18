@@ -247,3 +247,7 @@
   transform: scale(1.2);
   cursor: pointer;
 }
+
+.custom-modal.hidden{
+  display: none;
+}
