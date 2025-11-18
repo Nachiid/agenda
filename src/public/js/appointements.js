@@ -121,7 +121,6 @@ async function updateEventList({ type, eventData }) {
       break;
 
     case "update":
-      console.log(eventData);
       if (!eventData) return;
 
       const rdv = eventData;
@@ -150,7 +149,6 @@ async function updateEventList({ type, eventData }) {
 
     case "add":
       if (!eventData) return;
-      console.log(eventData);
       const newRdv = eventData;
       const newDate = new Date(newRdv.date_debut);
 
@@ -167,7 +165,6 @@ async function updateEventList({ type, eventData }) {
         // Si la date ne rentre pas dans l'intervalle → on ne l'ajoute pas
         const now = new Date();
         if (newDate < now || newDate > maxDate) {
-          console.log("arret cardçiagfez");
           return;
         }
       }

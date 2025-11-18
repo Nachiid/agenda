@@ -6,12 +6,12 @@ const { User, Calendar } = require("./models/db");
 async function seedAll() {
   try {
     await connectDB();
-    console.log("✅ Connecté à MongoDB");
+    console.log("Connecté à MongoDB");
 
     // Vider les collections
     await User.deleteMany({});
     await Calendar.deleteMany({});
-    console.log("🧹 Collections vidées");
+    console.log("Collections vidées");
 
     // Utilisateurs à créer
     const usersData = [
@@ -92,14 +92,14 @@ async function seedAll() {
 
     await Calendar.insertMany(calendars);
     console.log(
-      "📅 Calendriers créés avec rendez-vous pour l’utilisateur Aymen"
+      "Calendriers créés avec rendez-vous pour l’utilisateur Aymen"
     );
   } catch (err) {
-    console.error("❌ Erreur pendant le seedAll :", err);
+    console.error("Erreur pendant le seedAll :", err);
   } finally {
     const mongoose = require("mongoose");
     await mongoose.disconnect();
-    console.log("🔌 Déconnecté de MongoDB");
+    console.log("Déconnecté de MongoDB");
   }
 }
 

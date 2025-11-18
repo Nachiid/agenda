@@ -24,7 +24,7 @@ app.use("/", routes);
   try {
     await connectDB();
     app.listen(PORT, () =>
-      console.log(`🚀 Serveur lancé sur : http://localhost:${PORT}`)
+      console.log(`Serveur lancé sur : http://localhost:${PORT}`)
     );
   } catch (err) {
     console.error("Impossible de démarrer le serveur :", err);

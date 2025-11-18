@@ -6,19 +6,19 @@ const connectDB = require("./models/connexionDB");
 async function addAppointmentsByEmail(email) {
   try {
     await connectDB();
-    console.log("✅ Connecté à MongoDB");
+    console.log("Connecté à MongoDB");
 
     // 🔍 Recherche de l'utilisateur
     const user = await User.findOne({ email });
     if (!user) {
-      console.log(`❌ Utilisateur avec email "${email}" introuvable.`);
+      console.log(`Utilisateur avec email "${email}" introuvable.`);
       return;
     }
 
-    // 🔍 Récupère tous les calendriers de l'utilisateur
+    // Récupère tous les calendriers de l'utilisateur
     const calendars = await Calendar.find({ userId: user._id });
     if (!calendars.length) {
-      console.log("⚠️ Aucun calendrier trouvé pour cet utilisateur.");
+      console.log("Aucun calendrier trouvé pour cet utilisateur.");
       return;
     }
 
@@ -39,7 +39,7 @@ async function addAppointmentsByEmail(email) {
     for (const calendar of calendars) {
       const newAppointments = [];
 
-      // 🔁 On génère des rendez-vous sur 3 mois différents
+      // On génère des rendez-vous sur 3 mois différents
       for (let monthOffset = -1; monthOffset <= 1; monthOffset++) {
         for (let i = 0; i < 5; i++) {
           const baseDate = new Date();
@@ -63,21 +63,21 @@ async function addAppointmentsByEmail(email) {
         }
       }
 
-      // 🗓️ Sauvegarde dans le calendrier
+      // Sauvegarde dans le calendrier
       calendar.appointments.push(...newAppointments);
       await calendar.save();
       console.log(
-        `📅 ${newAppointments.length} RDV ajoutés à "${calendar.title}"`
+        `${newAppointments.length} RDV ajoutés à "${calendar.title}"`
       );
     }
   } catch (err) {
-    console.error("❌ Erreur lors de l’insertion des rendez-vous :", err);
+    console.error("Erreur lors de l’insertion des rendez-vous :", err);
   } finally {
     await mongoose.disconnect();
-    console.log("🔌 Déconnecté de MongoDB");
+    console.log("Déconnecté de MongoDB");
   }
 }
 
-// 🧪 Exemple d'utilisation
+// Exemple d'utilisation
 const email = "aymen@test.com";
 addAppointmentsByEmail(email);

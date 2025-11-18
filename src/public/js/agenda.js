@@ -784,7 +784,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 document.addEventListener("appointmentsUpdated", async () => {
   const calendarId = getActiveCalendarIdsLocal()[0];
-  console.log("appointmentsUpdated → ID utilisé :", calendarId);
 
   if (!calendarId) {
     console.error("Aucun ID calendrier");

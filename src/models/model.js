@@ -111,12 +111,6 @@ exports.deleteAppointment = async function (id_rdv) {
 
   const removed = calendar.appointments.splice(index, 1)[0];
   await calendar.save();
-  /* delete sur mongo
-  const result = await Calendar.deleteOne({ _id: calendarId });
-  if (result.deletedCount === 0) {
-    console.log("Aucun document supprimé");
-  }
-*/
   return removed;
 };
 
