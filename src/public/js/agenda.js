@@ -161,21 +161,18 @@ function createCalendarElement(cal, calendar) {
   const leftDiv = document.createElement("div");
   leftDiv.classList.add("event-left2");
 
-  // Création de la checkbox
+  // Checkbox
   const checkbox = document.createElement("input");
   checkbox.type = "checkbox";
   checkbox.checked = false;
 
-  // Écouteur pour la sélection d'un calendrier
   checkbox.addEventListener("change", async (e) => {
     const selectedCheckbox = e.target;
     const calDiv = selectedCheckbox.closest(".event-item2");
     if (!calDiv) return;
-
     const calendarId = calDiv.dataset.id;
 
     if (!selectedCheckbox.checked) {
-      // Si on décoche, on ne fait rien a part gerer local pour le test (SPRINT 2)
       let activeIds = getActiveCalendarIdsLocal();
       if (activeIds.includes(calendarId)) {
         removeActiveCalendarIdLocal(calendarId);
@@ -184,16 +181,13 @@ function createCalendarElement(cal, calendar) {
     }
 
     try {
-      // Récupère les données du calendrier sélectionné
       const res = await fetch(`/user/agenda/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ calendarId }),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
         showMessage(
           data.error || "Erreur lors du chargement du calendrier",
@@ -202,12 +196,8 @@ function createCalendarElement(cal, calendar) {
         selectedCheckbox.checked = false;
         return;
       }
-
-      // Met à jour l'affichage du calendrier
       updateCalendarView(data.calendar, calendar);
-      // Met à jour la liste des IDs actifs
       setActiveCalendarIdsLocal([calendarId]);
-      // Met à jour les cases à cocher pour refléter la sélection
       updateCalendarCheckboxes(getActiveCalendarIdsLocal());
       await window.fetchAppointments(getActiveCalendarIdsLocal());
       showMessage("Calendrier sélectionné avec succès", "success");
@@ -218,7 +208,6 @@ function createCalendarElement(cal, calendar) {
     }
   });
 
-  // Ajouter la checkbox au DOM
   leftDiv.appendChild(checkbox);
 
   const colorDiv = document.createElement("div");
@@ -228,7 +217,6 @@ function createCalendarElement(cal, calendar) {
 
   const titleDiv = document.createElement("div");
   titleDiv.classList.add("event-info2");
-
   const titleSpan = document.createElement("div");
   titleSpan.classList.add("event-title2");
   titleSpan.textContent = cal.title;
@@ -237,53 +225,63 @@ function createCalendarElement(cal, calendar) {
 
   calDiv.appendChild(leftDiv);
 
-  // --- Bouton modifier ---
+  // --- Menu wrapper pour boutons ---
+  const menuWrapper = document.createElement("div");
+  menuWrapper.classList.add("menu-wrapper");
+
+  // Bouton menu
+  const dotsBtn = document.createElement("button");
+  dotsBtn.classList.add("dots-btn");
+  dotsBtn.innerHTML = `<i class="fas fa-ellipsis-v"></i>`;
+  menuWrapper.appendChild(dotsBtn);
+
+  // Menu déroulant
+  const menu = document.createElement("div");
+  menu.classList.add("menu", "hidden");
+
+  // Bouton modifier
   const editBtn = document.createElement("button");
-  editBtn.classList.add("btn-icon", "edit-btn-cal");
-  editBtn.title = "Modifier";
-  editBtn.innerHTML = `<i class="fas fa-pen"></i>`;
-  calDiv.appendChild(editBtn);
+  editBtn.classList.add("menu-edit", "edit-btn-cal");
+  editBtn.dataset.id = cal._id;
+  editBtn.innerHTML = `<i class="fas fa-pen"></i> Modifier`;
+  menu.appendChild(editBtn);
 
-  document.addEventListener("click", (e) => {
-    const editBtn = e.target.closest(".edit-btn-cal");
-    if (!editBtn) return;
+  // Bouton supprimer
+  const deleteBtn = document.createElement("button");
+  deleteBtn.classList.add("menu-delete", "delete-btn-cal");
+  deleteBtn.dataset.id = cal._id;
+  deleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i> Supprimer`;
+  menu.appendChild(deleteBtn);
 
-    const calDiv = editBtn.closest(".event-item2");
-    const calendarId = calDiv?.dataset.id;
+  // Bouton partager
+  const shareBtn = document.createElement("button");
+  shareBtn.classList.add("menu-share-cal");
+  shareBtn.dataset.id = cal._id;
+  shareBtn.innerHTML = `<i class="fas fa-share-alt"></i> Partager`;
+  menu.appendChild(shareBtn);
 
-    const calendarModal = document.getElementById("calendarModal");
-    const calendarForm = document.getElementById("calendarForm");
-    const titleInput = document.getElementById("calendarTitle");
+  menuWrapper.appendChild(menu);
+  calDiv.appendChild(menuWrapper);
 
-    if (!calendarModal || !calendarForm || !titleInput) {
-      console.error(
-        "Le formulaire ou la modale de calendrier est introuvable."
-      );
-      return;
-    }
-
-    // Afficher la modale
-    calendarModal.classList.remove("hidden");
-
-    // Stocker temporairement l'ID dans la modale pour savoir quoi modifier
-    calendarForm.dataset.editingId = calendarId;
+  // --- Événement pour ouvrir/fermer le menu ---
+  dotsBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    menu.classList.toggle("hidden");
+    menu.classList.toggle("show");
   });
 
-  // --- Bouton supprimer ---
-  const deleteBtn = document.createElement("button");
-  deleteBtn.classList.add("btn-icon", "delete-btn-cal");
-  deleteBtn.title = "Supprimer";
-  deleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i>`;
-  calDiv.appendChild(deleteBtn);
+  // Fermer tous les menus si clic ailleurs
+  document.addEventListener("click", () => {
+    document.querySelectorAll(".menu").forEach((m) => {
+      m.classList.add("hidden");
+      m.classList.remove("show");
+    });
+  });
 
-  // --- Événement de suppression ---
+  // --- Gestion suppression existante ---
   deleteBtn.addEventListener("click", async (e) => {
     e.stopPropagation();
-    const button = e.target.closest("button.delete-btn-cal");
-    if (!button) return;
-
     const calendarId = calDiv.dataset.id;
-
     const confirmed = await showConfirm(
       `Voulez-vous vraiment supprimer ce calendrier ?`
     );
@@ -300,44 +298,35 @@ function createCalendarElement(cal, calendar) {
         return;
       }
 
-      button.closest(".event-item2").remove();
+      calDiv.remove();
       renderCalendarListUI(calendarListDiv);
       showMessage(data.message, "success");
-    } catch (err) {
-      showMessage(data.error, "error");
-    }
 
-    // --- Gérer le localStorage ---
-    let activeIds = getActiveCalendarIdsLocal();
-    if (activeIds.includes(calendarId)) {
-      removeActiveCalendarIdLocal(calendarId);
-    }
-
-    if (getActiveCalendarIdsLocal().length === 0) {
-      // Récupérer le premier calendrier restant dans la liste
-      const firstCalendarDiv = document.querySelector(".event-item2");
-      if (firstCalendarDiv) {
-        const newCalendarId = firstCalendarDiv.dataset.id;
-        setActiveCalendarIdsLocal([newCalendarId]);
-
-        // Récupérer les données du nouveau calendrier
-        const resNew = await fetch(`/user/agenda/`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ calendarId: newCalendarId }),
-        });
-        const dataNew = await resNew.json();
-        if (resNew.ok && dataNew.calendar) {
-          updateCalendarView(dataNew.calendar, calendar);
-          updateCalendarCheckboxes(getActiveCalendarIdsLocal());
-        }
-      } else {
-        // Aucun calendrier restant → erreur cas impossible
-        console.error(
-          "Le formulaire ou la modale de calendrier est introuvable."
-        );
+      // LocalStorage
+      let activeIds = getActiveCalendarIdsLocal();
+      if (activeIds.includes(calendarId)) {
+        removeActiveCalendarIdLocal(calendarId);
       }
+      if (getActiveCalendarIdsLocal().length === 0) {
+        const firstCalendarDiv = document.querySelector(".event-item2");
+        if (firstCalendarDiv) {
+          const newCalendarId = firstCalendarDiv.dataset.id;
+          setActiveCalendarIdsLocal([newCalendarId]);
+          const resNew = await fetch(`/user/agenda/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ calendarId: newCalendarId }),
+          });
+          const dataNew = await resNew.json();
+          if (resNew.ok && dataNew.calendar) {
+            updateCalendarView(dataNew.calendar, calendar);
+            updateCalendarCheckboxes(getActiveCalendarIdsLocal());
+          }
+        }
+      }
+    } catch (err) {
+      showMessage("Erreur serveur", "error");
     }
   });
 
@@ -816,6 +805,23 @@ document.addEventListener("appointmentsUpdated", async () => {
 
   const data = await res.json();
   updateCalendarView(data.calendar, calendar);
+});
+
+// Gestion globale pour tous les boutons modifier
+document.addEventListener("click", (e) => {
+  const editBtn = e.target.closest(".edit-btn-cal");
+  if (!editBtn) return;
+  const calDiv = editBtn.closest(".event-item2");
+  const calendarId = calDiv?.dataset.id;
+  const calendarModal = document.getElementById("calendarModal");
+  const calendarForm = document.getElementById("calendarForm");
+  const titleInput = document.getElementById("calendarTitle");
+  if (!calendarModal || !calendarForm || !titleInput) {
+    console.error("Le formulaire ou la modale de calendrier est introuvable.");
+    return;
+  }
+  calendarModal.classList.remove("hidden");
+  calendarForm.dataset.editingId = calendarId;
 });
 
 // --- Gestion fermeture popup des détails ---

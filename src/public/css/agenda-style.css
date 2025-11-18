@@ -126,8 +126,8 @@ body.dashboard-body {
   padding: 1rem;
   color: #1f2937;
   height: 75vh;
-  overflow-y: auto; 
-  overflow-x: hidden; 
+  overflow-y: auto;
+  overflow-x: hidden;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
@@ -195,17 +195,28 @@ body.dashboard-body {
 
 .event-item {
   display: flex;
-  gap: 1rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 0.6rem;
-  border-left: 3px solid #fff;
-  transition: 0.3s;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.event-item.hidden {
+  display: none;
 }
 
 .event-item:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateX(5px);
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(3px);
+}
+
+.event-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .event-date {
@@ -216,12 +227,102 @@ body.dashboard-body {
 
 .event-info .event-title {
   font-weight: 600;
-  color: white;
+  color: #fff;
 }
 
 .event-info .event-time {
   font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.8);
+}
+
+/* ================== MENU ================== */
+.menu-wrapper {
+  position: relative;
+}
+
+.dots-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #fff;
+  padding: 4px;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.dots-btn:hover {
+  color: #1e90ff;
+  transform: scale(1.2);
+}
+
+/* Menu déroulant */
+.menu {
+  position: absolute;
+  top: 28px;
+  right: 0;
+  background: #1f1f1f;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+  overflow: hidden;
+  z-index: 9999;
+  padding: 4px 0;
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+
+/* Afficher menu */
+.menu.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Boutons menu */
+.menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  width: 100%;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.15s ease;
+  text-align: left;
+}
+
+.menu button i {
+  width: 18px;
+  text-align: center;
+}
+
+/* Hover */
+.menu button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-left: 3px solid #1e90ff;
+}
+
+.delete-btn {
+  background: transparent;
+  color: #fff;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.delete-btn:hover {
+  color: #ff5b5b;
+  opacity: 1;
+  transform: scale(1.1);
 }
 
 .event-item2 {
@@ -371,47 +472,6 @@ body.dashboard-body {
 .btn-icon:hover {
   background: rgba(255, 255, 255, 0.4);
 }
-
-/*------------------------------------------------------------------*/
-.menu-wrapper {
-  position: relative;
-    z-index: 10; /* important */
-}
-
-.dots-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.menu {
-  position: absolute;
-  top: 25px;
-  background: black;
-  border: 1px solid #ccc;
-  padding: 5px;
-  border-radius: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-
-  z-index: 9999; /* 🔥 toujours au-dessus de tout */
-    pointer-events: auto;
-}
-
-.menu.hidden {
-  display: none;
-}
-
-.menu button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  padding: 5px;
-  width: 100%;
-}
 /*--------------------------------------------------------------*/
 /* ====== RESPONSIVE ====== */
 @media (max-width: 1200px) {
@@ -560,47 +620,6 @@ body.dashboard-body {
 #calendarForm .modal-actions {
   justify-content: space-between;
 }
-/* ===== ÉVÉNEMENTS À VENIR AVEC BOUTON SUPPRIMER ===== */
-.event-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 8px 12px;
-  margin-bottom: 10px;
-  transition: background 0.2s ease;
-}
-
-.event-item.hidden {
-  display: none;
-}
-
-.event-item:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.event-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.delete-btn {
-  background: transparent;
-  color: #fff;
-  font-size: 14px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  opacity: 0.7;
-}
-
-.delete-btn:hover {
-  color: #ff5b5b;
-  opacity: 1;
-  transform: scale(1.1);
-}
 
 /* ====== STYLE DES CHAMPS DE POPUP ====== */
 .modal-content input,
@@ -696,4 +715,3 @@ body.dashboard-body {
   transform: none !important;
   box-shadow: none !important;
 }
-

@@ -31,7 +31,7 @@ function createEventItemDiv(evt) {
   const timeEnd = end.toTimeString().slice(0, 5);
 
   const div = document.createElement("div");
-  div.className = "event-item hidden"; // ou retirer "hidden" si c'est pour l'ajout direct
+  div.className = "event-item hidden";
   div.dataset.id = evt._id;
   div.dataset.start = evt.date_debut;
   div.dataset.end = evt.date_fin || evt.date_debut;
@@ -46,13 +46,27 @@ function createEventItemDiv(evt) {
       </div>
     </div>
     <div class="menu-wrapper">
-      <button class="dots-btn">⋮</button>
-      <div class="menu hidden">
-        <button class="menu-edit btn-icon" data-id="${evt._id}">✏️ Modifier</button>
-        <button class="menu-delete btn-icon" data-id="${evt._id}">🗑️ Supprimer</button>
+      <button class="dots-btn"><i class="fas fa-ellipsis-vertical"></i></button>
+      <div class="menu">
+        <button class="menu-edit" data-id="${evt._id}"><i class="fas fa-pen"></i> Modifier</button>
+        <button class="menu-delete" data-id="${evt._id}"><i class="fas fa-trash"></i> Supprimer</button>
+        <button class="menu-share" data-id="${evt._id}"><i class="fas fa-share-alt"></i> Partager</button>
       </div>
     </div>
   `;
+
+  // Gestion du clic pour afficher / cacher le menu
+  const dotsBtn = div.querySelector(".dots-btn");
+  const menu = div.querySelector(".menu");
+  dotsBtn.addEventListener("click", (e) => {
+    e.stopPropagation(); // évite la fermeture immédiate
+    menu.classList.toggle("show");
+  });
+
+  // Fermer le menu si clic ailleurs
+  document.addEventListener("click", () => {
+    menu.classList.remove("show");
+  });
 
   return div;
 }
@@ -473,22 +487,5 @@ document.addEventListener("deleteAppointmentFromPopup", async (e) => {
   } catch (err) {
     console.error(err);
     showMessage("Erreur lors de la suppression", "error");
-  }
-});
-
-const upcoming = document.getElementById("upcomingEvents");
-upcoming.addEventListener("mouseover", (e) => {
-  const wrapper = e.target.closest(".menu-wrapper");
-  if (wrapper) {
-    const menu = wrapper.querySelector(".menu");
-    menu.classList.remove("hidden");
-  }
-});
-
-upcoming.addEventListener("mouseout", (e) => {
-  const wrapper = e.target.closest(".menu-wrapper");
-  if (wrapper && !wrapper.contains(e.relatedTarget)) {
-    const menu = wrapper.querySelector(".menu");
-    menu.classList.add("hidden");
   }
 });
