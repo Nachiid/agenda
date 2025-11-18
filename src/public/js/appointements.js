@@ -412,12 +412,11 @@ document
     }
 
     const btnEdit = e.target.closest(".menu-edit");
-
     if (btnEdit) {
       const eventItem = btnEdit.closest(".event-item");
 
       const rdv = {
-        _id: eventItem.querySelector(".delete-btn").getAttribute("data-id"),
+        _id: eventItem.querySelector(".menu-edit").getAttribute("data-id"),
         name: eventItem.querySelector(".event-title").textContent,
         description: eventItem.dataset.description || "",
         date_debut: eventItem.dataset.start,
