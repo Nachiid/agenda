@@ -710,7 +710,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const allData = await allRes.json();
     window.allUserCalendars = allData.calendars;
     
-    
+     fillCalendarSelect();
     // === La liste des calendriers ===
     const calendarListDiv = document.querySelector(".calendars-list");
     if (calendarListDiv) {

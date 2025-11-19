@@ -36,7 +36,7 @@ function createEventItemDiv(evt) {
   div.dataset.start = evt.date_debut;
   div.dataset.end = evt.date_fin || evt.date_debut;
   div.dataset.description = evt.description || "";
-  div.dataset.calendar = evt.calendar_id || evt.extendedProps?.calendarId;
+   
 
 
 
@@ -410,7 +410,7 @@ document.getElementById("upcomingEvents").addEventListener("click", async (e) =>
         description: eventItem.dataset.description || "",
         date_debut: eventItem.dataset.start,
         date_fin: eventItem.dataset.end,
-        calendar_id: calendarId 
+        calendar_id: eventItem.dataset.calendarId
 
       };
       fillCalendarSelect(rdv.calendar_id);
@@ -430,7 +430,7 @@ document.getElementById("upcomingEvents").addEventListener("click", async (e) =>
       document.getElementById("eventTimeStart").value = start.toTimeString().slice(0, 5);
       document.getElementById("eventDateEnd").value = end.toISOString().slice(0, 10);
       document.getElementById("eventTimeEnd").value = end.toTimeString().slice(0, 5);
-      document.getElementById("eventCalendar").value =ids;
+      //document.getElementById("eventCalendar").value =ids;
     }
   });
 
@@ -444,7 +444,6 @@ function fillCalendarSelect(selectedId = null) {
     opt.value = cal._id;
     opt.textContent = cal.title;
     if (selectedId && selectedId === cal._id) {
-    
       opt.selected = true;
     }
 
