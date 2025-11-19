@@ -48,12 +48,14 @@ exports.deletAppointment = async (req, res) => {
   try {
     const { id_rdv } = req.body;
     const userID = req.user.id;
-    const cldr = await model.getUserAppointment(userID , id_rdv);
-   const rdv = await model.deleteAppointment(id_rdv);
+    const cldr = await model.getUserAppointment(userID, id_rdv);
+    const rdv = await model.deleteAppointment(id_rdv);
     if (!rdv) {
       return res.status(404).json({ error: "RDV pas trouvé" });
-    }else if(!cldr){
-       return res.status(500).json({ error: "RDV n'appartient pas a ce utilisateur " });
+    } else if (!cldr) {
+      return res
+        .status(500)
+        .json({ error: "RDV n'appartient pas a ce utilisateur " });
     }
     return res.status(200).json({ rdv });
   } catch (error) {
@@ -63,32 +65,33 @@ exports.deletAppointment = async (req, res) => {
 
 exports.updateAppointment = async (req, res) => {
   try {
-      const { id_rdv, name, date_debut, date_fin, description } = req.body;
-      const userID = req.user.id;
-      const cldr = await model.getUserAppointment(userID , id_rdv);
-      if (!id_rdv) {
-        return res.status(400).json({ error: "L'ID du RDV est requis" });
-      }else if(!cldr){
-       return res.status(500).json({ error: "RDV n'appartient pas a ce utilisateur " });
-      }
-      const updatedRdv = await model.updateAppointment(id_rdv, {
-        name,
-        date_debut,
-        date_fin,
-        description,
-      });
-      if (!updatedRdv) {
-        return res.status(404).json({ error: "RDV pas trouvé" });
-      }
+    const { id_rdv, name, date_debut, date_fin, description } = req.body;
+    const userID = req.user.id;
+    const cldr = await model.getUserAppointment(userID, id_rdv);
+    if (!id_rdv) {
+      return res.status(400).json({ error: "L'ID du RDV est requis" });
+    } else if (!cldr) {
       return res
-        .status(200)
-        .json({ message: "RDV mis à jour avec succès", rdv: updatedRdv });
-  }catch (error) {
+        .status(500)
+        .json({ error: "RDV n'appartient pas a ce utilisateur " });
+    }
+    const updatedRdv = await model.updateAppointment(id_rdv, {
+      name,
+      date_debut,
+      date_fin,
+      description,
+    });
+    if (!updatedRdv) {
+      return res.status(404).json({ error: "RDV pas trouvé" });
+    }
+    return res
+      .status(200)
+      .json({ message: "RDV mis à jour avec succès", rdv: updatedRdv });
+  } catch (error) {
     console.error("Erreur updateAppointment:", error);
     return res.status(500).json({ error: error.message });
   }
 };
-
 
 exports.getAppointments = async (req, res) => {
   try {
@@ -99,36 +102,50 @@ exports.getAppointments = async (req, res) => {
 
     const now = new Date();
 
-    // ========= VERSION AVEC MAP =========
+    // Vérification console
+    console.log("Calendars récupérés :", calendars);
+
     const allAppointments = calendars
-      .map(cal => cal.appointments || [])  // récupère les rdv de chaque calendrier
-      .flat()                              // fusionne tout en un seul tableau
-      .filter(a => new Date(a.date_debut) >= now)  // rdv futurs
-      .sort((a, b) => new Date(a.date_debut) - new Date(b.date_debut)); // tri
+      .flatMap((cal) => {
+        // Si cal.appointments est undefined ou vide
+        const appointments = Array.isArray(cal.appointments)
+          ? cal.appointments
+          : [];
+        return appointments.map((event) => ({
+          ...event,
+          calendar_id: cal._id.toString(), // ou cal.cal_id selon ton modèle
+        }));
+      })
+      .filter((a) => new Date(a.date_debut) >= now) // rdv futurs
+      .sort((a, b) => new Date(a.date_debut) - new Date(b.date_debut));
 
-    const firstThree = allAppointments.slice(0, 10);
+    console.log("All appointments après traitement :", allAppointments);
 
-    return res.status(200).json(firstThree);
+    const first = allAppointments.slice(0, 10);
 
+    return res.status(200).json(first);
   } catch (err) {
     console.error("Erreur getAppointments:", err);
     return res.status(500).json({ error: "Erreur serveur" });
   }
 };
-exports.searchAppointment = async (req , res) => {
-  try{
-    const {appointments_name} = req.body;
+exports.searchAppointment = async (req, res) => {
+  try {
+    const { appointments_name } = req.body;
     const userID = req.user.id;
 
-    if(!appointments_name){
+    if (!appointments_name) {
       return res.status(400).json({ error: "Nom du rendez-vous requis" });
     }
-    const results = await model.searchUserAppointments(userID,appointments_name);
-    if(!results){
+    const results = await model.searchUserAppointments(
+      userID,
+      appointments_name
+    );
+    if (!results) {
       return res.status(404).json({ message: "Aucun rendez-vous trouvé" });
     }
     return res.status(200).json({ appointments: results });
-  }catch(err){
+  } catch (err) {
     return res.status(500).json({ error: "Erreur serveur" });
   }
-}
+};

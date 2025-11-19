@@ -16,6 +16,74 @@ function getActiveCalendarIdsLocal() {
   }
 }
 
+function renderCalendarField(mode, calendarId = null, calendarTitle = null) {
+  const container = document.getElementById("calendarFieldContainer");
+  if (!container) {
+    console.error("❌ Conteneur calendarFieldContainer introuvable");
+    return;
+  }
+
+  container.innerHTML = ""; // reset propre
+
+  // MODE MODIFICATION -----------------------------------------
+  if (mode === "edit" && calendarId && calendarTitle) {
+    const label = document.createElement("label");
+    label.textContent = "Calendrier concerné :";
+
+    const text = document.createElement("div");
+    text.classList.add("calendar-readonly");
+    text.textContent = calendarTitle;
+
+    // input caché pour stocker l'id du calendrier
+    const hidden = document.createElement("input");
+    hidden.type = "hidden";
+    hidden.id = "eventCalendar";
+    hidden.value = calendarId;
+
+    container.appendChild(label);
+    container.appendChild(text);
+    container.appendChild(hidden);
+
+    return; // On ne remplit PAS le select
+  }
+
+  // MODE AJOUT -----------------------------------------
+  // On crée le select + on le remplit
+  const label = document.createElement("label");
+  label.textContent = "Choisir un calendrier";
+
+  const select = document.createElement("select");
+  select.id = "eventCalendar";
+  select.required = true;
+
+  select.innerHTML = `<option value="">Sélectionnez un calendrier...</option>`;
+
+  container.appendChild(label);
+  container.appendChild(select);
+
+  // Remplir avec les calendriers visibles + hidden
+  const listVisible = document.getElementById("calendar-list");
+  const listHidden = document.querySelector(".hidden-calendars");
+
+  const items = [
+    ...listVisible.querySelectorAll(".event-item2"),
+    ...(listHidden ? listHidden.querySelectorAll(".event-item2") : []),
+  ];
+
+  console.log("📌 Calendriers récupérés :", items.length);
+
+  items.forEach((item) => {
+    const id = item.dataset.id;
+    const title = item.querySelector(".event-info2")?.textContent.trim();
+
+    const opt = document.createElement("option");
+    opt.value = id;
+    opt.textContent = title;
+
+    select.appendChild(opt);
+  });
+}
+
 /**
  * Crée et retourne une division pour un événement
  * @param {Object} evt - L'événement { _id, name, date_debut, date_fin, description }
@@ -36,9 +104,7 @@ function createEventItemDiv(evt) {
   div.dataset.start = evt.date_debut;
   div.dataset.end = evt.date_fin || evt.date_debut;
   div.dataset.description = evt.description || "";
-   
-
-
+  eventDiv.dataset.calendarId = evt.calendar_id;
 
   div.innerHTML = `
     <div class="event-left">
@@ -153,6 +219,7 @@ async function updateEventList({ type, eventData }) {
     case "add":
       if (!eventData) return;
       const newRdv = eventData;
+      console.log("add switch case :" + evt.calendar_id);
       const newDate = new Date(newRdv.date_debut);
 
       // Récupère tous les événements (visibles + cachés)
@@ -208,14 +275,15 @@ async function updateEventList({ type, eventData }) {
 if (btnNewEvent && eventModal && btnCancel && eventForm) {
   btnNewEvent.addEventListener("click", () => {
     eventModal.classList.remove("hidden");
+    renderCalendarField("add");
+    eventModal.classList.remove("hidden");
     delete eventForm.dataset.editingId; // mode ajout
     eventForm.reset();
     // Remettre le bon titre
     eventModal.querySelector(".modal-title").textContent =
       "Créer un nouvel événement";
     eventModal.querySelector(".btn.btn-primary").textContent = "Créer";
-  }); 
-  
+  });
 
   btnCancel.addEventListener("click", () => {
     eventModal.classList.add("hidden");
@@ -240,13 +308,16 @@ eventForm.addEventListener("submit", async (e) => {
 
   //const calendarId = getActiveCalendarIdsLocal()[0];
   const calendarId = document.getElementById("eventCalendar").value;
-  console.log(calendarId)
 
   const id_rdv = eventForm.dataset.editingId; // si existe → update
   const rdv = {
     name: document.getElementById("eventTitle").value.trim(),
-    date_debut: `${document.getElementById("eventDateStart").value}T${document.getElementById("eventTimeStart").value}`,
-    date_fin: `${document.getElementById("eventDateEnd").value}T${document.getElementById("eventTimeEnd").value}`,
+    date_debut: `${document.getElementById("eventDateStart").value}T${
+      document.getElementById("eventTimeStart").value
+    }`,
+    date_fin: `${document.getElementById("eventDateEnd").value}T${
+      document.getElementById("eventTimeEnd").value
+    }`,
     description: document.getElementById("eventComment").value.trim(),
     calendarId,
   };
@@ -310,6 +381,7 @@ eventForm.addEventListener("submit", async (e) => {
     }
 
     const newRdv = insertedAppointment.rdv;
+    newRdv.calendar_id = calendarId;
 
     // Mise à jour de la liste des rendez-vous
     updateEventList({
@@ -344,11 +416,19 @@ async function fetchAppointments(calendarIds) {
       credentials: "include",
       body: JSON.stringify({ calendarIds }),
     });
-    const data = await res.json();
 
     upcomingEvents.innerHTML = "";
+    const data = await res.json();
+
+    // Vérification si null ou vide
+    if (!data || (Array.isArray(data) && data.length === 0)) {
+      console.log("⚠️ La réponse est nulle ou le tableau est vide :", data);
+    } else {
+      console.log("✅ La réponse contient des données :", data);
+    }
 
     data.forEach((evt) => {
+      console.log("fetch calendar_id : " + evt.calendar_id);
       const div = createEventItemDiv(evt);
       upcomingEvents.appendChild(div);
     });
@@ -367,7 +447,9 @@ window.fetchAppointments = fetchAppointments;
 // ==========================
 // Popup édition + suppression
 // ==========================
-document.getElementById("upcomingEvents").addEventListener("click", async (e) => {
+document
+  .getElementById("upcomingEvents")
+  .addEventListener("click", async (e) => {
     const btnDelete = e.target.closest(".menu-delete");
     const eventItem = e.target.closest(".event-item");
     if (!eventItem) return;
@@ -389,9 +471,9 @@ document.getElementById("upcomingEvents").addEventListener("click", async (e) =>
           return;
         }
         // Met à jour la liste des événements côté frontend
-        updateEventList({type: "delete",eventData: { _id: id_rdv },});
+        updateEventList({ type: "delete", eventData: { _id: id_rdv } });
         // Pour la suppression
-        updateCalendar({type: "delete",eventData: { _id: id_rdv }, });
+        updateCalendar({ type: "delete", eventData: { _id: id_rdv } });
         showMessage("Rendez-vous supprimé", "success");
       } catch (err) {
         console.error(err);
@@ -402,21 +484,20 @@ document.getElementById("upcomingEvents").addEventListener("click", async (e) =>
     const btnEdit = e.target.closest(".menu-edit");
     if (btnEdit) {
       const eventItem = btnEdit.closest(".event-item");
-        const rdvId = eventItem.dataset.id;
-        const calendarId = findCalendarOfAppointment(rdvId);
+      const rdvId = eventItem.dataset.id;
+      const calendarId = findCalendarOfAppointment(rdvId);
       const rdv = {
         _id: eventItem.querySelector(".menu-edit").getAttribute("data-id"),
         name: eventItem.querySelector(".event-title").textContent,
         description: eventItem.dataset.description || "",
         date_debut: eventItem.dataset.start,
         date_fin: eventItem.dataset.end,
-        calendar_id: eventItem.dataset.calendarId
-
+        calendar_id: eventItem.dataset.calendarId, // ou dans le id du champs item-event 2
       };
-      fillCalendarSelect(rdv.calendar_id);
+      renderCalendarField("edit", rdv.calendar_id, rdv.calendar_title);
       eventModal.classList.remove("hidden");
       eventForm.dataset.editingId = rdv._id;
-      console.log(rdv)
+      console.log(rdv);
       // Modifier le titre DU popup ouvert
       eventModal.querySelector(".modal-title").textContent = "Modifier le RDV";
       eventModal.querySelector(".btn.btn-primary").textContent = "Modifier";
@@ -426,46 +507,36 @@ document.getElementById("upcomingEvents").addEventListener("click", async (e) =>
       console.log(ids);
       document.getElementById("eventTitle").value = rdv.name;
       document.getElementById("eventComment").value = rdv.description;
-      document.getElementById("eventDateStart").value = start.toISOString().slice(0, 10);
-      document.getElementById("eventTimeStart").value = start.toTimeString().slice(0, 5);
-      document.getElementById("eventDateEnd").value = end.toISOString().slice(0, 10);
-      document.getElementById("eventTimeEnd").value = end.toTimeString().slice(0, 5);
+      document.getElementById("eventDateStart").value = start
+        .toISOString()
+        .slice(0, 10);
+      document.getElementById("eventTimeStart").value = start
+        .toTimeString()
+        .slice(0, 5);
+      document.getElementById("eventDateEnd").value = end
+        .toISOString()
+        .slice(0, 10);
+      document.getElementById("eventTimeEnd").value = end
+        .toTimeString()
+        .slice(0, 5);
       //document.getElementById("eventCalendar").value =ids;
     }
   });
-
-function fillCalendarSelect(selectedId = null) {
-  const select = document.getElementById("eventCalendar");
-  if (!select) return;
-
-  select.innerHTML = `<option value="">Sélectionnez un calendrier...</option>`;
-  window.allUserCalendars.forEach(cal => {
-    const opt = document.createElement("option");
-    opt.value = cal._id;
-    opt.textContent = cal.title;
-    if (selectedId && selectedId === cal._id) {
-      opt.selected = true;
-    }
-
-    select.appendChild(opt);
-  });
-}
 
 function findCalendarOfAppointment(rdvId) {
   if (!window.allUserCalendars) return null;
 
   for (const cal of window.allUserCalendars) {
     if (Array.isArray(cal.appointments)) {
-      const match = cal.appointments.find(a => a._id === rdvId);
+      const match = cal.appointments.find((a) => a._id === rdvId);
       if (match) {
         return cal._id; // retourne l'ID du calendrier qui contient ce rdv
       }
     }
   }
 
-  return null; // pas trouvé
+  return null;
 }
-
 
 document.addEventListener("deleteAppointmentFromPopup", async (e) => {
   const id_rdv = e.detail.id;
@@ -507,88 +578,89 @@ document.addEventListener("deleteAppointmentFromPopup", async (e) => {
 
 // ======================chercher un rdv ================
 
-document.addEventListener("DOMContentLoaded", () => {
+const input = document.getElementById("appointments_name");
+const resultsList = document.getElementById("appointments_results");
 
-  const input = document.getElementById("appointments_name");
-  const resultsList = document.getElementById("appointments_results");
+let timeout = null;
 
-  let timeout = null;
+// 🔍 Recherche quand on tape
+input.addEventListener("input", () => {
+  const text = input.value.trim();
 
-  // 🔍 Recherche quand on tape
-  input.addEventListener("input", () => {
-    const text = input.value.trim();
+  // vider si trop court
+  if (text.length < 2) {
+    resultsList.innerHTML = "";
+    return;
+  }
 
-    // vider si trop court
-    if (text.length < 2) {
+  // anti-spam requêtes
+  clearTimeout(timeout);
+  timeout = setTimeout(() => searchAppointments(text), 300);
+});
+
+// 📡 Appel API
+async function searchAppointments(query) {
+  try {
+    const response = await fetch("http://localhost:3000/searchAppointment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ appointments_name: query }),
+    });
+
+    const data = await response.json();
+
+    if (!data.appointments) {
       resultsList.innerHTML = "";
       return;
     }
 
-    // anti-spam requêtes
-    clearTimeout(timeout);
-    timeout = setTimeout(() => searchAppointments(text), 300);
-  });
-
-
-  // 📡 Appel API
-  async function searchAppointments(query) {
-    try {
-      const response = await fetch("http://localhost:3000/searchAppointment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ appointments_name: query }),
-      });
-
-      const data = await response.json();
-
-      if (!data.appointments) {
-        resultsList.innerHTML = "";
-        return;
-      }
-
-      displayResults(data.appointments);
-
-    } catch (err) {
-      console.log("Erreur :", err);
-    }
+    displayResults(data.appointments);
+  } catch (err) {
+    console.log("Erreur :", err);
   }
+}
 
+// 📝 Affichage des suggestions
+function displayResults(appointments) {
+  resultsList.innerHTML = "";
 
-  // 📝 Affichage des suggestions
-  function displayResults(appointments) {
-    resultsList.innerHTML = "";
+  appointments.forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = item.appointment.name;
+    li.classList.add("suggestion-item");
 
-    appointments.forEach(item => {
-      const li = document.createElement("li");
-      li.textContent = item.appointment.name; 
-      li.classList.add("suggestion-item");
+    li.addEventListener("click", () => {
+      const rdv = item.appointment;
+      // 🔥 Ouvrir ton popup
+      eventModal.classList.remove("hidden");
+      eventForm.dataset.editingId = rdv._id;
+      // Modifier le titre
+      eventModal.querySelector(".modal-title").textContent = "Modifier le RDV";
+      eventModal.querySelector(".btn.btn-primary").textContent = "Modifier";
+      // Convertir les dates
+      const start = new Date(rdv.date_debut);
+      const end = new Date(rdv.date_fin);
 
-
-      li.addEventListener("click", () => {
-        const rdv = item.appointment;
-        // 🔥 Ouvrir ton popup
-        eventModal.classList.remove("hidden");
-        eventForm.dataset.editingId = rdv._id;
-        // Modifier le titre
-        eventModal.querySelector(".modal-title").textContent = "Modifier le RDV";
-        eventModal.querySelector(".btn.btn-primary").textContent = "Modifier";
-        // Convertir les dates
-        const start = new Date(rdv.date_debut);
-        const end = new Date(rdv.date_fin);
-
-        // Remplir les champs
-        document.getElementById("eventTitle").value = rdv.name || "";
-        document.getElementById("eventComment").value = rdv.description || "";
-        document.getElementById("eventDateStart").value = start.toISOString().slice(0, 10);
-        document.getElementById("eventTimeStart").value = start.toTimeString().slice(0, 5);
-        document.getElementById("eventDateEnd").value = end.toISOString().slice(0, 10);
-        document.getElementById("eventTimeEnd").value = end.toTimeString().slice(0, 5);
-        // fermer la liste des suggestions
-        resultsList.innerHTML = "";
-      });
-      resultsList.appendChild(li);
+      // Remplir les champs
+      document.getElementById("eventTitle").value = rdv.name || "";
+      document.getElementById("eventComment").value = rdv.description || "";
+      document.getElementById("eventDateStart").value = start
+        .toISOString()
+        .slice(0, 10);
+      document.getElementById("eventTimeStart").value = start
+        .toTimeString()
+        .slice(0, 5);
+      document.getElementById("eventDateEnd").value = end
+        .toISOString()
+        .slice(0, 10);
+      document.getElementById("eventTimeEnd").value = end
+        .toTimeString()
+        .slice(0, 5);
+      // fermer la liste des suggestions
+      resultsList.innerHTML = "";
     });
-  }
+    resultsList.appendChild(li);
   });
+}

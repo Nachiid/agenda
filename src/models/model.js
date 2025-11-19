@@ -172,7 +172,7 @@ exports.searchUserAppointments = async function (userId, name) {
 
 // plusieur calandars
 exports.getCalendars = async function (ids) {
-  return await Calendar.find({ _id: { $in: ids } });
+  return await Calendar.find({ _id: { $in: ids } }).lean();
 };
 
 /**
