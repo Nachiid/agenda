@@ -4,7 +4,11 @@ const path = require("path");
 const userController = require("../controllers/userController");
 const appointmentController = require("../controllers/appointmentController");
 const calendarController = require("../controllers/calendarController");
+const importController = require("../controllers/importController");
 const auth = require("../middleware/auth");
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // === ROUTES PAGES PUBLICS=== //
 router.get("/", (req, res) => {
@@ -78,6 +82,13 @@ router.put(
   calendarController.updateCalendarTitle
 );
 router.post("/user/calendar/create", auth, calendarController.addCalendar);
+router.post(
+  "/user/calendar/import",
+  auth,
+  upload.single("importFile"),
+  importController.importIcs
+);
+router.get("/user/calendar/export/:calendarId", auth, importController.exportIcs);
 
 router.get("/user/logout", (req, res) => {
   res.clearCookie("token");

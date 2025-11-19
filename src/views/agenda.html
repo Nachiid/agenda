@@ -129,8 +129,11 @@
             <button class="btn btn-primary btn-full" id="btnNewCalendar">
               Créer un calendrier
             </button>
-             <button class="btn btn-primary btn-full hidden" id="btnModCalendar">
+            <button class="btn btn-primary btn-full hidden" id="btnModCalendar">
               Modifier Calendrier
+            </button>
+            <button class="btn btn-primary btn-full" id="btnImporter">
+              Importer un calendrier
             </button>
           </div>
           <div class="calendar-list" id="calendar-list"></div>
@@ -278,6 +281,23 @@
           <button class="btn-delete" data-id="evt123">Supprimer</button>
         </div>
         <button class="btn-close">Fermer</button>
+      </div>
+    </div>
+      <div id="importModal" class="modal hidden">
+      <div class="modal-content">
+        <h2 class="modal-title">Importer un calendrier</h2>
+        <form id="importForm" class="event-form">
+          <div class="form-group">
+            <label for="importFile">Fichier de calendrier (.ics)</label>
+            <input type="file" id="importFile" accept=".ics" required />
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="btn btn-primary">Importer</button>
+            <button type="button" class="btn btn-secondary" id="btnCancelImport">
+              Annuler
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </body>
