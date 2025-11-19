@@ -36,6 +36,9 @@ function createEventItemDiv(evt) {
   div.dataset.start = evt.date_debut;
   div.dataset.end = evt.date_fin || evt.date_debut;
   div.dataset.description = evt.description || "";
+  div.dataset.calendar = evt.calendar_id || evt.extendedProps?.calendarId;
+
+
 
   div.innerHTML = `
     <div class="event-left">
@@ -235,23 +238,21 @@ if (btnNewEvent && eventModal && btnCancel && eventForm) {
 eventForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const calendarId = getActiveCalendarIdsLocal()[0];
+  //const calendarId = getActiveCalendarIdsLocal()[0];
+  const calendarId = document.getElementById("eventCalendar").value;
+  console.log(calendarId)
+
   const id_rdv = eventForm.dataset.editingId; // si existe → update
   const rdv = {
     name: document.getElementById("eventTitle").value.trim(),
-    date_debut: `${document.getElementById("eventDateStart").value}T${
-      document.getElementById("eventTimeStart").value
-    }`,
-    date_fin: `${document.getElementById("eventDateEnd").value}T${
-      document.getElementById("eventTimeEnd").value
-    }`,
+    date_debut: `${document.getElementById("eventDateStart").value}T${document.getElementById("eventTimeStart").value}`,
+    date_fin: `${document.getElementById("eventDateEnd").value}T${document.getElementById("eventTimeEnd").value}`,
     description: document.getElementById("eventComment").value.trim(),
     calendarId,
   };
   if (id_rdv) {
     try {
       rdv.id_rdv = id_rdv;
-
       const res = await fetch("/UpdateAppointment", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -302,7 +303,6 @@ eventForm.addEventListener("submit", async (e) => {
 
     // Récupération de la réponse
     const insertedAppointment = await res.json();
-
     // Vérifier que le rdv existe dans la réponse
     if (!insertedAppointment || !insertedAppointment.rdv) {
       showMessage("Réponse du serveur invalide", "error");
@@ -367,20 +367,16 @@ window.fetchAppointments = fetchAppointments;
 // ==========================
 // Popup édition + suppression
 // ==========================
-document
-  .getElementById("upcomingEvents")
-  .addEventListener("click", async (e) => {
+document.getElementById("upcomingEvents").addEventListener("click", async (e) => {
     const btnDelete = e.target.closest(".menu-delete");
     const eventItem = e.target.closest(".event-item");
     if (!eventItem) return;
-
     if (btnDelete) {
       const id_rdv = btnDelete.dataset.id;
       const confirmed = await showConfirm(
         "Voulez-vous vraiment supprimer ce rendez-vous ?"
       );
       if (!confirmed) return;
-
       try {
         const res = await fetch(`http://localhost:3000/deletAppointment`, {
           method: "DELETE",
@@ -388,23 +384,14 @@ document
           credentials: "include",
           body: JSON.stringify({ id_rdv }),
         });
-
         if (!res.ok) {
           showMessage("Erreur lors de la suppression", "error");
           return;
         }
-
         // Met à jour la liste des événements côté frontend
-        updateEventList({
-          type: "delete",
-          eventData: { _id: id_rdv },
-        });
+        updateEventList({type: "delete",eventData: { _id: id_rdv },});
         // Pour la suppression
-        updateCalendar({
-          type: "delete",
-          eventData: { _id: id_rdv }, // juste l'ID suffit pour trouver l'événement
-        });
-
+        updateCalendar({type: "delete",eventData: { _id: id_rdv }, });
         showMessage("Rendez-vous supprimé", "success");
       } catch (err) {
         console.error(err);
@@ -415,39 +402,71 @@ document
     const btnEdit = e.target.closest(".menu-edit");
     if (btnEdit) {
       const eventItem = btnEdit.closest(".event-item");
-
+        const rdvId = eventItem.dataset.id;
+        const calendarId = findCalendarOfAppointment(rdvId);
       const rdv = {
         _id: eventItem.querySelector(".menu-edit").getAttribute("data-id"),
         name: eventItem.querySelector(".event-title").textContent,
         description: eventItem.dataset.description || "",
         date_debut: eventItem.dataset.start,
         date_fin: eventItem.dataset.end,
+        calendar_id: calendarId 
+
       };
+      fillCalendarSelect(rdv.calendar_id);
       eventModal.classList.remove("hidden");
       eventForm.dataset.editingId = rdv._id;
-
+      console.log(rdv)
       // Modifier le titre DU popup ouvert
       eventModal.querySelector(".modal-title").textContent = "Modifier le RDV";
       eventModal.querySelector(".btn.btn-primary").textContent = "Modifier";
       const start = new Date(rdv.date_debut);
       const end = new Date(rdv.date_fin);
-
+      const ids = getActiveCalendarIdsLocal();
+      console.log(ids);
       document.getElementById("eventTitle").value = rdv.name;
       document.getElementById("eventComment").value = rdv.description;
-      document.getElementById("eventDateStart").value = start
-        .toISOString()
-        .slice(0, 10);
-      document.getElementById("eventTimeStart").value = start
-        .toTimeString()
-        .slice(0, 5);
-      document.getElementById("eventDateEnd").value = end
-        .toISOString()
-        .slice(0, 10);
-      document.getElementById("eventTimeEnd").value = end
-        .toTimeString()
-        .slice(0, 5);
+      document.getElementById("eventDateStart").value = start.toISOString().slice(0, 10);
+      document.getElementById("eventTimeStart").value = start.toTimeString().slice(0, 5);
+      document.getElementById("eventDateEnd").value = end.toISOString().slice(0, 10);
+      document.getElementById("eventTimeEnd").value = end.toTimeString().slice(0, 5);
+      document.getElementById("eventCalendar").value =ids;
     }
   });
+
+function fillCalendarSelect(selectedId = null) {
+  const select = document.getElementById("eventCalendar");
+  if (!select) return;
+
+  select.innerHTML = `<option value="">Sélectionnez un calendrier...</option>`;
+  window.allUserCalendars.forEach(cal => {
+    const opt = document.createElement("option");
+    opt.value = cal._id;
+    opt.textContent = cal.title;
+    if (selectedId && selectedId === cal._id) {
+    
+      opt.selected = true;
+    }
+
+    select.appendChild(opt);
+  });
+}
+
+function findCalendarOfAppointment(rdvId) {
+  if (!window.allUserCalendars) return null;
+
+  for (const cal of window.allUserCalendars) {
+    if (Array.isArray(cal.appointments)) {
+      const match = cal.appointments.find(a => a._id === rdvId);
+      if (match) {
+        return cal._id; // retourne l'ID du calendrier qui contient ce rdv
+      }
+    }
+  }
+
+  return null; // pas trouvé
+}
+
 
 document.addEventListener("deleteAppointmentFromPopup", async (e) => {
   const id_rdv = e.detail.id;
@@ -547,35 +566,29 @@ document.addEventListener("DOMContentLoaded", () => {
       li.textContent = item.appointment.name; 
       li.classList.add("suggestion-item");
 
-      // 🎯 Quand on clique -> console.log
-li.addEventListener("click", () => {
-  const rdv = item.appointment;
 
-  // 🔥 Ouvrir ton popup
-  eventModal.classList.remove("hidden");
-  eventForm.dataset.editingId = rdv._id;
+      li.addEventListener("click", () => {
+        const rdv = item.appointment;
+        // 🔥 Ouvrir ton popup
+        eventModal.classList.remove("hidden");
+        eventForm.dataset.editingId = rdv._id;
+        // Modifier le titre
+        eventModal.querySelector(".modal-title").textContent = "Modifier le RDV";
+        eventModal.querySelector(".btn.btn-primary").textContent = "Modifier";
+        // Convertir les dates
+        const start = new Date(rdv.date_debut);
+        const end = new Date(rdv.date_fin);
 
-  // Modifier le titre
-  eventModal.querySelector(".modal-title").textContent = "Modifier le RDV";
-  eventModal.querySelector(".btn.btn-primary").textContent = "Modifier";
-
-  // Convertir les dates
-  const start = new Date(rdv.date_debut);
-  const end = new Date(rdv.date_fin);
-
-  // Remplir les champs
-  document.getElementById("eventTitle").value = rdv.name || "";
-  document.getElementById("eventComment").value = rdv.description || "";
-  document.getElementById("eventDateStart").value = start.toISOString().slice(0, 10);
-  document.getElementById("eventTimeStart").value = start.toTimeString().slice(0, 5);
-  document.getElementById("eventDateEnd").value = end.toISOString().slice(0, 10);
-  document.getElementById("eventTimeEnd").value = end.toTimeString().slice(0, 5);
-
-  // fermer la liste des suggestions
-  resultsList.innerHTML = "";
-});
-
-
+        // Remplir les champs
+        document.getElementById("eventTitle").value = rdv.name || "";
+        document.getElementById("eventComment").value = rdv.description || "";
+        document.getElementById("eventDateStart").value = start.toISOString().slice(0, 10);
+        document.getElementById("eventTimeStart").value = start.toTimeString().slice(0, 5);
+        document.getElementById("eventDateEnd").value = end.toISOString().slice(0, 10);
+        document.getElementById("eventTimeEnd").value = end.toTimeString().slice(0, 5);
+        // fermer la liste des suggestions
+        resultsList.innerHTML = "";
+      });
       resultsList.appendChild(li);
     });
   }

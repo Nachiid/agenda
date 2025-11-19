@@ -1,5 +1,5 @@
 let calendar; // variable globale
-
+window.allUserCalendars = [];
 /**
  * Met à jour le data-attribute avec la liste d'IDs
  */
@@ -45,6 +45,7 @@ function removeActiveCalendarIdLocal(id) {
  * Met à jour l'affichage du calendrier avec un nouveau jeu de données
  */
 function updateCalendarView(calendars, calendar) {
+
   if (!Array.isArray(calendars) || !calendar) return;
 
   try {
@@ -66,6 +67,7 @@ function updateCalendarView(calendars, calendar) {
             title: r.name,
             start: r.date_debut,
             end: r.date_fin,
+            
             backgroundColor: cal.color,
             borderColor: cal.color,
             textColor: "#fff",
@@ -163,10 +165,13 @@ function renderCalendarListUI(calendarListDiv) {
 }
 
 /**
- * Crée un element dans la list des calendriers
+ * Crée un element dans la list des calendriers /////////////////
  */
+
+
 function createCalendarElement(cal, calendar) {
   const calendarListDiv = document.querySelector(".calendars-list");
+  
   if (!calendarListDiv) return;
 
   const calDiv = document.createElement("div");
@@ -621,6 +626,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Clic sur un événement
     eventClick: function (info) {
       openEventDetailsPopup(info.event);
+      console.log("ID calendrier =", info.event.extendedProps.calendarId);
     },
     // Ajuste la couleur des événements en fonction du calendrier
     eventContent: function (arg) {
@@ -702,14 +708,18 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     const allData = await allRes.json();
-
+    window.allUserCalendars = allData.calendars;
+    
+    
     // === La liste des calendriers ===
     const calendarListDiv = document.querySelector(".calendars-list");
     if (calendarListDiv) {
       // Boucle sur tous les calendriers pour créer les éléments
       allData.calendars.forEach((cal) => {
+ 
         createCalendarElement(cal, calendar);
       });
+
 
       // Appel de la fonction qui gère la limite à 4 et le bouton "Afficher plus / moins"
       updateCalendarCheckboxes(getActiveCalendarIdsLocal());
@@ -868,6 +878,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         // --- Création du nouvel élément calendrier ---
         createCalendarElement(cal, calendar);
+           window.allUserCalendars =  createCalendarElement(cal, calendar);
         // --- Mise à jour du bouton "Afficher plus / moins" ---
         renderCalendarListUI(calendarListDiv);
       } catch (err) {

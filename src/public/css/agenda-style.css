@@ -1127,3 +1127,29 @@ body {
     font-size: 14px;
   }
 }
+
+
+
+
+.event-form select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none; /* enlève le style moche par défaut */
+}
+
+/* Focus identique aux inputs */
+.event-form select:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 3px rgba(74, 144, 226, 0.3);
+}
+
+/* Option de sélection */
+.event-form select option {
+  padding: 10px;
+}

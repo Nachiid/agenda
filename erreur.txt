@@ -15,3 +15,5 @@ faire sortir 10 rendez vous et afficher 5, ne pas faire fetsh a chaque suppressi
 verification userid update (fini)
 
 3 boutons - tolower
+
+
