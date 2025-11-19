@@ -48,7 +48,7 @@ async function chargerProfil() {
         Array.from(defaultViewSelect.options).forEach((opt) => {
           opt.selected = opt.value === userDefaultView;
         });
-      }else{
+      } else {
         console.log("default vide ou champs nom trouvé&");
       }
     } else {
@@ -181,7 +181,6 @@ document.getElementById("closeModal").addEventListener("click", () => {
 
   fields.forEach((field) => (field.type = "password"));
 
-  // Optionnel : vider les champs
   document.getElementById("passwordForm").reset();
 });
 
@@ -191,7 +190,10 @@ document
   .addEventListener("click", async (e) => {
     e.preventDefault();
 
-    if (!confirm("Êtes-vous sûr de vouloir supprimer votre compte ?")) return;
+    const confirmed = await showConfirm(
+      `Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.`
+    );
+    if (!confirmed) return;
 
     try {
       const res = await fetch(`http://localhost:3000/user/profile`, {
@@ -225,16 +227,12 @@ document
   });
 
 // === SUPPRESSION DU COMPTE AVEC MODALE ===
-const deleteBtn = document.querySelector("#btnDeleteAccount");
 const deleteModal = document.getElementById("deleteConfirmModal");
 const cancelDelete = document.getElementById("cancelDelete");
 const confirmDelete = document.getElementById("confirmDelete");
 
-// Ouvrir la modale
-deleteBtn.addEventListener("click", (e) => {
-  e.preventDefault();
-  deleteModal.classList.remove("hidden");
-});
+
+
 
 // Fermer la modale
 cancelDelete.addEventListener("click", () => {
@@ -244,6 +242,12 @@ cancelDelete.addEventListener("click", () => {
 // Confirmer la suppression
 confirmDelete.addEventListener("click", async () => {
   deleteModal.classList.add("hidden");
+
+  const confirmed = await showConfirm(
+    `Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est
+          irréversible.`
+  );
+  if (!confirmed) return;
 
   try {
     const res = await fetch(`http://localhost:3000/user/profile`, {

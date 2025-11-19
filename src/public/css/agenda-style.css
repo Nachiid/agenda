@@ -26,72 +26,273 @@ body {
 
 /* ====== NAVBAR ====== */
 .navbar {
-  background: rgba(255, 255, 255, 0.12);
+  position: fixed;
+  top: 1rem; /* un petit écart du haut pour effet flottant */
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 2rem); /* padding horizontal pour flotter */
+  background: rgba(255, 255, 255, 0.12); /* semi-transparent */
   backdrop-filter: blur(12px);
-  padding: 1.25rem 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2); /* bordure flottante */
+  border-radius: 1rem;
+  padding: 0.75rem 1.5rem;
+  z-index: 1000;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  transition: 0.3s ease;
 }
 
+/* On garde le conteneur interne identique */
 .nav-content {
-  max-width: 1400px;
-  margin: 0 auto;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+/* ===== ZONE GAUCHE ===== */
+.left-area {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex: 0 0 auto;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-}
-
-.logo-text {
-  font-size: 1.4rem;
-  font-weight: 700;
+  gap: 0.5rem;
+  font-weight: 600;
   color: white;
 }
 
+.aside-toggle {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  color: white;
+  cursor: pointer;
+}
+
+/* ===== ZONE CENTRALE ===== */
+.nav-search-area {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.search-wrapper {
+  width: 100%;
+  max-width: 500px;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0.55rem 0.85rem;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.search-container:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.search-icon {
+  margin-right: 0.5rem;
+  font-size: 1.1rem;
+  color: white;
+}
+
+#appointments_name {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 1rem;
+}
+
+/* ===== ZONE DROITE ===== */
 .nav-links {
   display: flex;
-  gap: 1.5rem;
+  align-items: center;
+  gap: 1rem;
+  flex: 0 0 auto;
 }
 
 .nav-link {
   color: rgba(255, 255, 255, 0.85);
   text-decoration: none;
-  font-weight: 500;
-  padding: 0.6rem 1rem;
-  border-radius: 0.5rem;
-  transition: all 0.3s;
+  padding: 0.45rem 0.8rem;
+  border-radius: 6px;
+  transition: 0.3s;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  font-size: 0.95rem;
 }
 
 .nav-link:hover {
-  background: rgba(255, 255, 255, 0.25);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
 }
 
 .nav-link.active {
-  background: rgba(255, 255, 255, 0.35);
-  color: #fff;
+  background: rgba(79, 70, 229, 0.35);
 }
 
-.nav-links button.nav-link {
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.85);
-  text-decoration: none;
-  font-weight: 500;
-  font-family: inherit;
-  font-size: 1rem;
-  padding: 0.6rem 1rem;
-  border-radius: 0.5rem;
-  transition: all 0.3s;
+/* ===== RESPONSIVE ===== */
+
+/* 950px : cacher juste le texte du logo */
+@media (max-width: 950px) {
+  .logo-text {
+    display: none;
+  }
 }
 
-.nav-links button.nav-link:hover {
-  background: rgba(255, 255, 255, 0.25);
-  color: #fff;
+/* 850px : logo caché, recherche à côté du bouton, liens restent à droite */
+@media (max-width: 850px) {
+  .logo svg,
+  .logo-text {
+    display: none;
+  }
+
+  .nav-content {
+    flex-wrap: nowrap; /* reste sur une ligne */
+    align-items: center;
+    justify-content: space-between; /* bouton + recherche à gauche, liens à droite */
+  }
+
+  .left-area {
+    flex: 0 0 auto; /* bouton reste à gauche */
+    order: 1;
+  }
+
+  .nav-search-area {
+    order: 2; /* juste après le bouton */
+    flex: 1 1 auto; /* prend l’espace restant entre bouton et liens */
+    display: flex;
+    justify-content: flex-start; /* barre commence après bouton */
+    margin-top: 0;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .nav-links {
+    flex: 0 0 auto; /* liens prennent leur place naturelle */
+    order: 3;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  .search-wrapper {
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box;
+  }
+}
+
+/* 750px et en dessous : réduction progressive du champ de recherche */
+@media (max-width: 850px) {
+  .nav-search-area {
+    order: 2; /* reste sur la ligne avec bouton et liens */
+    flex: 1 1 auto; /* prend l’espace restant et rétrécit si nécessaire */
+    display: flex;
+    justify-content: flex-start; /* alignée avec bouton */
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    margin-top: 0;
+    min-width: 0; /* permet à flex de rétrécir */
+  }
+
+  .search-wrapper {
+    width: 100%;
+    max-width: 100%; /* ne dépasse jamais la navbar */
+    min-width: 0; /* permet de rétrécir progressivement */
+    box-sizing: border-box;
+  }
+
+  .search-container {
+    width: 100%;
+    min-width: 0; /* important pour rétraction du champ input */
+    box-sizing: border-box;
+  }
+
+  .search-container input {
+    min-width: 0; /* permet au placeholder de ne pas bloquer la réduction */
+  }
+}
+
+@media (max-width: 520px) {
+  .nav-content {
+    flex-wrap: wrap;
+    align-items: center;
+    /*justify-content: flex-start;*/
+    gap: 0;
+  }
+
+  /* Ligne supérieure : bouton + liens */
+  .left-area {
+    display: flex;
+    align-items: center;
+    order: 1;
+    flex: 0 0 auto; /* bouton prend sa largeur naturelle */
+  }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  order: 1;
+  flex: 1 1 auto;
+  gap: 2.7rem; /* distance entre liens */
+  justify-content: flex-start; /* liens alignés à gauche */
+}
+
+
+  /* Formulaire prend toute la largeur */
+  .nav-search-area form#appointments_search {
+    width: 100%;
+    display: flex;       /* permet à .search-wrapper de s’étendre */
+    flex: 1 1 auto;
+    margin-top: 0.5rem;
+  }
+
+  .search-wrapper {
+    width: 100%;         /* déjà présent, mais on s’assure */
+    display: flex;
+    justify-content: flex-start; /* début aligné avec le bouton */
+  }
+
+  .search-container {
+    flex: 1 1 auto;      /* input s’étend sur toute la largeur restante */
+    min-width: 0;        /* important pour que l’input rétrécisse si nécessaire */
+  }
+
+  .search-container input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+
+/* Pour écrans encore plus petits, réduire progressivement gap et input */
+@media (max-width: 400px) {
+  .nav-links {
+    gap: 0.5rem; /* espace réduit entre liens */
+  }
+
+  .search-wrapper {
+    max-width: 100%; /* input continue de rétrécir */
+  }
 }
 
 /* ====== LAYOUT PRINCIPAL ====== */
@@ -109,8 +310,8 @@ body {
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
 }
-/* ====== MAIN CONTENT ====== */
 
+/* ====== MAIN CONTENT ====== */
 /* Conteneur global du calendrier */
 #calendar-wrapper {
   flex: 1;
