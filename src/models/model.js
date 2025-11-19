@@ -147,6 +147,29 @@ exports.getUserAppointment = async function (idUser, idAppointement) {
   return calandar ? true : false;
 };
 
+exports.searchUserAppointments = async function (userId, name) {
+  // Chercher tous les calendriers du user
+  const calendars = await Calendar.find({ userId });
+
+  if (!calendars || calendars.length === 0) return [];
+
+  const results = [];
+
+  calendars.forEach(calendar => {
+    calendar.appointments.forEach(app => {
+      if (app.name && app.name.toLowerCase().includes(name.toLowerCase())) {
+        results.push({
+          calendarId: calendar._id,
+          calendarTitle: calendar.title,
+          appointment: app,
+        });
+      }
+    });
+  });
+
+  return results;
+};
+
 // plusieur calandars
 exports.getCalendars = async function (ids) {
   return await Calendar.find({ _id: { $in: ids } });

@@ -255,6 +255,30 @@ function createCalendarElement(cal, calendar) {
   dotsBtn.innerHTML = `<i class="fas fa-ellipsis-v"></i>`;
   menuWrapper.appendChild(dotsBtn);
 
+  dotsBtn.addEventListener("click", () => {
+    menu.classList.toggle("show");
+    menu.classList.toggle("hidden");
+  });
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".menu-wrapper")) {
+      menu.classList.remove("show");
+      menu.classList.add("hidden");
+    }
+  });
+
+  dotsBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+
+    // fermer tous les autres menus
+    const allMenus = document.querySelectorAll(".menu.show");
+    allMenus.forEach((m) => {
+      if (m !== menu) m.classList.remove("show");
+    });
+
+    // basculer celui-ci
+    menu.classList.toggle("show");
+  });
+
   // Menu déroulant
   const menu = document.createElement("div");
   menu.classList.add("menu", "hidden");
@@ -280,15 +304,16 @@ function createCalendarElement(cal, calendar) {
   shareBtn.innerHTML = `<i class="fas fa-share-alt"></i> Partager`;
   menu.appendChild(shareBtn);
 
-  menuWrapper.appendChild(menu);
+  document.body.appendChild(menu);
   calDiv.appendChild(menuWrapper);
 
   // --- Événement pour ouvrir/fermer le menu ---
-  dotsBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    menu.classList.toggle("hidden");
-    menu.classList.toggle("show");
-  });
+dotsBtn.addEventListener("click", (e) => {
+  const rect = dotsBtn.getBoundingClientRect();
+  menu.style.top = `${rect.bottom + window.scrollY}px`;
+  menu.style.left = `${rect.left + window.scrollX}px`; 
+  menu.classList.toggle("show");
+});
 
   // Fermer tous les menus si clic ailleurs
   document.addEventListener("click", () => {
@@ -898,6 +923,31 @@ document.addEventListener("click", (e) => {
     e.stopPropagation();
   });
 })();
+
+// --- Menu Créer : ouvrir / fermer ---
+const btnCreateMenu = document.getElementById("btnCreateMenu");
+const createDropdown = document.getElementById("createDropdown");
+
+btnCreateMenu.addEventListener("click", () => {
+  createDropdown.classList.toggle("hidden");
+});
+
+// Fermer le menu si on clique à l’extérieur
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".create-wrapper")) {
+    createDropdown.classList.add("hidden");
+  }
+});
+
+document.addEventListener("click", (e) => {
+  const allMenus = document.querySelectorAll(".menu");
+
+  allMenus.forEach((menu) => {
+    if (!e.target.closest(".menu-wrapper")) {
+      menu.classList.remove("show");
+    }
+  });
+});
 
 // --- Réinitialise les événements actuels ---
 //calendar.removeAllEvents();

@@ -115,3 +115,20 @@ exports.getAppointments = async (req, res) => {
     return res.status(500).json({ error: "Erreur serveur" });
   }
 };
+exports.searchAppointment = async (req , res) => {
+  try{
+    const {appointments_name} = req.body;
+    const userID = req.user.id;
+
+    if(!appointments_name){
+      return res.status(400).json({ error: "Nom du rendez-vous requis" });
+    }
+    const results = await model.searchUserAppointments(userID,appointments_name);
+    if(!results){
+      return res.status(404).json({ message: "Aucun rendez-vous trouvé" });
+    }
+    return res.status(200).json({ appointments: results });
+  }catch(err){
+    return res.status(500).json({ error: "Erreur serveur" });
+  }
+}

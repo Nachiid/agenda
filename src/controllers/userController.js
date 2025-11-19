@@ -243,7 +243,7 @@ exports.updatePreference = async (req, res) => {
   const userId = req.user.id;
   const { defaultView } = req.body;
 
-  if (!defaultView || !["Mois", "Semaine", "Jour"].includes(defaultView)) {
+  if (!defaultView || !["Mois", "Semaine", "Jour", "Liste"].includes(defaultView)) {
     return res
       .status(400)
       .json({ error: "Valeur de vue par défaut invalide." });
