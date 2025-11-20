@@ -390,6 +390,7 @@ if (btnNewEvent && eventModal && btnCancel && eventForm) {
       "Créer un nouvel événement";
     eventModal.querySelector(".btn.btn-primary").textContent = "Créer";
   });
+      eventModal.querySelector(".btn.btn-primary").classList.add("menu-edit");
 
   btnCancel.addEventListener("click", () => {
     eventModal.classList.add("hidden");
