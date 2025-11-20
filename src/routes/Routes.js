@@ -84,4 +84,15 @@ router.get("/user/logout", (req, res) => {
   res.status(200).json({ message: "Déconnecté avec succès" });
 });
 
+//==========================================================================================
+// PARTAGE AGENDA
+// Recherche utilisateurs (email prefix)
+router.get("/search", auth, calendarController.searchUsers);
+
+// Partage de calendrier
+router.post("/calendar/share", auth, calendarController.shareCalendar);
+//PARTAGE DE RDV
+router.post("/shareAppointment", auth, appointmentController.shareAppointment);
+
+
 module.exports = router;

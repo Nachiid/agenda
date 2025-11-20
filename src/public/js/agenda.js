@@ -182,6 +182,15 @@ function createCalendarElement(cal, calendar) {
   checkbox.type = "checkbox";
   checkbox.checked = false;
 
+  /**
+   * 
+   * 
+   *                                  changement checkbox.addEventListener("change", async (e)
+   * 
+   * 
+   */
+  
+  /*
   checkbox.addEventListener("change", async (e) => {
     const selectedCheckbox = e.target;
     const calDiv = selectedCheckbox.closest(".event-item2");
@@ -227,6 +236,66 @@ function createCalendarElement(cal, calendar) {
       selectedCheckbox.checked = false;
     }
   });
+  */
+
+  checkbox.addEventListener("change", async (e) => {
+  const selectedCheckbox = e.target;
+  const calDiv = selectedCheckbox.closest(".event-item2");
+  if (!calDiv) return;
+  const calendarId = calDiv.dataset.id;
+
+  let activeIds = getActiveCalendarIdsLocal();
+
+  // --- Si on décoche ---
+  if (!selectedCheckbox.checked) {
+    if (activeIds.length === 1) {
+      selectedCheckbox.checked = true;
+      showMessage("Vous devez garder au moins un calendrier actif.", "error");
+      return;
+    }
+
+    removeActiveCalendarIdLocal(calendarId);
+    removeCalendarEvents(calendarId, calendar);
+
+    await window.fetchAppointments(getActiveCalendarIdsLocal());
+    return;
+  }
+
+  // --- Si on coche ---
+  // Ajouter le calendrier aux actifs
+  if (!activeIds.includes(calendarId)) {
+    activeIds.push(calendarId);
+    setActiveCalendarIdsLocal(activeIds);
+  }
+
+  try {
+    const res = await fetch(`/user/agenda/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ calendarIds: activeIds }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      showMessage(
+        data.error || "Erreur lors du chargement du calendrier",
+        "error"
+      );
+      selectedCheckbox.checked = false;
+      return;
+    }
+
+    updateCalendarView(data.calendars, calendar);
+    updateCalendarCheckboxes();
+    await window.fetchAppointments(activeIds);
+  } catch (err) {
+    console.error(err);
+    showMessage("Erreur serveur, réessayez plus tard.", "error");
+    selectedCheckbox.checked = false;
+  }
+});
+
 
   leftDiv.appendChild(checkbox);
 
@@ -280,6 +349,10 @@ function createCalendarElement(cal, calendar) {
   shareBtn.innerHTML = `<i class="fas fa-share-alt"></i> Partager`;
   menu.appendChild(shareBtn);
 
+  shareBtn.addEventListener("click", () => {
+    openSharePopup(cal._id);
+  });
+
   menuWrapper.appendChild(menu);
   calDiv.appendChild(menuWrapper);
 
@@ -302,10 +375,10 @@ function createCalendarElement(cal, calendar) {
   deleteBtn.addEventListener("click", async (e) => {
     e.stopPropagation();
     const calendarId = calDiv.dataset.id;
-     if (getActiveCalendarIdsLocal().length === 1) {
-     showMessage("Vous devez garder au moins un calendrier.", "error");
-    return;
-     }
+    if (getActiveCalendarIdsLocal().length === 1) {
+      showMessage("Vous devez garder au moins un calendrier.", "error");
+      return;
+    }
     const confirmed = await showConfirm(
       `Voulez-vous vraiment supprimer ce calendrier ?`
     );
@@ -897,3 +970,117 @@ document.addEventListener("appointmentsUpdated", async () => {
   updateCalendarView(data.calendar, calendar);
 });
 */
+
+
+/* ------------------------------------------------------------
+    PARTAGE AGENDA
+------------------------------------------------------------ */
+
+function openSharePopup(calendarId) {
+    const modal = document.getElementById("shareCalendarModal");
+    modal.classList.remove("hidden");
+    modal.dataset.calendarId = calendarId;
+
+    // reset
+    document.getElementById("shareEmailInput").value = "";
+    document.getElementById("shareEmailInput").dataset.userId = "";
+    document.getElementById("shareUserResults").innerHTML = "";
+}
+
+document.getElementById("btnCancelShare").addEventListener("click", () => {
+    const modal = document.getElementById("shareCalendarModal");
+    modal.classList.add("hidden");
+
+    document.getElementById("shareUserResults").innerHTML = "";
+    document.getElementById("shareEmailInput").value = "";
+    document.getElementById("shareEmailInput").dataset.userId = "";
+});
+
+/* ------------------------------------------------------------
+    AUTOCOMPLETION EMAIL
+------------------------------------------------------------ */
+
+const emailInput = document.getElementById("shareEmailInput");
+const resultsBox = document.getElementById("shareUserResults");
+let searchTimeout = null;
+
+emailInput.addEventListener("input", () => {
+    const query = emailInput.value.trim();
+    clearTimeout(searchTimeout);
+
+    if (query.length < 1) {
+        resultsBox.innerHTML = "";
+        return;
+    }
+
+    searchTimeout = setTimeout(async () => {
+        try {
+            const response = await fetch(`/search?prefix=${encodeURIComponent(query)}`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include"
+            });
+
+            const data = await response.json();
+
+            resultsBox.innerHTML = "";
+
+            if (!data.users || data.users.length === 0) {
+                resultsBox.innerHTML = "<p>Aucun utilisateur trouvé.</p>";
+                return;
+            }
+
+            data.users.forEach(user => {
+                const div = document.createElement("div");
+                div.classList.add("share-user-item");
+                div.textContent = `${user.email} (${user.firstName} ${user.lastName})`;
+
+                div.addEventListener("click", () => {
+                    emailInput.value = user.email;
+                    emailInput.dataset.userId = user._id;
+                    resultsBox.innerHTML = "";
+                });
+
+                resultsBox.appendChild(div);
+            });
+
+        } catch (error) {
+            console.error("Erreur recherche :", error);
+        }
+    }, 200);
+});
+
+/* ------------------------------------------------------------
+    CONFIRMATION DU PARTAGE
+------------------------------------------------------------ */
+
+document.getElementById("btnConfirmShare").addEventListener("click", async () => {
+    const receiverId = emailInput.dataset.userId;
+    const calendarId = document.getElementById("shareCalendarModal").dataset.calendarId;
+
+    if (!receiverId) {
+        showMessage("Veuillez sélectionner un utilisateur dans la liste.", "error");
+        return;
+    }
+
+    try {
+        const res = await fetch("/calendar/share", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ calendarId, receiverId })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            showMessage("Calendrier partagé avec succès !", "success");
+            document.getElementById("shareCalendarModal").classList.add("hidden");
+        } else {
+            showMessage(data.error || "Erreur lors du partage.", "error");
+        }
+    } catch (err) {
+        console.error("Erreur fetch :", err);
+        showMessage("Erreur lors du partage", "error");
+    }
+});

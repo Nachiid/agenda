@@ -148,9 +148,36 @@ exports.getUserAppointment = async function (idUser, idAppointement) {
 };
 
 // plusieur calandars
+
+/**
+ * 
+ * 
+ * 
+
+              changelent de getCalendars 
+
+
+
+
+
+
+
+ */
+/*
 exports.getCalendars = async function (ids) {
   return await Calendar.find({ _id: { $in: ids } });
 };
+*/
+exports.getCalendars = async function (userId, ids) {
+  return Calendar.find({
+    _id: { $in: ids },
+    $or: [
+      { userId: userId },         // l’utilisateur est propriétaire
+      { sharedWith: userId }      // l’utilisateur est destinataire du partage
+    ]
+  });
+};
+
 
 /**
  * Récupère l'ID de l'utilisateur associé à un calendrier donné.
@@ -181,8 +208,28 @@ exports.getFirstCalendar = async function (userId) {
 /**
  * Renvoie les id, titres et couleurs de tous les calendriers d'un utilisateur
  */
+/*=========================================================================================changement dans 
+
+
+
+
+
+            changement dans getAllCalendarsIdsTitles : on affiche les calidriers crées et partagés 
+
+
+
+
+
+*/
 exports.getAllCalendarsIdsTitles = async function (userId) {
-  const calendars = await Calendar.find({ userId: userId }).select(
+  const calendars = await Calendar.find(
+    {
+      $or: [
+        { userId: userId },      // propriétaires
+        { sharedWith: userId }   // calendriers partagés avec lui
+      ]
+    },
+  ).select(
     "_id title color"
   );
   return calendars;
@@ -195,7 +242,7 @@ exports.getCalandar = async function (id_cal) {
 /**
  * Crée un calendrier pour un utilisateur donné.
  */
-exports.createCalendar = async function (userId, title, appointments = []) {
+exports.createCalendar = async function (userId, title, appointments = [], isShared = false) {
   const colorPalette = [
     "#3498db", // Bleu
     "#2ecc71", // Vert
@@ -220,6 +267,7 @@ exports.createCalendar = async function (userId, title, appointments = []) {
     color,
     userId,
     appointments,
+    isShared,
   });
   return await newCalendar.save();
 };
@@ -317,5 +365,49 @@ exports.updateUserPreference = async function (userId, defaultView) {
   );
   return updatedUser;
 };
+
+//==========================================================================================
+// PARTAGE AGENDA
+
+// Recherche par début d'email
+exports.searchUsersByEmailPrefix = async function (prefix) {
+  return User.find(
+    { email: { $regex: "^" + prefix, $options: "i" } },
+    "_id email firstName lastName"
+  );
+};
+
+// Partager un calendrier
+exports.shareCalendar = async function (calendarId, ownerId, receiverId) {
+  return Calendar.findOneAndUpdate(
+    { _id: calendarId, userId: ownerId },
+    { $addToSet: { sharedWith: receiverId } },
+    { new: true }
+  );
+};
+
+// Vérifier que user peut voir calendrier
+exports.getUserCalendarSharedOrOwned = async function (calendarId, userId) {
+  return Calendar.findOne({
+    _id: calendarId,
+    $or: [{ userId }, { sharedWith: userId }],
+  });
+};
+
+exports.addSharedAppointment = async function (receiverId, appointmentData) {
+    // trouver l’agenda fantôme du receveur RDV partagés
+    let sharedCal = await Calendar.findOne({
+        userId: receiverId,
+        isShared: true
+    });
+
+    // ajouter le rendez-vous
+    sharedCal.appointments.push(appointmentData);
+
+    // sauvegarder
+    const saved = await sharedCal.save();
+    return saved;
+};
+
 
 

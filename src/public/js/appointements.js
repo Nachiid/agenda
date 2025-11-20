@@ -211,8 +211,7 @@ if (btnNewEvent && eventModal && btnCancel && eventForm) {
     eventModal.querySelector(".modal-title").textContent =
       "Créer un nouvel événement";
     eventModal.querySelector(".btn.btn-primary").textContent = "Créer";
-  }); 
-  
+  });
 
   btnCancel.addEventListener("click", () => {
     eventModal.classList.add("hidden");
@@ -230,7 +229,7 @@ if (btnNewEvent && eventModal && btnCancel && eventForm) {
 }
 
 // ==========================
-// Ajout / Update RDV
+// Ajout / Update / partage RDV
 // ==========================
 eventForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -485,4 +484,120 @@ document.addEventListener("deleteAppointmentFromPopup", async (e) => {
     console.error(err);
     showMessage("Erreur lors de la suppression", "error");
   }
+});
+// ==========================
+// PARTAGE RDV — OUVERTURE POPUP
+// ==========================
+document.getElementById("upcomingEvents").addEventListener("click", (e) => {
+  const btnShare = e.target.closest(".menu-share");
+  if (!btnShare) return;
+
+  const rdvId = btnShare.dataset.id;
+  document.getElementById("shareAppointmentModal").dataset.rdvId = rdvId;
+
+  document.getElementById("shareRdvEmailInput").value = "";
+  document.getElementById("shareRdvUserResults").innerHTML = "";
+
+  document.getElementById("shareAppointmentModal").classList.remove("hidden");
+});
+// ==========================
+// PARTAGE RDV — SUGGESTION EMAIL
+// ==========================
+const shareRdvEmailInput = document.getElementById("shareRdvEmailInput");
+const shareRdvResults = document.getElementById("shareRdvUserResults");
+let rdvSearchTimeout = null;
+
+shareRdvEmailInput.addEventListener("input", () => {
+  const query = shareRdvEmailInput.value.trim();
+  clearTimeout(rdvSearchTimeout);
+
+  if (query.length < 1) {
+    shareRdvResults.innerHTML = "";
+    return;
+  }
+
+  rdvSearchTimeout = setTimeout(async () => {
+    try {
+      const response = await fetch(
+        `/search?prefix=${encodeURIComponent(query)}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      shareRdvResults.innerHTML = "";
+
+      if (!data.users || data.users.length === 0) {
+        shareRdvResults.innerHTML = "<p>Aucun utilisateur trouvé.</p>";
+        return;
+      }
+
+      data.users.forEach((user) => {
+        const div = document.createElement("div");
+        div.classList.add("share-user-item");
+        div.textContent = `${user.email} (${user.firstName} ${user.lastName})`;
+        div.dataset.userId = user._id;
+
+        div.addEventListener("click", () => {
+          shareRdvEmailInput.value = user.email;
+          shareRdvEmailInput.dataset.userId = user._id;
+          shareRdvResults.innerHTML = "";
+        });
+
+        shareRdvResults.appendChild(div);
+      });
+    } catch (error) {
+      console.error("Erreur recherche RDV :", error);
+    }
+  }, 200);
+});
+
+// ==========================
+// PARTAGE RDV — ENVOI
+// ==========================
+document
+  .getElementById("btnSendShareRdv")
+  .addEventListener("click", async () => {
+    const receiverId = shareRdvEmailInput.dataset.userId;
+    const rdvId = document.getElementById("shareAppointmentModal").dataset
+      .rdvId;
+
+    if (!receiverId) {
+      showMessage("Choisissez un utilisateur dans la liste", "error");
+      return;
+    }
+
+    const rdvDiv = document.querySelector(`.event-item[data-id='${rdvId}']`);
+    const appointment = {
+      _id: rdvId,
+      name: rdvDiv.querySelector(".event-title").textContent,
+      date_debut: rdvDiv.dataset.start,
+      date_fin: rdvDiv.dataset.end,
+      description: rdvDiv.dataset.description,
+    };
+
+    const res = await fetch("/shareAppointment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        receiverId,
+        appointment,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      showMessage("Rendez-vous partagé !", "success");
+      document.getElementById("shareAppointmentModal").classList.add("hidden");
+    } else {
+      showMessage("Erreur lors du partage", "error");
+    }
+  });
+document.getElementById("btnCancelShareRdv").addEventListener("click", () => {
+  document.getElementById("shareAppointmentModal").classList.add("hidden");
 });
