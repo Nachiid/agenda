@@ -1,163 +1,279 @@
 <!DOCTYPE html>
 <html lang="fr">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=330, initial-scale=1.0" />
     <title>Mon Agenda - Profil</title>
-    <link rel="stylesheet" href="/css/profile-style.css">
-    <link rel="stylesheet" href="/css/agenda-style.css">
-    <link rel="stylesheet" href="/css/style.css">
-
-</head>
-
-<body class="dashboard-body">
+    <link rel="stylesheet" href="/css/profile-style.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="css/global-style.css" />
+    <!-- Font Awesome Free -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+  <body class="dashboard-body">
     <!-- Navigation -->
-    <nav class="navbar">
+    <div class="navbar-wrapper">
+      <nav class="navbar">
         <div class="nav-content">
+          <!-- Zone gauche : logo + bouton -->
+          <div class="left-area">
             <div class="logo">
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="40" height="40" rx="8" fill="#4F46E5" />
-                    <path
-                        d="M12 10H28C29.1046 10 30 10.8954 30 12V28C30 29.1046 29.1046 30 28 30H12C10.8954 30 10 29.1046 10 28V12C10 10.8954 10.8954 10 12 10Z"
-                        stroke="white" stroke-width="2" />
-                    <line x1="10" y1="16" x2="30" y2="16" stroke="white" stroke-width="2" />
-                    <line x1="16" y1="8" x2="16" y2="12" stroke="white" stroke-width="2" stroke-linecap="round" />
-                    <line x1="24" y1="8" x2="24" y2="12" stroke="white" stroke-width="2" stroke-linecap="round" />
-                </svg>
-                <span class="logo-text">Mon Agenda</span>
+              <svg
+                width="40"
+                height="40"
+                viewBox="0 0 40 40"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect width="40" height="40" rx="8" fill="#4F46E5" />
+                <path
+                  d="M12 10H28C29.1046 10 30 10.8954 30 12V28C30 29.1046 29.1046 30 28 30H12C10.8954 30 10 29.1046 10 28V12C10 10.8954 10.8954 10 12 10Z"
+                  stroke="white"
+                  stroke-width="2"
+                />
+                <line
+                  x1="10"
+                  y1="16"
+                  x2="30"
+                  y2="16"
+                  stroke="white"
+                  stroke-width="2"
+                />
+                <line
+                  x1="16"
+                  y1="8"
+                  x2="16"
+                  y2="12"
+                  stroke="white"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+                <line
+                  x1="24"
+                  y1="8"
+                  x2="24"
+                  y2="12"
+                  stroke="white"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+              <span class="logo-text">Mon Agenda</span>
             </div>
-            <div class="nav-links">
-                <a href="/agenda" class="nav-link">Agenda</a>
-                <a href="profile.html" class="nav-link active">Profil</a>
-                <button onclick="logout()">Se déconnecter</button>
-            </div>
+          </div>
+          <!-- Zone droite : liens -->
+          <div class="nav-links">
+            <a href="agenda" class="nav-link">Agenda</a>
+            <a href="/profile" class="nav-link active">Profil</a>
+            <button class="nav-link" onclick="logout()">Se déconnecter</button>
+          </div>
         </div>
-    </nav>
-
+      </nav>
+    </div>
     <!-- Contenu principal -->
     <div class="profile-container">
-        <div class="profile-header">
-            <div class="profile-avatar">
-                <div class="avatar-circle">JD</div>
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <div class="avatar-circle"></div>
+        </div>
+        <div class="profile-info">
+          <h1 class="profile-name"></h1>
+          <p class="profile-email"></p>
+        </div>
+      </div>
+
+      <div class="profile-content">
+        <!-- Section Informations personnelles -->
+        <div class="profile-section">
+          <h2 class="section-title">Informations personnelles</h2>
+          <form id="profileForm" class="profile-form">
+            <div class="form-group">
+              <label for="firstName" class="form-label">Nom</label>
+              <input
+                type="text"
+                id="firstName"
+                class="form-input"
+                value=""
+                required
+              />
             </div>
-            <div class="profile-info">
-                <h1 class="profile-name">Jean Dupont</h1>
-                <p class="profile-email">jean.dupont@example.com</p>
+            <div class="form-group">
+              <label for="lastName" class="form-label">Prénom</label>
+              <input
+                type="text"
+                id="lastName"
+                class="form-input"
+                value=""
+                required
+              />
             </div>
+            <div class="form-group">
+              <label for="email" class="form-label">Adresse email</label>
+              <input
+                type="email"
+                id="email"
+                class="form-input"
+                value=""
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="phone" class="form-label">Telephone</label>
+              <input
+                type="tel"
+                id="phone"
+                class="form-input"
+                pattern="^\+?[0-9\s\-]+$"
+                placeholder="+33 612345678"
+              />
+            </div>
+            <div class="form-group">
+              <label for="timezone" class="form-label">Fuseau horaire</label>
+              <select id="timezone" class="form-input">
+                <option value="Europe/Paris" selected>
+                  Europe/Paris (GMT+2)
+                </option>
+                <option value="Europe/London">Europe/London (GMT+1)</option>
+                <option value="America/New_York">
+                  America/New York (GMT-4)
+                </option>
+                <option value="Asia/Tokyo">Asia/Tokyo (GMT+9)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              Enregistrer les modifications
+            </button>
+          </form>
         </div>
 
-        <div class="profile-content">
-            <!-- Section Informations personnelles -->
-            <div class="profile-section">
-                <h2 class="section-title">Informations personnelles</h2>
-                <form id="profileForm" class="profile-form">
-                    <div class="form-group">
-                        <label for="firstName" class="form-label">Nom</label>
-                        <input type="text" id="firstName" class="form-input" value="Jean Dupont" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="lastName" class="form-label">Prénom</label>
-                        <input type="text" id="lastName" class="form-input" value="Jean Dupont" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email" class="form-label">Adresse email</label>
-                        <input type="email" id="email" class="form-input" value="jean.dupont@example.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone" class="form-label">Telephone</label>
-                        <input type="tel" id="phone" class="form-input" placeholder="+33 6 12 34 56 78">
-                    </div>
-                    <div class="form-group">
-                        <label for="timezone" class="form-label">Fuseau horaire</label>
-                        <select id="timezone" class="form-input">
-                            <option value="Europe/Paris" selected>Europe/Paris (GMT+2)</option>
-                            <option value="Europe/London">Europe/London (GMT+1)</option>
-                            <option value="America/New_York">America/New York (GMT-4)</option>
-                            <option value="Asia/Tokyo">Asia/Tokyo (GMT+9)</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
-                </form>
+        <!-- Section Préférences -->
+        <div class="profile-section">
+          <h2 class="section-title">Preferences</h2>
+          <div class="preferences-list">
+            <div class="preference-item">
+              <div class="preference-info">
+                <h3>Notifications par email</h3>
+                <p>Recevoir des rappels par email pour les evenements</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" checked />
+                <span class="toggle-slider"></span>
+              </label>
             </div>
-
-            <!-- Section Préférences -->
-            <div class="profile-section">
-                <h2 class="section-title">Preferences</h2>
-                <div class="preferences-list">
-                    <div class="preference-item">
-                        <div class="preference-info">
-                            <h3>Notifications par email</h3>
-                            <p>Recevoir des rappels par email pour les evenements</p>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    <div class="preference-item">
-                        <div class="preference-info">
-                            <h3>Rappels automatiques</h3>
-                            <p>Activer les rappels 30 minutes avant chaque evenement</p>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    <div class="preference-item">
-                        <div class="preference-info">
-                            <h3>Vue par defaut</h3>
-                            <p>Choisir la vue d'affichage par defaut du calendrier</p>
-                        </div>
-                        <select class="form-input" style="width: 150px;">
-                            <option value="month" selected>Mois</option>
-                            <option value="week">Semaine</option>
-                            <option value="day">Jour</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="preference-item">
+              <div class="preference-info">
+                <h3>Rappels automatiques</h3>
+                <p>Activer les rappels 30 minutes avant chaque evenement</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" checked />
+                <span class="toggle-slider"></span>
+              </label>
             </div>
-
-            <!-- Section Statistiques -->
-            <div class="profile-section">
-                <h2 class="section-title">Statistiques</h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">📅</div>
-                        <div class="stat-value">24</div>
-                        <div class="stat-label">Evenements ce mois</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">✅</div>
-                        <div class="stat-value">18</div>
-                        <div class="stat-label">Evenements termines</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">⏰</div>
-                        <div class="stat-value">6</div>
-                        <div class="stat-label">Evenements a venir</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">🎯</div>
-                        <div class="stat-value">92%</div>
-                        <div class="stat-label">Taux de completion</div>
-                    </div>
-                </div>
+            <div class="preference-item-view">
+              <div class="preference-info">
+                <h3>Vue par defaut</h3>
+                <p>Choisir la vue d'affichage par defaut du calendrier</p>
+              </div>
+              <select class="form-input" style="width: 150px">
+                <option value="Mois">Mois</option>
+                <option value="Semaine">Semaine</option>
+                <option value="Jour">Jour</option>
+                <option value="Liste">Liste</option>
+              </select>
             </div>
-
-            <!-- Section Sécurité -->
-            <div class="profile-section">
-                <h2 class="section-title">Securite</h2>
-                <button class="btn btn-secondary" id="btnChangePassword">Changer le mot de passe</button>
-                <button class="btn btn-danger" id="btnDeleteAccount" style="margin-left: 1rem;">Supprimer le
-                    compte</button>
-            </div>
+          </div>
         </div>
+
+        <!-- Section Sécurité -->
+        <div class="profile-section">
+          <h2 class="section-title">Securite</h2>
+          <button class="btn btn-secondary" id="btnChangePassword">
+            Changer le mot de passe
+          </button>
+          <button
+            class="btn btn-danger"
+            id="btnDeleteAccount"
+          >
+            Supprimer le compte
+          </button>
+        </div>
+      </div>
     </div>
 
-    <script src="/js/profile.js"></script>
-    <script src="/js/logout.js"></script>
-</body>
+    <!-- MODAL Changement de mot de passe -->
+    <div id="passwordModal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Changer le mot de passe</h2>
+        <form id="passwordForm" class="profile-form">
+          <div class="form-group">
+            <label for="currentPassword">Mot de passe actuel</label>
+            <input
+              type="password"
+              id="currentPassword"
+              class="form-input"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="newPassword">Nouveau mot de passe</label>
+            <input
+              type="password"
+              id="newPassword"
+              class="form-input"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="confirmNewPassword"
+              >Confirmer le nouveau mot de passe</label
+            >
+            <input
+              type="password"
+              id="confirmNewPassword"
+              class="form-input"
+              required
+            />
+          </div>
 
+          <!-- Checkbox pour afficher/masquer le mot de passe -->
+          <div class="form-group" style="margin-top: 0.5rem">
+            <label>
+              <input type="checkbox" id="showPasswords" /> Afficher les mots de
+              passe
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <button type="button" id="closeModal" class="btn btn-secondary">
+              Annuler
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Popup de confirmation de suppression -->
+    <div id="deleteConfirmModal" class="custom-modal hidden">
+      <div class="custom-modal-content">
+        <h3>Supprimer le compte - entrez votre de passe ici ---</h3>
+        <p>
+          Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est
+          irréversible.
+        </p>
+        <div class="modal-buttons">
+          <button id="cancelDelete" class="btn-secondary">Annuler</button>
+          <button id="confirmDelete" class="btn-danger">Supprimer</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/global.js" defer></script>
+    <script src="/js/profile.js" defer></script>
+    <script src="/js/logout.js" defer></script>
+  </body>
 </html>

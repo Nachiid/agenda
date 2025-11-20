@@ -1,0 +1,38 @@
+# **Rétrospective du Sprint**
+
+## **Ce qui s’est bien passé**
+
+* Plusieurs fonctionnalités clés ont été intégrées avec succès (importation ICS, amélioration UI/UX, actions depuis le calendrier, etc.).
+* L’équipe a su réagir rapidement face aux problèmes rencontrés dans le code existant.
+* La communication interne s'est améliorée au fur et à mesure du sprint.
+* Nous avons clarifié la direction du produit après avoir identifié les sources de blocage.
+
+---
+
+## **Ce qui a été difficile**
+
+* **Le choix des fonctionnalités à intégrer dans ce sprint et le prochain.**
+  Nous avons passé beaucoup de temps à réfléchir, ajouter, retirer puis réorganiser les priorités.
+
+* **Optimisation du code existant.**
+  Une grande partie du sprint a été consommée par l’analyse et la tentative d’amélioration de morceaux de code anciens ou mal structurés.
+
+* **Reprise et réécriture de certaines fonctionnalités déjà implémentées.**
+  Plusieurs éléments ont dû être entièrement refaits car ils n'étaient juste pas assez optimisé.
+
+---
+
+## **3. Ce que nous avons appris**
+
+* Il est nécessaire d’avoir une **vision claire dès le début du sprint** (liste des objectifs, priorisation stricte).
+* L’optimisation prématurée peut faire perdre beaucoup de temps : mieux vaut **stabiliser la fonctionnalité d’abord**, optimiser ensuite.
+* Les revues de code régulières évitent les mauvaises surprises en fin de sprint.
+* Avoir un backlog bien organisé permet d’éviter de s’éparpiller.
+
+---
+
+## **4. Ce que nous allons améliorer**
+
+* **Mieux définir les fonctionnalités du prochain sprint**.
+* **Mettre en place une stratégie de développement plus stricte** dès le premier jour du sprint.
+* Adoption d’une architecture plus propre pour faciliter les futures évolutions.

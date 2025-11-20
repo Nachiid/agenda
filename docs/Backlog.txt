@@ -1,0 +1,118 @@
+Backlog Produit : Application Web Agenda
+========================================
+
+– Sprint 1 :
+============
+
+1. Création de compte
+------------------------
+En tant que nouvel utilisateur, je veux créer un compte, afin d'accéder à mon agenda personnel.
+
+2. Connexion
+------------------------
+En tant qu'utilisateur inscrit, je veux me connecter à mon compte, afin d'accéder à mes rendez-vous.
+
+3. Ajout de rendez-vous
+------------------------
+En tant qu'utilisateur connecté, je veux ajouter un rendez-vous, afin de planifier mes événements.
+
+4. Modification de rendez-vous
+------------------------
+En tant qu'utilisateur, je veux pouvoir modifier un rendez-vous existant, afin de mettre à jour les informations.
+
+5. Suppression de rendez-vous
+------------------------
+En tant qu'utilisateur, je veux pouvoir supprimer un rendez-vous, afin de gérer mon planning.
+
+6. Affichage d'une liste des rendez-vous
+------------------------
+En tant qu'utilisateur, je veux afficher une liste de mes rendez-vous, afin de visualiser facilement les événements à venir.
+
+
+- Sprint 2 :
+============
+
+1. Affichage du calendrier
+------------------------
+En tant qu'utilisateur connecté, je veux afficher mes rendez-vous dans une vue calendrier (jour, semaine, mois), afin de visualiser mon planning de manière chronologique.
+
+2. Création de calendrier
+------------------------
+En tant qu'utilisateur, je veux pouvoir créer un nouveau calendrier, afin de catégoriser mes rendez-vous (personnel, professionnel, etc.).
+
+3. Modification de calendrier
+------------------------
+En tant qu'utilisateur, je veux pouvoir modifier un calendrier existant (nom, couleur, etc.), afin de maintenir mon organisation à jour.
+
+4. Suppression de calendrier
+------------------------
+En tant qu'utilisateur, je veux pouvoir supprimer un calendrier, afin de nettoyer ma liste de calendriers.
+
+5. Affichage de la liste des calendriers
+------------------------
+En tant qu'utilisateur, je veux afficher une liste de mes calendriers, afin de pouvoir les gérer et les sélectionner.
+
+6. Modification du profil
+------------------------
+En tant qu'utilisateur, je veux pouvoir modifier les informations de mon profil (nom, email, mot de passe), afin de maintenir mes données personnelles à jour.
+
+7. Suppression de compte
+------------------------
+En tant qu'utilisateur, je veux pouvoir supprimer mon compte de manière définitive, afin de garantir le droit à l'oubli de mes données personnelles.
+
+
+- Sprint 3
+============
+
+
+1. Affichage des calendriers en parallèle
+------------------------
+En tant qu’utilisateur, je veux afficher plusieurs calendriers en même temps dans FullCalendar, afin de visualiser simultanément les événements provenant de différentes sources.
+
+2. Définition d’une vue par défaut
+------------------------
+En tant qu’utilisateur, je veux définir une vue par défaut (jour, semaine, mois ou liste), afin que FullCalendar s’ouvre automatiquement selon ma préférence.
+
+3. Gestion des rendez-vous directement depuis le calendrier
+------------------------
+En tant qu’utilisateur, je veux pouvoir gérer mes rendez-vous directement depuis FullCalendar (modifier, déplacer, redimensionner ou supprimer un événement), afin d’ajuster rapidement mon planning sans passer par des interfaces supplémentaires.
+
+4. Import et export de calendriers
+------------------------
+En tant qu’utilisateur, je veux importer et exporter mes calendriers au format ICS (ou équivalent), afin de sauvegarder mes données ou les synchroniser avec d’autres applications.
+
+5. Recherche globale de rendez-vous
+------------------------
+En tant qu’utilisateur, je veux rechercher un rendez-vous dans l’ensemble de mes calendriers, afin de retrouver rapidement un événement sans naviguer manuellement.
+
+6.Collaboration entre utilisateurs
+------------------------
+En tant qu’utilisateur, je veux pouvoir collaborer avec d’autres utilisateurs sur des calendriers ou des rendez-vous partagés, afin de co-gérer les événements, modifier les informations et suivre les changements en temps réel selon les droits définie
+
+
+
+# **– Sprint 4 :**
+
+====================
+
+1. Rendez-vous récurrents
+------------------------
+En tant qu’utilisateur, je veux pouvoir créer des rendez-vous récurrents (quotidiens, hebdomadaires, mensuels, annuels, ou personnalisés), afin de planifier facilement des événements qui se répètent sans avoir à les recréer manuellement.
+
+2. Système de corbeille (restauration pendant 30 jours)
+------------------------
+En tant qu’utilisateur, je veux que les calendriers et rendez-vous supprimés soient déplacés dans une corbeille pendant 30 jours avant suppression définitive, afin de pouvoir restaurer un élément supprimé par erreur.
+
+3. Mode sombre
+------------------------
+En tant qu’utilisateur, je veux pouvoir activer un mode sombre, afin d’améliorer le confort visuel lorsque j’utilise l’application dans un environnement sombre ou le soir.
+
+4. Mode équipe / entreprise
+------------------------
+En tant qu’utilisateur, je veux pouvoir basculer en mode équipe ou entreprise, afin de collaborer avec plusieurs membres, partager des calendriers, gérer des droits d’accès et visualiser la disponibilité de mon équipe.
+
+5. Intégration automatique des jours fériés
+------------------------
+En tant qu’utilisateur, je veux que mon calendrier inclue automatiquement les jours fériés associés à mon pays, afin de planifier mes événements en tenant compte des jours non ouvrés.
+
+

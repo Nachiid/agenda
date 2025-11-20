@@ -6,17 +6,25 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "expresse": "^1.0.2",
+    "ics": "^3.8.1",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.19.2"
+    "mongoose": "^8.19.2",
+    "multer": "^2.0.2",
+    "node-ical": "^0.22.1",
+    "tippy.js": "^6.3.7"
   },
   "name": "agenda",
   "version": "1.0.0",
   "main": "./src/server.js",
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "start": "node src/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
 }

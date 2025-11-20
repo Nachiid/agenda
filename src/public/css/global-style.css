@@ -1,0 +1,76 @@
+/* Conteneur global des messages */
+.message-box {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 200px;
+  max-width: 300px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.3s ease;
+  display: none;
+  z-index: 9999;
+}
+
+/* Couleur pour les erreurs */
+.message-box.error {
+  background-color: #ef4444; /* rouge */
+}
+
+/* Couleur pour les succès */
+.message-box.success {
+  background-color: #10b981; /* vert */
+}
+
+/* CSS global à ajouter */
+.confirm-box {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  pointer-events: auto;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.confirm-box.hidden {
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.confirm-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.confirm-content {
+  position: relative;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  z-index: 10;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}

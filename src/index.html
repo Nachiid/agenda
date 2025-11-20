@@ -1,61 +1,99 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mon Agenda - Organisez votre vie</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
     <div class="container">
-        <header class="header">
-            <div class="logo">
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="40" height="40" rx="8" fill="#4F46E5"/>
-                    <path d="M12 10H28C29.1046 10 30 10.8954 30 12V28C30 29.1046 29.1046 30 28 30H12C10.8954 30 10 29.1046 10 28V12C10 10.8954 10.8954 10 12 10Z" stroke="white" stroke-width="2"/>
-                    <line x1="10" y1="16" x2="30" y2="16" stroke="white" stroke-width="2"/>
-                    <line x1="16" y1="8" x2="16" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                    <line x1="24" y1="8" x2="24" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-                <span class="logo-text">Mon Agenda</span>
-                <a href=""> </a>
-            </div>
-        </header>
+      <header class="header">
+        <div class="logo">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 40 40"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect width="40" height="40" rx="8" fill="#4F46E5" />
+            <path
+              d="M12 10H28C29.1046 10 30 10.8954 30 12V28C30 29.1046 29.1046 30 28 30H12C10.8954 30 10 29.1046 10 28V12C10 10.8954 10.8954 10 12 10Z"
+              stroke="white"
+              stroke-width="2"
+            />
+            <line
+              x1="10"
+              y1="16"
+              x2="30"
+              y2="16"
+              stroke="white"
+              stroke-width="2"
+            />
+            <line
+              x1="16"
+              y1="8"
+              x2="16"
+              y2="12"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+            <line
+              x1="24"
+              y1="8"
+              x2="24"
+              y2="12"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+          <span class="logo-text">Mon Agenda</span>
+          <a href=""> </a>
+        </div>
+      </header>
 
-        <main class="hero">
-            <h1 class="hero-title">Organisez votre vie simplement</h1>
-            <p class="hero-description">
-                Gérez vos rendez-vous, événements et tâches quotidiennes en un seul endroit. 
-                Simple, intuitif et toujours accessible.
-            </p>
+      <main class="hero">
+        <h1 class="hero-title">Organisez votre vie simplement</h1>
+        <p class="hero-description">
+          Gérez vos rendez-vous, événements et tâches quotidiennes en un seul
+          endroit. Simple, intuitif et toujours accessible.
+        </p>
 
-            <div class="features">
-                <div class="feature-card">
-                    <div class="feature-icon">📅</div>
-                    <h3>Planification facile</h3>
-                    <p>Créez et organisez vos événements en quelques clics</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔔</div>
-                    <h3>Rappels automatiques</h3>
-                    <p>Ne manquez plus jamais un rendez-vous important</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🌐</div>
-                    <h3>Accessible partout</h3>
-                    <p>Accédez à votre agenda depuis n'importe quel appareil</p>
-                </div>
-            </div>
+        <div class="features">
+          <div class="feature-card">
+            <div class="feature-icon">📅</div>
+            <h3>Planification facile</h3>
+            <p>Créez et organisez vos événements en quelques clics</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔔</div>
+            <h3>Rappels automatiques</h3>
+            <p>Ne manquez plus jamais un rendez-vous important</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🌐</div>
+            <h3>Accessible partout</h3>
+            <p>Accédez à votre agenda depuis n'importe quel appareil</p>
+          </div>
+        </div>
 
-            <div class="cta-buttons">
-                <a href="/register" class="btn btn-primary">S'inscrire</a>
-                <a href="/login" class="btn btn-secondary">Se connecter</a>
-            </div>
-        </main>
+        <div class="cta-buttons">
+          <a href="/register" class="btn btn-primary">S'inscrire</a>
+          <a href="/login" class="btn btn-secondary">Se connecter</a>
+        </div>
+      </main>
 
-        <footer class="footer">
-            <p>&copy; 2025 Mon Agenda. Tous droits réservés.</p>
-        </footer>
+      <footer class="footer">
+        <p>&copy; 2025 Mon Agenda. Tous droits réservés.</p>
+        <script>
+  // vider le localStorage dès que l'utilisateur revient sur la page d'accueil
+  localStorage.clear();
+</script>
+
+      </footer>
     </div>
-</body>
+  </body>
 </html>

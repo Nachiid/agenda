@@ -1,0 +1,55 @@
+# **Sprint Review – Sprint en cours**
+
+# **Fonctionnalités terminées**
+
+### **1. Affichage des calendriers en parallèle**
+
+La fonctionnalité est entièrement opérationnelle.
+L’utilisateur peut désormais afficher plusieurs calendriers en même temps, avec une intégration fluide dans FullCalendar.
+
+### **2. Définition d’une vue par défaut**
+
+La gestion de la vue par défaut (jour, semaine, mois ou liste) a été implémentée avec succès.
+Le calendrier se charge automatiquement selon la préférence définie par l’utilisateur.
+
+### **4. Import et export de calendriers**
+
+L’import/export au format ICS fonctionne correctement.
+L’utilisateur peut importer un fichier ICS, avec détection automatique du nom du calendrier, et exporter ses calendriers vers un format compatible.
+
+### **5. Recherche globale de rendez-vous**
+
+La recherche fonctionne sur l’ensemble des calendriers de l’utilisateur.
+Cela permet de trouver rapidement un rendez-vous sans parcourir les différentes vues.
+
+---
+
+# **Fonctionnalités partiellement réalisées**
+
+### **3. Gestion des rendez-vous directement depuis le calendrier**
+
+* ✔ Modification d’un rendez-vous → **fonctionnelle**
+* ✔ Suppression d’un rendez-vous → **fonctionnelle**
+* x Création d’un rendez-vous depuis un créneau du calendrier → **non réalisée dans ce sprint**
+
+La gestion est donc partielle ; l’ajout direct depuis le calendrier reste à faire dans un prochain sprint.
+
+---
+
+# ** Fonctionnalité en cours / avec bugs**
+
+### **6. Collaboration entre utilisateurs**
+
+* ✔ Partage de calendrier → **fonctionnel**
+* x Affichage des calendriers partagés → **bug d’organisation**
+
+  * Les calendriers partagés apparaissent mais **ne sont pas triés** correctement selon les droits (éditeur / viewer).
+* ✏ Le développeur travaille encore sur :
+
+  * la gestion correcte de l’affichage selon les droits,
+  * la finalisation du partage de rendez-vous.
+
+Cette fonctionnalité est donc **en cours de développement**, partiellement disponible mais non finalisée.
+
+---
+
