@@ -1,4 +1,8 @@
-const { getCalendarById, addAppointment, createCalendar } = require("../models/model");
+const {
+  getCalendarById,
+  addAppointment,
+  createCalendar,
+} = require("../models/model");
 const ics = require("ics");
 const ical = require("node-ical");
 
@@ -14,10 +18,30 @@ const importIcs = async (req, res) => {
       return res.status(400).json({ error: "Empty ICS file" });
     }
 
-    const calendar = await createCalendar(req.user.id, "Imported Calendar");
+    let calendarTitle = null;
+
+    for (const key in events) {
+      if (events[key].type === "VCALENDAR") {
+        calendarTitle =
+          events[key]["x-wr-calname"] || events[key]["X-WR-CALNAME"];
+        break;
+      }
+    }
+
+    if (!calendarTitle) {
+      const originalName = req.file.originalname;
+      calendarTitle = originalName.replace(/\.[^/.]+$/, "");
+    }
+    calendarTitle = calendarTitle + " Importé";
+    const calendar = await createCalendar(req.user.id, calendarTitle);
 
     for (const event of Object.values(events)) {
-      if (event.type === "VEVENT" && event.summary && event.start && event.end) {
+      if (
+        event.type === "VEVENT" &&
+        event.summary &&
+        event.start &&
+        event.end
+      ) {
         try {
           await addAppointment(calendar._id, {
             name: event.summary,
@@ -31,7 +55,7 @@ const importIcs = async (req, res) => {
       }
     }
 
-    res.status(200).json({ message: "Calendar imported successfully" });
+    res.status(200).json({ message: "Calendar importer avec succée " });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });

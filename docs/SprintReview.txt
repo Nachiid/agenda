@@ -1,25 +1,55 @@
-# Sprint 1 Review – Application Web Agenda
+# **Sprint Review – Sprint en cours**
 
-##  Période du Sprint
+# **Fonctionnalités terminées**
 
-* Sprint 1 : Affichage et gestion des calendriers
+### **1. Affichage des calendriers en parallèle**
+
+La fonctionnalité est entièrement opérationnelle.
+L’utilisateur peut désormais afficher plusieurs calendriers en même temps, avec une intégration fluide dans FullCalendar.
+
+### **2. Définition d’une vue par défaut**
+
+La gestion de la vue par défaut (jour, semaine, mois ou liste) a été implémentée avec succès.
+Le calendrier se charge automatiquement selon la préférence définie par l’utilisateur.
+
+### **4. Import et export de calendriers**
+
+L’import/export au format ICS fonctionne correctement.
+L’utilisateur peut importer un fichier ICS, avec détection automatique du nom du calendrier, et exporter ses calendriers vers un format compatible.
+
+### **5. Recherche globale de rendez-vous**
+
+La recherche fonctionne sur l’ensemble des calendriers de l’utilisateur.
+Cela permet de trouver rapidement un rendez-vous sans parcourir les différentes vues.
 
 ---
 
-## Objectifs du Sprint
+# **Fonctionnalités partiellement réalisées**
 
-* Implémenter l’affichage des calendriers et la gestion complète des calendriers utilisateurs (création, modification, suppression).
-* Assurer la gestion du profil utilisateur et la suppression de compte.
+### **3. Gestion des rendez-vous directement depuis le calendrier**
+
+* ✔ Modification d’un rendez-vous → **fonctionnelle**
+* ✔ Suppression d’un rendez-vous → **fonctionnelle**
+* x Création d’un rendez-vous depuis un créneau du calendrier → **non réalisée dans ce sprint**
+
+La gestion est donc partielle ; l’ajout direct depuis le calendrier reste à faire dans un prochain sprint.
+
 ---
 
-## Fonctionnalités réalisées et validées
+# ** Fonctionnalité en cours / avec bugs**
 
-| # | Fonctionnalité                                | Statut      | Commentaire                                                                                   |
-| - | --------------------------------------------- | --------    | --------------------------------------------------------------------------------------------- |
-| 1 | Affichage du calendrier (jour, semaine, mois) |  Validé     | Les rendez-vous s’affichent correctement selon le calendrier sélectionné.                     |
-| 2 | Création de calendrier                        |  Validé     | L’utilisateur peut créer un calendrier avec un titre et une couleur.                          |
-| 3 | Modification de calendrier                    |  Validé     | L’utilisateur peut modifier le nom et la couleur d’un calendrier existant.                    |
-| 4 | Suppression de calendrier                     |  Validé     | Les calendriers peuvent être supprimés et le calendrier actif est mis à jour automatiquement. |
-| 5 | Affichage de la liste des calendriers         |  Validé     | La liste des calendriers est correctement affichée et la sélection fonctionne.                |
-| 6 | Modification du profil                        |  Validé     | Les informations personnelles (nom, email, mot de passe) peuvent être mises à jour.           |
-| 7 | Suppression de compte                         |  Validé     | L’utilisateur peut supprimer son compte et toutes les données associées sont supprimées.      |
+### **6. Collaboration entre utilisateurs**
+
+* ✔ Partage de calendrier → **fonctionnel**
+* x Affichage des calendriers partagés → **bug d’organisation**
+
+  * Les calendriers partagés apparaissent mais **ne sont pas triés** correctement selon les droits (éditeur / viewer).
+* ✏ Le développeur travaille encore sur :
+
+  * la gestion correcte de l’affichage selon les droits,
+  * la finalisation du partage de rendez-vous.
+
+Cette fonctionnalité est donc **en cours de développement**, partiellement disponible mais non finalisée.
+
+---
+

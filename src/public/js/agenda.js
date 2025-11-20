@@ -310,7 +310,7 @@ function createCalendarElement(cal, calendar) {
   ExpoBtn.classList.add("menu-expo");
   ExpoBtn.dataset.id = cal._id;
   ExpoBtn.innerHTML = `<i class="fas fa-expo-alt"></i> Exporter`;
-  menu.appendChild(ExpoBtn); 
+  menu.appendChild(ExpoBtn);
 
   ExpoBtn.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -357,12 +357,14 @@ function createCalendarElement(cal, calendar) {
       }
       calDiv.remove();
       renderCalendarListUI(calendarListDiv);
+      removeCalendarEvents(calendarId, calendar);
+
       showMessage(data.message, "success");
       if (getActiveCalendarIdsLocal().length === 0) {
         const firstCalendarDiv = document.querySelector(".event-item2");
         if (firstCalendarDiv) {
           const newCalendarId = firstCalendarDiv.dataset.id;
-                    setActiveCalendarIdsLocal([newCalendarId]);
+          setActiveCalendarIdsLocal([newCalendarId]);
         }
       }
     } catch (err) {
@@ -400,8 +402,7 @@ function openEventDetailsPopup(event) {
     description: event.extendedProps.description || "",
     date_debut: event.start,
     date_fin: event.end,
-    calendar_id: event.extendedProps.calendarId 
-
+    calendar_id: event.extendedProps.calendarId,
   };
 
   const popup = document.getElementById("eventDetailsModal");
@@ -780,7 +781,10 @@ document.addEventListener("DOMContentLoaded", async function () {
         const data = await res.json();
 
         if (!res.ok) {
-          return showMessage(data.error || "Failed to import calendar.", "error");
+          return showMessage(
+            data.error || "Failed to import calendar.",
+            "error"
+          );
         }
 
         showMessage(data.message, "success");
