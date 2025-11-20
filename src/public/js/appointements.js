@@ -739,7 +739,7 @@ function displayResults(appointments) {
       eventModal.classList.remove("hidden");
       eventForm.dataset.editingId = rdv._id;
       // Modifier le titre
-      eventModal.querySelector(".modal-title").textContent = "Modifier le RDV";
+      eventModal.querySelector(".modal-title").textContent = "inforamtion du RDV";
       eventModal.querySelector(".btn.btn-primary").classList.add("modifier1", "hidden");
       //eventModal.querySelector(".btn.btn-primary").textContent = "Modifier";
       // Convertir les dates
@@ -869,6 +869,7 @@ document
       description: rdvDiv.dataset.description,
     };
 
+
     const res = await fetch("/shareAppointment", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -879,7 +880,7 @@ document
     });
 
     const data = await res.json();
-
+  
     if (data.success) {
       showMessage("Rendez-vous partagé !", "success");
       document.getElementById("shareAppointmentModal").classList.add("hidden");

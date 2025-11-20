@@ -59,7 +59,7 @@ async function seedAll() {
       { title: "amis", color: "#2ecc71" },
       { title: "famille", color: "#e74c3c" },
       { title: "travail", color: "#34495e"},
-      { title: "Rendez-vous partagés", color: "#grey" , isShared : true},
+      { title: "Rendez-vous partagés", color: "grey" , isShared : true},
 
     ];
 
@@ -80,6 +80,7 @@ async function seedAll() {
               date_debut: start,
               date_fin: end,
               description: `Description du rendez-vous ${i + 1}`,
+
             });
           }
         }
@@ -89,6 +90,7 @@ async function seedAll() {
           color: t.color,
           userId: user._id,
           appointments,
+   
         });
       }
     }

@@ -149,16 +149,19 @@ exports.searchAppointment = async (req, res) => {
 exports.shareAppointment = async (req, res) => {
   try {
     const { receiverId, appointment } = req.body;
-
+    console.log(receiverId +" "+ appointment.name);
+    
     if (!receiverId || !appointment) {
       return res.status(400).json({ error: "Données manquantes." });
     }
 
+    console.log("12")
     // Appel du modèle (logique dans model.js)
     const updatedCalendar = await model.addSharedAppointment(
       receiverId,
-      appointment
+      appointment,
     );
+
 
     return res.json({
       success: true,
