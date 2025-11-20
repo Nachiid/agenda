@@ -305,6 +305,19 @@ function createCalendarElement(cal, calendar) {
   menu.appendChild(shareBtn);
 
   document.body.appendChild(menu);
+  // Bouton Exporter
+  const ExpoBtn = document.createElement("Button");
+  ExpoBtn.classList.add("menu-expo");
+  ExpoBtn.dataset.id = cal._id;
+  ExpoBtn.innerHTML = `<i class="fas fa-expo-alt"></i> Exporter`;
+  menu.appendChild(ExpoBtn); 
+
+  ExpoBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const calendarId = e.currentTarget.dataset.id;
+    window.location.href = `/user/calendar/export/${calendarId}`;
+  });
+
   calDiv.appendChild(menuWrapper);
 
   // --- Événement pour ouvrir/fermer le menu ---
@@ -716,11 +729,70 @@ document.addEventListener("DOMContentLoaded", async function () {
   } catch (err) {
     showMessage("Impossible de charger votre calendrier", "error");
   }
-  // === Gestion des Popups ===
+  // --- Gestion des Popups ---
   //
   //
   //
+  const btnImporter = document.getElementById("btnImporter");
+  const importModal = document.getElementById("importModal");
+  const importForm = document.getElementById("importForm");
+  const btnCancelImport = document.getElementById("btnCancelImport");
 
+  if (btnImporter && importModal && importForm && btnCancelImport) {
+    // Ouvrir le popup
+    btnImporter.addEventListener("click", () => {
+      importModal.classList.remove("hidden");
+    });
+
+    // Fermer le popup
+    btnCancelImport.addEventListener("click", () => {
+      importModal.classList.add("hidden");
+      importForm.reset();
+    });
+
+    // Fermer si clic à l’extérieur
+    importModal.addEventListener("click", (e) => {
+      if (e.target === importModal) {
+        importModal.classList.add("hidden");
+        importForm.reset();
+      }
+    });
+
+    importForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById("importFile");
+      const file = fileInput.files[0];
+
+      if (!file) {
+        return showMessage("Please select a file to import.", "error");
+      }
+
+      const formData = new FormData();
+      formData.append("importFile", file);
+
+      try {
+        const res = await fetch("/user/calendar/import", {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          return showMessage(data.error || "Failed to import calendar.", "error");
+        }
+
+        showMessage(data.message, "success");
+        importModal.classList.add("hidden");
+        importForm.reset();
+        location.reload();
+      } catch (err) {
+        console.error(err);
+        showMessage("Server error, please try again later.", "error");
+      }
+    });
+  }
   const newCalendarModal = document.getElementById("newCalendarModal");
   const newCalendarForm = document.getElementById("newCalendarForm");
   const btnNewCalendar = document.getElementById("btnNewCalendar");

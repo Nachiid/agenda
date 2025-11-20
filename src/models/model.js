@@ -79,7 +79,7 @@ exports.addAppointment = async function (calendarId, appointmentData) {
     name: appointmentData.name,
     date_debut: appointmentData.date_debut,
     date_fin: appointmentData.date_fin,
-    description: appointmentData.description || " ",
+    description: appointmentData.description || "",
   };
 
   // Ajouter au calendrier
@@ -215,6 +215,10 @@ exports.getCalandar = async function (id_cal) {
   return await Calendar.findById(id_cal);
 };
 
+exports.getCalendarById = async function (calendarId) {
+  return await Calendar.findById(calendarId).populate("appointments");
+};
+
 /**
  * Crée un calendrier pour un utilisateur donné.
  */
@@ -236,7 +240,10 @@ exports.createCalendar = async function (userId, title, appointments = []) {
   const usedColors = userCalendars.map((c) => c.color);
 
   const availableColors = colorPalette.filter((c) => !usedColors.includes(c));
-  const color = availableColors[0];
+  const color =
+    availableColors.length > 0
+      ? availableColors[0]
+      : colorPalette[Math.floor(Math.random() * colorPalette.length)];
 
   const newCalendar = new Calendar({
     title,
