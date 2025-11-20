@@ -58,7 +58,9 @@ async function seedAll() {
       { title: "perso", color: "#3498db" },
       { title: "amis", color: "#2ecc71" },
       { title: "famille", color: "#e74c3c" },
-      { title: "travail", color: "#34495e" },
+      { title: "travail", color: "#34495e"},
+      { title: "Rendez-vous partagés", color: "#grey" , isShared : true},
+
     ];
 
     const calendars = [];
