@@ -155,8 +155,8 @@ exports.searchUserAppointments = async function (userId, name) {
 
   const results = [];
 
-  calendars.forEach(calendar => {
-    calendar.appointments.forEach(app => {
+  calendars.forEach((calendar) => {
+    calendar.appointments.forEach((app) => {
       if (app.name && app.name.toLowerCase().includes(name.toLowerCase())) {
         results.push({
           calendarId: calendar._id,
@@ -192,11 +192,11 @@ exports.getCalendars = async function (ids, userId) {
 
   // 2. IDs des calendriers partagés
   const sharedRows = await sharedCalendar.find({ userId }).lean();
-  const sharedIds = sharedRows.map(s => s.calendarId);
+  const sharedIds = sharedRows.map((s) => s.calendarId);
 
   // 3. Récupérer les calendriers partagés QUI SONT dans ids
   const sharedCalendars = await Calendar.find({
-    _id: { $in: sharedIds.filter(id => ids.includes(id.toString())) }
+    _id: { $in: sharedIds.filter((id) => ids.includes(id.toString())) },
   }).lean();
 
   // 4. Fusionner les résultats (sans doublons)
@@ -204,15 +204,10 @@ exports.getCalendars = async function (ids, userId) {
 
   // suppression des doublons par _id
   const map = new Map();
-  all.forEach(cal => map.set(cal._id.toString(), cal));
+  all.forEach((cal) => map.set(cal._id.toString(), cal));
 
   return Array.from(map.values());
 };
-
-
-
-
-
 
 /**
  * Récupère l'ID de l'utilisateur associé à un calendrier donné.
@@ -227,19 +222,19 @@ exports.getProfilCal = async function (id_cal) {
  * Vérifie si un calendrier appartient à un utilisateur spécifique.
  * Renvoie le calendrier si trouvé, sinon null.
  */
+
 exports.getUserCalendar = async function (calendarId, userId) {
-  let calendar = await Calendar.findOne({ _id: calendarId, userId }).lean();
+  let calendar = await Calendar.findOne({ _id: calendarId, userId });
   if (calendar) return calendar;
   const isShared = await sharedCalendar.findOne({
     calendarId: calendarId,
     userId: userId,
-  }).lean();
+  });
   if (isShared) {
-    return await Calendar.findById(calendarId).lean();
+    return await Calendar.findById(calendarId);
   }
   return null;
 };
-
 
 /**
  * Renvoie le premier calendrier de user.
@@ -266,18 +261,32 @@ exports.getFirstCalendar = async function (userId) {
 
 */
 exports.getAllCalendarsIdsTitles = async function (userId) {
-  const calendars = await Calendar.find(
-    {
-      $or: [
-        { userId: userId },      // propriétaires
-        { sharedWith: userId }   // calendriers partagés avec lui
-      ]
-    },
-  ).select(
-    "_id title color"
-  );
-  return calendars;
+  // 1. Calendriers dont l'utilisateur est propriétaire
+  const ownedCalendars = await Calendar.find({ userId })
+    .select("_id title color")
+    .lean();
+
+  // 2. IDs des calendriers partagés via la table pivot
+  const sharedIds = await sharedCalendar
+    .find({ userId })
+    .distinct("calendarId");
+
+  // 3. Récupérer les calendriers partagés
+  const sharedCalendars = await Calendar.find({
+    _id: { $in: sharedIds }
+  })
+    .select("_id title color")
+    .lean();
+
+  // 4. Fusionner (sans doublons)
+  const all = [...ownedCalendars, ...sharedCalendars];
+
+  const map = new Map();
+  all.forEach(cal => map.set(cal._id.toString(), cal));
+
+  return Array.from(map.values());
 };
+
 
 exports.getCalandar = async function (id_cal) {
   return await Calendar.findById(id_cal);
@@ -290,7 +299,12 @@ exports.getCalendarById = async function (calendarId) {
 /**
  * Crée un calendrier pour un utilisateur donné.
  */
-exports.createCalendar = async function (userId, title, appointments = [], isShared = false) {
+exports.createCalendar = async function (
+  userId,
+  title,
+  appointments = [],
+  isShared = false
+) {
   const colorPalette = [
     "#3498db", // Bleu
     "#2ecc71", // Vert
@@ -408,7 +422,6 @@ exports.supprimerProfile = async function (userId) {
 
 // mettre à jour la vue par défaut du calendrier d'un utilisateur
 exports.updateUserPreference = async function (userId, defaultView) {
-
   const updatedUser = await User.findByIdAndUpdate(
     userId,
     { "calendarPreferences.defaultView": defaultView },
@@ -430,11 +443,24 @@ exports.searchUsersByEmailPrefix = async function (prefix) {
 
 // Partager un calendrier
 exports.shareCalendar = async function (calendarId, ownerId, receiverId) {
-  return Calendar.findOneAndUpdate(
-    { _id: calendarId, userId: ownerId },
-    { $addToSet: { sharedWith: receiverId } },
-    { new: true }
+  // 1. Vérifier que le owner possède bien le calendrier
+  const calendar = await Calendar.findOne({
+    _id: calendarId,
+    userId: ownerId,
+  });
+
+  if (!calendar) {
+    return null; // ou throw new Error("Unauthorized");
+  }
+
+  // 2. Ajouter l'entrée dans sharedCalendar (évite doublons)
+  const shared = await sharedCalendar.findOneAndUpdate(
+    { calendarId: calendarId, userId: receiverId }, // clé unique
+    { $setOnInsert: { role: "viewer" } }, // ajouté seulement si nouveau
+    { upsert: true, new: true }
   );
+
+  return shared;
 };
 
 // Vérifier que user peut voir calendrier
@@ -446,19 +472,16 @@ exports.getUserCalendarSharedOrOwned = async function (calendarId, userId) {
 };
 
 exports.addSharedAppointment = async function (receiverId, appointmentData) {
-    // trouver l’agenda fantôme du receveur RDV partagés
-    let sharedCal = await Calendar.findOne({
-        userId: receiverId,
-        isShared: true
-    });
+  // trouver l’agenda fantôme du receveur RDV partagés
+  let sharedCal = await Calendar.findOne({
+    userId: receiverId,
+    isShared: true,
+  });
 
-    // ajouter le rendez-vous
-    sharedCal.appointments.push(appointmentData);
+  // ajouter le rendez-vous
+  sharedCal.appointments.push(appointmentData);
 
-    // sauvegarder
-    const saved = await sharedCal.save();
-    return saved;
+  // sauvegarder
+  const saved = await sharedCal.save();
+  return saved;
 };
-
-
-

@@ -209,6 +209,7 @@ function createCalendarElement(cal, calendar) {
         credentials: "include",
         body: JSON.stringify({ calendarIds: [calendarId] }),
       });
+
       const data = await res.json();
       if (!res.ok) {
         showMessage(
@@ -304,11 +305,9 @@ function createCalendarElement(cal, calendar) {
   shareBtn.innerHTML = `<i class="fas fa-share-alt"></i> Partager`;
   menu.appendChild(shareBtn);
 
-
   shareBtn.addEventListener("click", () => {
     openSharePopup(cal._id);
   });
-
 
   document.body.appendChild(menu);
   // Bouton Exporter
@@ -1117,23 +1116,23 @@ document.addEventListener("appointmentsUpdated", async () => {
 ------------------------------------------------------------ */
 
 function openSharePopup(calendarId) {
-    const modal = document.getElementById("shareCalendarModal");
-    modal.classList.remove("hidden");
-    modal.dataset.calendarId = calendarId;
+  const modal = document.getElementById("shareCalendarModal");
+  modal.classList.remove("hidden");
+  modal.dataset.calendarId = calendarId;
 
-    // reset
-    document.getElementById("shareEmailInput").value = "";
-    document.getElementById("shareEmailInput").dataset.userId = "";
-    document.getElementById("shareUserResults").innerHTML = "";
+  // reset
+  document.getElementById("shareEmailInput").value = "";
+  document.getElementById("shareEmailInput").dataset.userId = "";
+  document.getElementById("shareUserResults").innerHTML = "";
 }
 
 document.getElementById("btnCancelShare").addEventListener("click", () => {
-    const modal = document.getElementById("shareCalendarModal");
-    modal.classList.add("hidden");
+  const modal = document.getElementById("shareCalendarModal");
+  modal.classList.add("hidden");
 
-    document.getElementById("shareUserResults").innerHTML = "";
-    document.getElementById("shareEmailInput").value = "";
-    document.getElementById("shareEmailInput").dataset.userId = "";
+  document.getElementById("shareUserResults").innerHTML = "";
+  document.getElementById("shareEmailInput").value = "";
+  document.getElementById("shareEmailInput").dataset.userId = "";
 });
 
 /* ------------------------------------------------------------
@@ -1145,82 +1144,90 @@ const resultsBox = document.getElementById("shareUserResults");
 let searchTimeout = null;
 
 emailInput.addEventListener("input", () => {
-    const query = emailInput.value.trim();
-    clearTimeout(searchTimeout);
+  const query = emailInput.value.trim();
+  clearTimeout(searchTimeout);
 
-    if (query.length < 1) {
-        resultsBox.innerHTML = "";
-        return;
-    }
+  if (query.length < 1) {
+    resultsBox.innerHTML = "";
+    return;
+  }
 
-    searchTimeout = setTimeout(async () => {
-        try {
-            const response = await fetch(`/search?prefix=${encodeURIComponent(query)}`, {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include"
-            });
-
-            const data = await response.json();
-
-            resultsBox.innerHTML = "";
-
-            if (!data.users || data.users.length === 0) {
-                resultsBox.innerHTML = "<p>Aucun utilisateur trouvé.</p>";
-                return;
-            }
-
-            data.users.forEach(user => {
-                const div = document.createElement("div");
-                div.classList.add("share-user-item");
-                div.textContent = `${user.email} (${user.firstName} ${user.lastName})`;
-
-                div.addEventListener("click", () => {
-                    emailInput.value = user.email;
-                    emailInput.dataset.userId = user._id;
-                    resultsBox.innerHTML = "";
-                });
-
-                resultsBox.appendChild(div);
-            });
-
-        } catch (error) {
-            console.error("Erreur recherche :", error);
+  searchTimeout = setTimeout(async () => {
+    try {
+      const response = await fetch(
+        `/search?prefix=${encodeURIComponent(query)}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
         }
-    }, 200);
+      );
+
+      const data = await response.json();
+
+      resultsBox.innerHTML = "";
+
+      if (!data.users || data.users.length === 0) {
+        resultsBox.innerHTML = "<p>Aucun utilisateur trouvé.</p>";
+        return;
+      }
+
+      data.users.forEach((user) => {
+        const div = document.createElement("div");
+        div.classList.add("share-user-item");
+        div.textContent = `${user.email} (${user.firstName} ${user.lastName})`;
+
+        div.addEventListener("click", () => {
+          emailInput.value = user.email;
+          emailInput.dataset.userId = user._id;
+          resultsBox.innerHTML = "";
+        });
+
+        resultsBox.appendChild(div);
+      });
+    } catch (error) {
+      console.error("Erreur recherche :", error);
+    }
+  }, 200);
 });
 
 /* ------------------------------------------------------------
     CONFIRMATION DU PARTAGE
 ------------------------------------------------------------ */
 
-document.getElementById("btnConfirmShare").addEventListener("click", async () => {
+document
+  .getElementById("btnConfirmShare")
+  .addEventListener("click", async () => {
     const receiverId = emailInput.dataset.userId;
-    const calendarId = document.getElementById("shareCalendarModal").dataset.calendarId;
+    const calendarId =
+      document.getElementById("shareCalendarModal").dataset.calendarId;
 
     if (!receiverId) {
-        showMessage("Veuillez sélectionner un utilisateur dans la liste.", "error");
-        return;
+      showMessage(
+        "Veuillez sélectionner un utilisateur dans la liste.",
+        "error"
+      );
+      return;
     }
 
     try {
-        const res = await fetch("/calendar/share", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ calendarId, receiverId })
-        });
+      const res = await fetch("/calendar/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ calendarId, receiverId }),
+      });
 
-        const data = await res.json();
+      const data = await res.json();
 
-        if (res.ok) {
-            showMessage("Calendrier partagé avec succès !", "success");
-            document.getElementById("shareCalendarModal").classList.add("hidden");
-        } else {
-            showMessage(data.error || "Erreur lors du partage.", "error");
-        }
+      if (res.ok) {
+        showMessage("Calendrier partagé avec succès !", "success");
+        document.getElementById("shareCalendarModal").classList.add("hidden");
+      } else {
+        showMessage(data.error || "Erreur lors du partage.", "error");
+      }
     } catch (err) {
-        console.error("Erreur fetch :", err);
-        showMessage("Erreur lors du partage", "error");
+      console.error("Erreur fetch :", err);
+      showMessage("Erreur lors du partage", "error");
     }
-});
+  });

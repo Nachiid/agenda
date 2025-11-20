@@ -35,7 +35,6 @@ exports.showCalendar = async (req, res) => {
   }
 };
 
-
 exports.getAllCalendarsIdsTitles = async (req, res) => {
   try {
     const userID = req.user.id;
@@ -157,7 +156,6 @@ exports.searchUsers = async (req, res) => {
 
     const users = await model.searchUsersByEmailPrefix(prefix);
     return res.status(200).json({ users });
-
   } catch (err) {
     console.error("searchUsers error:", err);
     return res.status(500).json({ error: "Erreur serveur" });
@@ -177,13 +175,13 @@ exports.shareCalendar = async (req, res) => {
     const result = await model.shareCalendar(calendarId, ownerId, receiverId);
 
     if (!result)
-      return res.status(404).json({ error: "Calendrier introuvable ou non autorisé" });
+      return res
+        .status(404)
+        .json({ error: "Calendrier introuvable ou non autorisé" });
 
     return res.status(200).json({ message: "Calendrier partagé avec succès" });
-
   } catch (error) {
     console.error("shareCalendar error:", error);
     return res.status(500).json({ error: "Erreur serveur" });
   }
 };
-
