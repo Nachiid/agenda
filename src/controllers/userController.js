@@ -33,6 +33,7 @@ exports.register = async (req, res) => {
     const NewUser = await model.register(firstName, lastName, email, password);
     const userId = await model.getUserIdByEmail(email);
     await model.createCalendar(userId, "Mon agenda", []);
+    await model.createCalendar(userId, "RDV partagés", [], true);
     return res
       .status(201)
       .json({ message: "Utilisateur ajouté", user: NewUser });
