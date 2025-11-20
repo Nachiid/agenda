@@ -1,4 +1,4 @@
-const { User, Calendar } = require("./db");
+const { User, Calendar, sharedCalendar } = require("./db");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
@@ -180,26 +180,38 @@ exports.searchUserAppointments = async function (userId, name) {
               changelent de getCalendars 
 
 
-
-
-
-
-
  */
 /*
 exports.getCalendars = async function (ids) {
   return await Calendar.find({ _id: { $in: ids } }).lean();
 };
 */
-exports.getCalendars = async function (userId, ids) {
-  return Calendar.find({
-    _id: { $in: ids },
-    $or: [
-      { userId: userId },         // l’utilisateur est propriétaire
-      { sharedWith: userId }      // l’utilisateur est destinataire du partage
-    ]
-  });
+exports.getCalendars = async function (ids, userId) {
+  // 1. Calendriers dont l'utilisateur est propriétaire
+  const ownedCalendars = await Calendar.find({ _id: { $in: ids } }).lean();
+
+  // 2. IDs des calendriers partagés
+  const sharedRows = await sharedCalendar.find({ userId }).lean();
+  const sharedIds = sharedRows.map(s => s.calendarId);
+
+  // 3. Récupérer les calendriers partagés QUI SONT dans ids
+  const sharedCalendars = await Calendar.find({
+    _id: { $in: sharedIds.filter(id => ids.includes(id.toString())) }
+  }).lean();
+
+  // 4. Fusionner les résultats (sans doublons)
+  const all = [...ownedCalendars, ...sharedCalendars];
+
+  // suppression des doublons par _id
+  const map = new Map();
+  all.forEach(cal => map.set(cal._id.toString(), cal));
+
+  return Array.from(map.values());
 };
+
+
+
+
 
 
 /**
@@ -216,9 +228,18 @@ exports.getProfilCal = async function (id_cal) {
  * Renvoie le calendrier si trouvé, sinon null.
  */
 exports.getUserCalendar = async function (calendarId, userId) {
-  const calendar = await Calendar.findOne({ _id: calendarId, userId });
-  return calendar;
+  let calendar = await Calendar.findOne({ _id: calendarId, userId }).lean();
+  if (calendar) return calendar;
+  const isShared = await sharedCalendar.findOne({
+    calendarId: calendarId,
+    userId: userId,
+  }).lean();
+  if (isShared) {
+    return await Calendar.findById(calendarId).lean();
+  }
+  return null;
 };
+
 
 /**
  * Renvoie le premier calendrier de user.

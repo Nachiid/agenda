@@ -19,7 +19,7 @@ function renderCalendarField(mode, calendarId = null) {
   const container = document.getElementById("calendarFieldContainer");
 
   if (!container) {
-    console.error("❌ Conteneur calendarFieldContainer introuvable");
+    console.error("Conteneur calendarFieldContainer introuvable");
     return;
   }
 
@@ -27,7 +27,6 @@ function renderCalendarField(mode, calendarId = null) {
   // reset propre
   container.innerHTML = "";
 
-  // MODE MODIFICATION ---------------------------------------------------
   // ==== MODE EDIT ======================================================
   if (mode === "edit" && calendarId) {
 
@@ -52,7 +51,7 @@ function renderCalendarField(mode, calendarId = null) {
 
     // Si pas trouvé → sécurité
     if (!titleFound) {
-      console.warn("⚠️ Aucun titre trouvé pour l'id", calendarId);
+      console.warn("Aucun titre trouvé pour l'id", calendarId);
       titleFound = "(Calendrier inconnu)";
     }
 
@@ -408,7 +407,7 @@ if (btnNewEvent && eventModal && btnCancel && eventForm) {
 }
 
 // ==========================
-// Ajout / Update / partage RDV
+// Ajout / Update RDV
 // ==========================
 eventForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -767,6 +766,8 @@ function displayResults(appointments) {
     resultsList.appendChild(li);
   });
 }
+
+
 
 
 

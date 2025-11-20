@@ -50,4 +50,4 @@ const User = mongoose.model("User", userSchema);
 const Calendar = mongoose.model("Calendar", calendarSchema);
 const sharedCalendar = mongoose.model("sharedCalendar", sharedCalendarSchema);
 
-module.exports = { User, Calendar };
+module.exports = { User, Calendar,  sharedCalendar};

@@ -98,9 +98,7 @@ exports.getAppointments = async (req, res) => {
     const { calendarIds } = req.body;
 
     // Récupération de tous les calendriers
-    //const calendars = await model.getCalendars(calendarIds);
-    //POUR AFFICHER LES RDV SUR EVENT A VENIR
-    const calendars = await model.getCalendars(req.user.id, calendarIds);
+    const calendars = await model.getCalendars(calendarIds);
 
     const now = new Date();
 
@@ -117,7 +115,7 @@ exports.getAppointments = async (req, res) => {
       })
       .filter((a) => new Date(a.date_debut) >= now) // rdv futurs
       .sort((a, b) => new Date(a.date_debut) - new Date(b.date_debut));
-
+      
 
     const first = allAppointments.slice(0, 10);
 

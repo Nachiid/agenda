@@ -182,15 +182,6 @@ function createCalendarElement(cal, calendar) {
   checkbox.type = "checkbox";
   checkbox.checked = false;
 
-  /**
-   * 
-   * 
-   *                                  changement checkbox.addEventListener("change", async (e)
-   * 
-   * 
-   */
-  
-  /*
   checkbox.addEventListener("change", async (e) => {
     const selectedCheckbox = e.target;
     const calDiv = selectedCheckbox.closest(".event-item2");
@@ -236,66 +227,6 @@ function createCalendarElement(cal, calendar) {
       selectedCheckbox.checked = false;
     }
   });
-  */
-
-  checkbox.addEventListener("change", async (e) => {
-  const selectedCheckbox = e.target;
-  const calDiv = selectedCheckbox.closest(".event-item2");
-  if (!calDiv) return;
-  const calendarId = calDiv.dataset.id;
-
-  let activeIds = getActiveCalendarIdsLocal();
-
-  // --- Si on décoche ---
-  if (!selectedCheckbox.checked) {
-    if (activeIds.length === 1) {
-      selectedCheckbox.checked = true;
-      showMessage("Vous devez garder au moins un calendrier actif.", "error");
-      return;
-    }
-
-    removeActiveCalendarIdLocal(calendarId);
-    removeCalendarEvents(calendarId, calendar);
-
-    await window.fetchAppointments(getActiveCalendarIdsLocal());
-    return;
-  }
-
-  // --- Si on coche ---
-  // Ajouter le calendrier aux actifs
-  if (!activeIds.includes(calendarId)) {
-    activeIds.push(calendarId);
-    setActiveCalendarIdsLocal(activeIds);
-  }
-
-  try {
-    const res = await fetch(`/user/agenda/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ calendarIds: activeIds }),
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      showMessage(
-        data.error || "Erreur lors du chargement du calendrier",
-        "error"
-      );
-      selectedCheckbox.checked = false;
-      return;
-    }
-
-    updateCalendarView(data.calendars, calendar);
-    updateCalendarCheckboxes();
-    await window.fetchAppointments(activeIds);
-  } catch (err) {
-    console.error(err);
-    showMessage("Erreur serveur, réessayez plus tard.", "error");
-    selectedCheckbox.checked = false;
-  }
-});
-
 
   leftDiv.appendChild(checkbox);
 
@@ -373,6 +304,12 @@ function createCalendarElement(cal, calendar) {
   shareBtn.innerHTML = `<i class="fas fa-share-alt"></i> Partager`;
   menu.appendChild(shareBtn);
 
+
+  shareBtn.addEventListener("click", () => {
+    openSharePopup(cal._id);
+  });
+
+
   document.body.appendChild(menu);
   // Bouton Exporter
   const ExpoBtn = document.createElement("Button");
@@ -385,10 +322,6 @@ function createCalendarElement(cal, calendar) {
     e.stopPropagation();
     const calendarId = e.currentTarget.dataset.id;
     window.location.href = `/user/calendar/export/${calendarId}`;
-  });
-
-  shareBtn.addEventListener("click", () => {
-    openSharePopup(cal._id);
   });
 
   calDiv.appendChild(menuWrapper);
@@ -761,6 +694,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         "add"
       );
     },
+
     // Ajuste la couleur des événements en fonction du calendrier
     eventContent: function (arg) {
       const backgroundColor = arg.event.backgroundColor || "#4f46e5";
@@ -1148,7 +1082,35 @@ document.addEventListener("click", (e) => {
   });
 });
 
+// --- Réinitialise les événements actuels ---
+//calendar.removeAllEvents();
+/*
 
+
+document.addEventListener("appointmentsUpdated", async () => {
+  const calendarId = getActiveCalendarIdsLocal()[0];
+
+  if (!calendarId) {
+    console.error("Aucun ID calendrier");
+    return;
+  }
+
+  const res = await fetch("http://localhost:3000/user/agenda", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ calendarId }),
+  });
+
+  if (!res.ok) {
+    console.error("Erreur backend :", res.status);
+    return;
+  }
+
+  const data = await res.json();
+  updateCalendarView(data.calendar, calendar);
+});
+*/
 
 /* ------------------------------------------------------------
     PARTAGE AGENDA
