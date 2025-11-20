@@ -42,14 +42,13 @@ async function chargerProfil() {
         ".preference-item-view select"
       );
       if (defaultViewSelect && user.calendarPreferences) {
-        console.log(user.calendarPreferences.defaultView);
         const userDefaultView = user.calendarPreferences.defaultView;
 
         Array.from(defaultViewSelect.options).forEach((opt) => {
           opt.selected = opt.value === userDefaultView;
         });
       } else {
-        console.log("default vide ou champs nom trouvé&");
+        showMessage("default vide ou champs nom trouvé", "error");
       }
     } else {
       showMessage(data.error || "Erreur lors du chargement du profil", "error");

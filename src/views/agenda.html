@@ -272,11 +272,7 @@
             <textarea id="eventComment" rows="3" placeholder="Détails de l’événement..."></textarea>
           </div>
           <div class="form-group">
-            <label for="eventCalendar">Choisir un calendrier</label>
-            <select id="eventCalendar" required>
-              <option value="">Sélectionnez un calendrier...</option>
-              <!-- Options dynamiques ici -->
-            </select>
+            <div class="calendarFieldContainer" id = "calendarFieldContainer"></div>
           </div>
           <div class="modal-actions">
             <button type="button" class="btn btn-secondary" id="btnCancel"> Annuler </button>
@@ -306,3 +302,10 @@
   <script src="js/appointements.js" defer></script>
   <script src="js/logout.js" defer></script>
 </html>
+
+
+<!--
+            <select id="eventCalendar" required>
+              <option value="">Sélectionnez un calendrier...</option>
+               Options dynamiques ici 
+            </select> -->

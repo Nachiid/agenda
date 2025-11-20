@@ -395,18 +395,7 @@ body {
   scrollbar-color: #9ca3af #e5e7eb;
 }
 
-/*
-#calendar {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 1rem;
-  padding: 1rem;
-  color: #1f2937;
-  height: 75vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-}
-*/
+
 .fc-toolbar-title {
   font-size: 1.25rem !important;
   font-weight: 600 !important;
@@ -418,12 +407,7 @@ body {
   padding: 3px 5px !important;
   font-size: 0.8rem !important;
 }
-/*
-#calendar {
-  scrollbar-width: thin;
-  scrollbar-color: #9ca3af #e5e7eb;
-}
-  */
+
 
 #calendar::-webkit-scrollbar {
   width: 8px;

@@ -3,38 +3,68 @@ const eventModal = document.getElementById("eventModal");
 const btnCancel = document.getElementById("btnCancel");
 const eventForm = document.getElementById("eventForm");
 
-/**
- * Recupere les id des calendriers actifs
- */
-function getActiveCalendarIdsLocal() {
-  const data = localStorage.getItem("activeCalendars");
-  if (!data) return [];
-  try {
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
+
+function getEventItemById(rdv_id) {
+  const parent = document.getElementById("upcomingEvents");
+  if (!parent) return null;
+
+  return parent.querySelector(`.event-item[data-id="${rdv_id}"]`);
 }
 
-function renderCalendarField(mode, calendarId = null, calendarTitle = null) {
+
+
+
+function renderCalendarField(mode, calendarId = null) {
+
   const container = document.getElementById("calendarFieldContainer");
+
   if (!container) {
     console.error("❌ Conteneur calendarFieldContainer introuvable");
     return;
   }
 
-  container.innerHTML = ""; // reset propre
 
-  // MODE MODIFICATION -----------------------------------------
-  if (mode === "edit" && calendarId && calendarTitle) {
+  // reset propre
+  container.innerHTML = "";
+
+  // MODE MODIFICATION ---------------------------------------------------
+  // ==== MODE EDIT ======================================================
+  if (mode === "edit" && calendarId) {
+
+    // ➤ On récupère le titre depuis le DOM
+    let titleFound = null;
+
+    const listVisible = document.getElementById("calendar-list");
+    const listHidden = document.querySelector(".hidden-calendars");
+
+    const items = [
+      ...listVisible.querySelectorAll(".event-item2"),
+      ...(listHidden ? listHidden.querySelectorAll(".event-item2") : []),
+    ];
+
+
+    items.forEach((item) => {
+      if (item.dataset.id === calendarId) {
+        titleFound = item.querySelector(".event-info2")?.textContent.trim();
+      }
+    });
+
+
+    // Si pas trouvé → sécurité
+    if (!titleFound) {
+      console.warn("⚠️ Aucun titre trouvé pour l'id", calendarId);
+      titleFound = "(Calendrier inconnu)";
+    }
+
+    // ➤ Construction du champ READONLY
     const label = document.createElement("label");
     label.textContent = "Calendrier concerné :";
 
     const text = document.createElement("div");
     text.classList.add("calendar-readonly");
-    text.textContent = calendarTitle;
+    text.textContent = titleFound;
 
-    // input caché pour stocker l'id du calendrier
+    // Hidden input pour l'id
     const hidden = document.createElement("input");
     hidden.type = "hidden";
     hidden.id = "eventCalendar";
@@ -44,11 +74,12 @@ function renderCalendarField(mode, calendarId = null, calendarTitle = null) {
     container.appendChild(text);
     container.appendChild(hidden);
 
-    return; // On ne remplit PAS le select
+
+    return;
   }
 
-  // MODE AJOUT -----------------------------------------
-  // On crée le select + on le remplit
+  // MODE AJOUT ----------------------------------------------------------
+
   const label = document.createElement("label");
   label.textContent = "Choisir un calendrier";
 
@@ -61,28 +92,35 @@ function renderCalendarField(mode, calendarId = null, calendarTitle = null) {
   container.appendChild(label);
   container.appendChild(select);
 
-  // Remplir avec les calendriers visibles + hidden
+  // Récupération des calendriers visibles
   const listVisible = document.getElementById("calendar-list");
+
   const listHidden = document.querySelector(".hidden-calendars");
 
+  // Récupération des items
   const items = [
     ...listVisible.querySelectorAll(".event-item2"),
     ...(listHidden ? listHidden.querySelectorAll(".event-item2") : []),
   ];
 
-  console.log("📌 Calendriers récupérés :", items.length);
 
-  items.forEach((item) => {
+  items.forEach((item, index) => {
+
     const id = item.dataset.id;
     const title = item.querySelector(".event-info2")?.textContent.trim();
+
 
     const opt = document.createElement("option");
     opt.value = id;
     opt.textContent = title;
 
+
     select.appendChild(opt);
   });
+
 }
+
+window.renderCalendarField = renderCalendarField;
 
 /**
  * Crée et retourne une division pour un événement
@@ -104,7 +142,7 @@ function createEventItemDiv(evt) {
   div.dataset.start = evt.date_debut;
   div.dataset.end = evt.date_fin || evt.date_debut;
   div.dataset.description = evt.description || "";
-  eventDiv.dataset.calendarId = evt.calendar_id;
+  div.dataset.calendarId = evt.calendar_id;
 
   div.innerHTML = `
     <div class="event-left">
@@ -114,28 +152,98 @@ function createEventItemDiv(evt) {
         <div class="event-time">${timeStart} – ${timeEnd}</div>
       </div>
     </div>
-    <div class="menu-wrapper">
-      <button class="dots-btn"><i class="fas fa-ellipsis-vertical"></i></button>
-      <div class="menu">
-        <button class="menu-edit" data-id="${evt._id}"><i class="fas fa-pen"></i> Modifier</button>
-        <button class="menu-delete" data-id="${evt._id}"><i class="fas fa-trash"></i> Supprimer</button>
-        <button class="menu-share" data-id="${evt._id}"><i class="fas fa-share-alt"></i> Partager</button>
-      </div>
-    </div>
   `;
 
-  // Gestion du clic pour afficher / cacher le menu
-  const dotsBtn = div.querySelector(".dots-btn");
-  const menu = div.querySelector(".menu");
-  dotsBtn.addEventListener("click", (e) => {
-    e.stopPropagation(); // évite la fermeture immédiate
+  const menu = document.createElement("div");
+  menu.classList.add("menu", "hidden");
+
+  const editBtn = document.createElement("button");
+  editBtn.innerHTML = `<i class="fas fa-pen"></i> Modifier`;
+  menu.appendChild(editBtn);
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i> Supprimer`;
+  menu.appendChild(deleteBtn);
+
+  document.body.appendChild(menu);
+
+
+
+    // --- Menu wrapper pour boutons ---
+  const menuWrapper = document.createElement("div");
+  menuWrapper.classList.add("menu-wrapper");
+
+  // Bouton menu
+  const dotsBtn = document.createElement("button");
+  dotsBtn.classList.add("dots-btn");
+  dotsBtn.innerHTML = `<i class="fas fa-ellipsis-v"></i>`;
+  menuWrapper.appendChild(dotsBtn);
+
+  dotsBtn.addEventListener("click", () => {
+    menu.classList.toggle("show");
+    menu.classList.toggle("hidden");
+  });
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".menu-wrapper")) {
+      menu.classList.remove("show");
+      menu.classList.add("hidden");
+    }
+  });
+
+    dotsBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+
+    // fermer tous les autres menus
+    const allMenus = document.querySelectorAll(".menu.show");
+    allMenus.forEach((m) => {
+      if (m !== menu) m.classList.remove("show");
+    });
+
+    // basculer celui-ci
     menu.classList.toggle("show");
   });
 
-  // Fermer le menu si clic ailleurs
-  document.addEventListener("click", () => {
-    menu.classList.remove("show");
+    // --- Événement pour ouvrir/fermer le menu ---
+  dotsBtn.addEventListener("click", (e) => {
+    const rect = dotsBtn.getBoundingClientRect();
+    menu.style.top = `${rect.bottom + window.scrollY}px`;
+    menu.style.left = `${rect.left + window.scrollX}px`;
+    menu.classList.toggle("show");
   });
+
+  // Fermer tous les menus si clic ailleurs
+  document.addEventListener("click", () => {
+    document.querySelectorAll(".menu").forEach((m) => {
+      m.classList.add("hidden");
+      m.classList.remove("show");
+    });
+  });
+
+
+// Menu déroulant
+  menu.classList.add("menu", "hidden");
+
+  // Bouton modifier
+  editBtn.classList.add("menu-edit");
+  editBtn.dataset.id = evt._id
+  editBtn.innerHTML = `<i class="fas fa-pen"></i> Modifier`;
+  menu.appendChild(editBtn);
+
+  // Bouton supprimer
+  deleteBtn.classList.add("menu-delete");
+  deleteBtn.dataset.id = evt._id
+  deleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i> Supprimer`;
+  menu.appendChild(deleteBtn);
+
+  // Bouton partager
+  const shareBtn = document.createElement("button");
+  shareBtn.classList.add("menu-share");
+  shareBtn.dataset.id = evt._id
+  shareBtn.innerHTML = `<i class="fas fa-share-alt"></i> Partager`;
+  menu.appendChild(shareBtn);
+
+  div.appendChild(menuWrapper);
+
 
   return div;
 }
@@ -185,7 +293,7 @@ async function updateEventList({ type, eventData }) {
         // Remonte un événement caché si existant
         const hiddenEvent = upcomingEvents.querySelector(".event-item.hidden");
         if (hiddenEvent) hiddenEvent.classList.remove("hidden");
-        else await fetchAppointments(getActiveCalendarIdsLocal());
+        else await fetchAppointments(window.getActiveCalendarIdsLocal());
       }
       break;
 
@@ -219,7 +327,6 @@ async function updateEventList({ type, eventData }) {
     case "add":
       if (!eventData) return;
       const newRdv = eventData;
-      console.log("add switch case :" + evt.calendar_id);
       const newDate = new Date(newRdv.date_debut);
 
       // Récupère tous les événements (visibles + cachés)
@@ -422,13 +529,10 @@ async function fetchAppointments(calendarIds) {
 
     // Vérification si null ou vide
     if (!data || (Array.isArray(data) && data.length === 0)) {
-      console.log("⚠️ La réponse est nulle ou le tableau est vide :", data);
     } else {
-      console.log("✅ La réponse contient des données :", data);
     }
 
     data.forEach((evt) => {
-      console.log("fetch calendar_id : " + evt.calendar_id);
       const div = createEventItemDiv(evt);
       upcomingEvents.appendChild(div);
     });
@@ -447,12 +551,9 @@ window.fetchAppointments = fetchAppointments;
 // ==========================
 // Popup édition + suppression
 // ==========================
-document
-  .getElementById("upcomingEvents")
-  .addEventListener("click", async (e) => {
+document.addEventListener("click", async (e) => {
     const btnDelete = e.target.closest(".menu-delete");
-    const eventItem = e.target.closest(".event-item");
-    if (!eventItem) return;
+
     if (btnDelete) {
       const id_rdv = btnDelete.dataset.id;
       const confirmed = await showConfirm(
@@ -481,30 +582,32 @@ document
       }
     }
 
+
     const btnEdit = e.target.closest(".menu-edit");
     if (btnEdit) {
-      const eventItem = btnEdit.closest(".event-item");
+
+    const eventItem = getEventItemById(btnEdit.dataset.id);  
+    if(!eventItem) return;
+    
       const rdvId = eventItem.dataset.id;
       const calendarId = findCalendarOfAppointment(rdvId);
       const rdv = {
-        _id: eventItem.querySelector(".menu-edit").getAttribute("data-id"),
+        _id: rdvId,
         name: eventItem.querySelector(".event-title").textContent,
         description: eventItem.dataset.description || "",
         date_debut: eventItem.dataset.start,
         date_fin: eventItem.dataset.end,
-        calendar_id: eventItem.dataset.calendarId, // ou dans le id du champs item-event 2
+        calendar_id: eventItem.dataset.calendarId,
       };
-      renderCalendarField("edit", rdv.calendar_id, rdv.calendar_title);
+      renderCalendarField("edit", rdv.calendar_id);
       eventModal.classList.remove("hidden");
       eventForm.dataset.editingId = rdv._id;
-      console.log(rdv);
       // Modifier le titre DU popup ouvert
       eventModal.querySelector(".modal-title").textContent = "Modifier le RDV";
       eventModal.querySelector(".btn.btn-primary").textContent = "Modifier";
       const start = new Date(rdv.date_debut);
       const end = new Date(rdv.date_fin);
-      const ids = getActiveCalendarIdsLocal();
-      console.log(ids);
+      const ids = window.getActiveCalendarIdsLocal();
       document.getElementById("eventTitle").value = rdv.name;
       document.getElementById("eventComment").value = rdv.description;
       document.getElementById("eventDateStart").value = start
@@ -618,7 +721,6 @@ async function searchAppointments(query) {
 
     displayResults(data.appointments);
   } catch (err) {
-    console.log("Erreur :", err);
   }
 }
 
@@ -664,3 +766,9 @@ function displayResults(appointments) {
     resultsList.appendChild(li);
   });
 }
+
+
+
+
+
+

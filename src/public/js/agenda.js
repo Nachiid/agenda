@@ -19,7 +19,7 @@ function getActiveCalendarIdsLocal() {
     return [];
   }
 }
-
+window.getActiveCalendarIdsLocal = getActiveCalendarIdsLocal;
 /**
  * Ajoute un ID à la liste des calendriers actifs
  */
@@ -76,8 +76,6 @@ function updateCalendarView(calendars, calendar) {
             display: "auto",
           });
         });
-      } else {
-        console.log(cal.appointments);
       }
     });
 
@@ -329,10 +327,6 @@ function createCalendarElement(cal, calendar) {
   deleteBtn.addEventListener("click", async (e) => {
     e.stopPropagation();
     const calendarId = calDiv.dataset.id;
-    if (getActiveCalendarIdsLocal().length === 1) {
-      showMessage("Vous devez garder au moins un calendrier.", "error");
-      return;
-    }
     const confirmed = await showConfirm(
       `Voulez-vous vraiment supprimer ce calendrier ?`
     );
@@ -355,8 +349,7 @@ function createCalendarElement(cal, calendar) {
         const firstCalendarDiv = document.querySelector(".event-item2");
         if (firstCalendarDiv) {
           const newCalendarId = firstCalendarDiv.dataset.id;
-          console.log("test suppression : " + newCalendarId);
-          setActiveCalendarIdsLocal([newCalendarId]);
+                    setActiveCalendarIdsLocal([newCalendarId]);
         }
       }
     } catch (err) {
@@ -394,9 +387,12 @@ function openEventDetailsPopup(event) {
     description: event.extendedProps.description || "",
     date_debut: event.start,
     date_fin: event.end,
+    calendar_id: event.extendedProps.calendarId 
+
   };
 
   const popup = document.getElementById("eventDetailsModal");
+  renderCalendarField("edit", rdv.calendar_id);
   popup.classList.remove("hidden");
 
   popup.querySelector(".details-title").textContent = rdv.name;
@@ -623,7 +619,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Clic sur un événement
     eventClick: function (info) {
       openEventDetailsPopup(info.event);
-      console.log("ID calendrier =", info.event.extendedProps.calendarId);
     },
     // Ajuste la couleur des événements en fonction du calendrier
     eventContent: function (arg) {
@@ -884,8 +879,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 document.addEventListener("click", (e) => {
   const editBtn = e.target.closest(".edit-btn-cal");
   if (!editBtn) return;
-  const calDiv = editBtn.closest(".event-item2");
-  const calendarId = calDiv?.dataset.id;
+  const calendarId = editBtn.dataset.id;
   const calendarModal = document.getElementById("calendarModal");
   const calendarForm = document.getElementById("calendarForm");
   const titleInput = document.getElementById("calendarTitle");

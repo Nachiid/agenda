@@ -102,9 +102,6 @@ exports.getAppointments = async (req, res) => {
 
     const now = new Date();
 
-    // Vérification console
-    console.log("Calendars récupérés :", calendars);
-
     const allAppointments = calendars
       .flatMap((cal) => {
         // Si cal.appointments est undefined ou vide
@@ -119,7 +116,6 @@ exports.getAppointments = async (req, res) => {
       .filter((a) => new Date(a.date_debut) >= now) // rdv futurs
       .sort((a, b) => new Date(a.date_debut) - new Date(b.date_debut));
 
-    console.log("All appointments après traitement :", allAppointments);
 
     const first = allAppointments.slice(0, 10);
 
