@@ -98,7 +98,9 @@ exports.getAppointments = async (req, res) => {
     const { calendarIds } = req.body;
 
     // Récupération de tous les calendriers
-    const calendars = await model.getCalendars(calendarIds);
+    //const calendars = await model.getCalendars(calendarIds);
+    //POUR AFFICHER LES RDV SUR EVENT A VENIR
+    const calendars = await model.getCalendars(req.user.id, calendarIds);
 
     const now = new Date();
 
@@ -142,6 +144,30 @@ exports.searchAppointment = async (req, res) => {
     }
     return res.status(200).json({ appointments: results });
   } catch (err) {
+    return res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
+exports.shareAppointment = async (req, res) => {
+  try {
+    const { receiverId, appointment } = req.body;
+
+    if (!receiverId || !appointment) {
+      return res.status(400).json({ error: "Données manquantes." });
+    }
+
+    // Appel du modèle (logique dans model.js)
+    const updatedCalendar = await model.addSharedAppointment(
+      receiverId,
+      appointment
+    );
+
+    return res.json({
+      success: true,
+      calendar: updatedCalendar,
+    });
+  } catch (err) {
+    console.error("Erreur shareAppointment :", err);
     return res.status(500).json({ error: "Erreur serveur" });
   }
 };

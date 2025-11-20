@@ -146,3 +146,44 @@ exports.addCalendar = async (req, res) => {
       .json({ error: "Erreur serveur lors de la création du calendrier" });
   }
 };
+
+//==========================================================================================
+// PARTAGE AGENDA
+// Recherche des utilisateurs (email prefix)
+exports.searchUsers = async (req, res) => {
+  try {
+    const { prefix } = req.query;
+    if (!prefix) return res.status(400).json({ error: "Préfixe requis" });
+
+    const users = await model.searchUsersByEmailPrefix(prefix);
+    return res.status(200).json({ users });
+
+  } catch (err) {
+    console.error("searchUsers error:", err);
+    return res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
+// Partager un calendrier
+exports.shareCalendar = async (req, res) => {
+  try {
+    const ownerId = req.user.id;
+    const { calendarId, receiverId } = req.body;
+
+    if (!calendarId || !receiverId) {
+      return res.status(400).json({ error: "Données invalides" });
+    }
+
+    const result = await model.shareCalendar(calendarId, ownerId, receiverId);
+
+    if (!result)
+      return res.status(404).json({ error: "Calendrier introuvable ou non autorisé" });
+
+    return res.status(200).json({ message: "Calendrier partagé avec succès" });
+
+  } catch (error) {
+    console.error("shareCalendar error:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+

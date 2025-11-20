@@ -29,6 +29,7 @@ const calendarSchema = new mongoose.Schema({
   color: { type: String, required: true },
   appointments: [appointmentSchema],
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  sharedWith: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   isShared: { type: Boolean, default: false },
 });
 
@@ -42,6 +43,7 @@ const sharedCalendarSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   role: { type: String, enum: ["editor", "viewer"], default: "viewer" },
 });
+
 
 // Création des modèles
 const User = mongoose.model("User", userSchema);
