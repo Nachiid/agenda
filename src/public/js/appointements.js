@@ -740,7 +740,8 @@ function displayResults(appointments) {
       eventForm.dataset.editingId = rdv._id;
       // Modifier le titre
       eventModal.querySelector(".modal-title").textContent = "Modifier le RDV";
-      eventModal.querySelector(".btn.btn-primary").textContent = "Modifier";
+      eventModal.querySelector(".btn.btn-primary").classList.add("modifier1", "hidden");
+      //eventModal.querySelector(".btn.btn-primary").textContent = "Modifier";
       // Convertir les dates
       const start = new Date(rdv.date_debut);
       const end = new Date(rdv.date_fin);

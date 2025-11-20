@@ -1137,3 +1137,8 @@ body {
 .event-form select option {
   padding: 10px;
 }
+
+
+.hidden{
+  display: none;
+}
