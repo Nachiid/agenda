@@ -495,6 +495,8 @@ eventForm.addEventListener("submit", async (e) => {
       type: "add",
       eventData: newRdv,
     });
+  // add ids active fetch 
+
 
     // Mise à jour du calendrier
     window.updateCalendar({
@@ -590,7 +592,6 @@ document.addEventListener("click", async (e) => {
     if(!eventItem) return;
     
       const rdvId = eventItem.dataset.id;
-      const calendarId = findCalendarOfAppointment(rdvId);
       const rdv = {
         _id: rdvId,
         name: eventItem.querySelector(".event-title").textContent,
@@ -829,11 +830,9 @@ shareRdvEmailInput.addEventListener("input", () => {
         const div = document.createElement("div");
         div.classList.add("share-user-item");
         div.textContent = `${user.email} (${user.firstName} ${user.lastName})`;
-        div.dataset.userId = user._id;
 
         div.addEventListener("click", () => {
           shareRdvEmailInput.value = user.email;
-          shareRdvEmailInput.dataset.userId = user._id;
           shareRdvResults.innerHTML = "";
         });
 
@@ -851,11 +850,11 @@ shareRdvEmailInput.addEventListener("input", () => {
 document
   .getElementById("btnSendShareRdv")
   .addEventListener("click", async () => {
-    const receiverId = shareRdvEmailInput.dataset.userId;
+    const email = shareRdvEmailInput.value;
     const rdvId = document.getElementById("shareAppointmentModal").dataset
       .rdvId;
 
-    if (!receiverId) {
+    if (!email) {
       showMessage("Choisissez un utilisateur dans la liste", "error");
       return;
     }
@@ -874,7 +873,7 @@ document
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        receiverId,
+        email,
         appointment,
       }),
     });

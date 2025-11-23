@@ -29,7 +29,6 @@ const calendarSchema = new mongoose.Schema({
   color: { type: String, required: true },
   appointments: [appointmentSchema],
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  sharedWith: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   isShared: { type: Boolean, default: false },
 });
 
@@ -44,10 +43,25 @@ const sharedCalendarSchema = new mongoose.Schema({
   role: { type: String, enum: ["editor", "viewer"], default: "viewer" },
 });
 
+// Shéma pour les rendez-vous partagé
+const sharedAppointmentSchema = new mongoose.Schema({
+  calendarId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Calendar",
+    required: true,
+  },
+  appointmentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Appointment",
+    required: true,
+  },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+});
 
 // Création des modèles
 const User = mongoose.model("User", userSchema);
 const Calendar = mongoose.model("Calendar", calendarSchema);
 const sharedCalendar = mongoose.model("sharedCalendar", sharedCalendarSchema);
+const sharedAppointment = mongoose.model("sharedAppointment", sharedAppointmentSchema);
 
-module.exports = { User, Calendar,  sharedCalendar};
+module.exports = { User, Calendar, sharedCalendar, sharedAppointment};

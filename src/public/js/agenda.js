@@ -464,6 +464,40 @@ function openEventDetailsPopup(event, mode) {
         .toTimeString()
         .slice(0, 5);
     };
+
+    // ==========================
+    // ==========================
+    // ==========================
+    // ==========================
+    // ==========================
+    document.addEventListener("click", async (e) => {
+      const btnShare = e.target.closest(".menu-share");
+      if (!btnShare) return;
+
+      document.getElementById("shareAppointmentModal").dataset.id = rdv._id;
+
+      document.getElementById("shareRdvEmailInput").value = "";
+      document.getElementById("shareRdvUserResults").innerHTML = "";
+
+      document
+        .getElementById("shareAppointmentModal")
+        .classList.remove("hidden");
+    });
+
+    btnShare.addEventListener("click", async (e) => {
+  if (!btnShare) return;
+
+  document.getElementById("shareAppointmentModal").dataset.rdvId = btnShare.dataset.id;
+
+  document.getElementById("shareRdvEmailInput").value = "";
+  document.getElementById("shareRdvUserResults").innerHTML = "";
+
+  document.getElementById("shareAppointmentModal").classList.remove("hidden");
+});
+// ==========================
+// ==========================
+// ==========================
+// ==========================
   } else if (mode === "add") {
     const eventModal = document.getElementById("eventModal");
     renderCalendarField("add");
@@ -474,6 +508,7 @@ function openEventDetailsPopup(event, mode) {
     eventModal.querySelector(".btn.btn-primary").textContent = "Créer";
 
     // On récupère les dates envoyées depuis dateClick
+
     const start = new Date(event.start);
     const end = new Date(event.end);
 
@@ -577,9 +612,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     locale: "fr",
     themeSystem: "standard",
     nowIndicator: true,
-    slotMinTime: "06:00:00",
-    slotMaxTime: "30:00:00",
-    slotDuration: "00:30:00",
+    slotMinTime: "00:00:01",
+    slotMaxTime: "23:59:59",
+    slotDuration: "00:15:00",
     slotLabelInterval: "01:00",
     slotLabelFormat: { hour: "2-digit", minute: "2-digit", hour12: false },
 
@@ -672,26 +707,56 @@ document.addEventListener("DOMContentLoaded", async function () {
     eventClick: function (info) {
       openEventDetailsPopup(info.event, "update");
     },
-    dateClick: function (info) {
-      openEventDetailsPopup(
-        {
-          start: info.date,
-          end: new Date(info.date.getTime() + 30 * 60000),
-        },
-        "add"
-      );
-    },
+
     selectable: true,
     selectMirror: true,
 
     select: function (info) {
-      openEventDetailsPopup(
-        {
-          start: info.start,
-          end: info.end,
-        },
-        "add"
-      );
+      const viewType =
+        (info.view && info.view.type) ||
+        (calendar && calendar.view && calendar.view.type) ||
+        "";
+      if (viewType.startsWith("timeGrid") || viewType === "dayGridMonth") {
+        const clickedDate = new Date(info.start);
+
+        // Start = 00:00:00 du même jour
+        const startOfDay = new Date(
+          clickedDate.getFullYear(),
+          clickedDate.getMonth(),
+          clickedDate.getDate(),
+          0,
+          0,
+          0
+        );
+
+        // End = 23:59:59 du même jour
+        const endOfDay = new Date(
+          clickedDate.getFullYear(),
+          clickedDate.getMonth(),
+          clickedDate.getDate(),
+          23,
+          59,
+          59
+        );
+
+        console.log("Start Of Day :", startOfDay);
+        console.log("End Of Day   :", endOfDay);
+        openEventDetailsPopup(
+          {
+            start: info.start,
+            end: info.end,
+          },
+          "add"
+        );
+      } else {
+        openEventDetailsPopup(
+          {
+            start: info.start,
+            end: info.end,
+          },
+          "add"
+        );
+      }
     },
 
     // Ajuste la couleur des événements en fonction du calendrier
@@ -1122,7 +1187,6 @@ function openSharePopup(calendarId) {
 
   // reset
   document.getElementById("shareEmailInput").value = "";
-  document.getElementById("shareEmailInput").dataset.userId = "";
   document.getElementById("shareUserResults").innerHTML = "";
 }
 
@@ -1132,7 +1196,6 @@ document.getElementById("btnCancelShare").addEventListener("click", () => {
 
   document.getElementById("shareUserResults").innerHTML = "";
   document.getElementById("shareEmailInput").value = "";
-  document.getElementById("shareEmailInput").dataset.userId = "";
 });
 
 /* ------------------------------------------------------------
@@ -1179,7 +1242,6 @@ emailInput.addEventListener("input", () => {
 
         div.addEventListener("click", () => {
           emailInput.value = user.email;
-          emailInput.dataset.userId = user._id;
           resultsBox.innerHTML = "";
         });
 
@@ -1198,11 +1260,12 @@ emailInput.addEventListener("input", () => {
 document
   .getElementById("btnConfirmShare")
   .addEventListener("click", async () => {
-    const receiverId = emailInput.dataset.userId;
+    const email = emailInput.value;
+    console.log(email);
     const calendarId =
       document.getElementById("shareCalendarModal").dataset.calendarId;
 
-    if (!receiverId) {
+    if (!email) {
       showMessage(
         "Veuillez sélectionner un utilisateur dans la liste.",
         "error"
@@ -1215,7 +1278,7 @@ document
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ calendarId, receiverId }),
+        body: JSON.stringify({ calendarId, email }),
       });
 
       const data = await res.json();
@@ -1224,7 +1287,7 @@ document
         showMessage("Calendrier partagé avec succès !", "success");
         document.getElementById("shareCalendarModal").classList.add("hidden");
       } else {
-        showMessage(data.error || "Erreur lors du partage.", "error");
+        showMessage(data.error, "error");
       }
     } catch (err) {
       console.error("Erreur fetch :", err);

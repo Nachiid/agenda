@@ -261,32 +261,26 @@ exports.getFirstCalendar = async function (userId) {
 
 */
 exports.getAllCalendarsIdsTitles = async function (userId) {
-  // 1. Calendriers dont l'utilisateur est propriétaire
   const ownedCalendars = await Calendar.find({ userId })
     .select("_id title color")
     .lean();
-
-  // 2. IDs des calendriers partagés via la table pivot
   const sharedIds = await sharedCalendar
     .find({ userId })
     .distinct("calendarId");
 
-  // 3. Récupérer les calendriers partagés
   const sharedCalendars = await Calendar.find({
-    _id: { $in: sharedIds }
+    _id: { $in: sharedIds },
   })
     .select("_id title color")
     .lean();
 
-  // 4. Fusionner (sans doublons)
   const all = [...ownedCalendars, ...sharedCalendars];
 
   const map = new Map();
-  all.forEach(cal => map.set(cal._id.toString(), cal));
+  all.forEach((cal) => map.set(cal._id.toString(), cal));
 
   return Array.from(map.values());
 };
-
 
 exports.getCalandar = async function (id_cal) {
   return await Calendar.findById(id_cal);
@@ -412,13 +406,32 @@ exports.changePassword = async function (userId, currentPassword, newPassword) {
 /**
  * Supprime un utilisateur et tous ses calendriers associés.
  * @param {string} userId - L'ID de l'utilisateur à supprimer.
- * @returns {Promise<Object>} L'utilisateur supprimé.
+ * @returns {Promise<Object|null>} L'utilisateur supprimé.
  */
 exports.supprimerProfile = async function (userId) {
-  await Calendar.deleteMany({ userId });
-  const deletedUser = await User.findByIdAndDelete(userId);
-  return deletedUser;
+  
+    const ownedCalendars = await Calendar.find({ userId })
+      .select("_id")
+      .lean();
+
+    const ownedIds = ownedCalendars.map(c => c._id);
+
+
+    if (ownedIds.length > 0) {
+      await sharedCalendar.deleteMany({
+        calendarId: { $in: ownedIds }
+      });
+
+      await Calendar.deleteMany({
+        _id: { $in: ownedIds }
+      });
+    }
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    return deletedUser;
+
 };
+
 
 // mettre à jour la vue par défaut du calendrier d'un utilisateur
 exports.updateUserPreference = async function (userId, defaultView) {
@@ -442,8 +455,11 @@ exports.searchUsersByEmailPrefix = async function (prefix) {
 };
 
 // Partager un calendrier
-exports.shareCalendar = async function (calendarId, ownerId, receiverId) {
-  // 1. Vérifier que le owner possède bien le calendrier
+exports.shareCalendar = async function (calendarId, ownerId, email) {
+
+  receiverId = await User.findOne({email : email});
+
+
   const calendar = await Calendar.findOne({
     _id: calendarId,
     userId: ownerId,
@@ -463,15 +479,17 @@ exports.shareCalendar = async function (calendarId, ownerId, receiverId) {
   return shared;
 };
 
-// Vérifier que user peut voir calendrier
+// Vérifier que l'utilisateur peut voir le calendrier
 exports.getUserCalendarSharedOrOwned = async function (calendarId, userId) {
   return Calendar.findOne({
     _id: calendarId,
-    $or: [{ userId }, { sharedWith: userId }],
+    userId: userId,
   });
 };
 
-exports.addSharedAppointment = async function (receiverId, appointmentData) {
+exports.addSharedAppointment = async function (email, appointmentData) {
+
+  const receiverId = await User.findOne({email : email});
   // trouver l’agenda fantôme du receveur RDV partagés
   let sharedCal = await Calendar.findOne({
     userId: receiverId,

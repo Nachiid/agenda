@@ -166,13 +166,13 @@ exports.searchUsers = async (req, res) => {
 exports.shareCalendar = async (req, res) => {
   try {
     const ownerId = req.user.id;
-    const { calendarId, receiverId } = req.body;
+    const { calendarId, email } = req.body;
 
-    if (!calendarId || !receiverId) {
+    if (!calendarId || !email) {
       return res.status(400).json({ error: "Données invalides" });
     }
 
-    const result = await model.shareCalendar(calendarId, ownerId, receiverId);
+    const result = await model.shareCalendar(calendarId, ownerId, email);
 
     if (!result)
       return res
