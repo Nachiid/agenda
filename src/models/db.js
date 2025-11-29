@@ -15,12 +15,25 @@ const userSchema = new mongoose.Schema({
   timezone: { type: String, default: "Europe/Paris" }, // Sprint 4
 });
 
+const isRecurentShema = new mongoose.Schema({
+  type: {
+    type: String,
+    enum: ["daily", "weekly", "monthly", "yearly"],
+    required: true,
+  },
+  date_fin: { type: Date, required: false },
+  avoided: { type: [String], default: [] },
+});
+
 // Schéma pour les rendez-vous (Appointment) — sous-document uniquement
 const appointmentSchema = new mongoose.Schema({
   name: { type: String, required: true },
   date_debut: { type: Date, required: true },
   date_fin: { type: Date, required: true },
   description: { type: String, default: "" },
+  actif: { type: Boolean, default: true },
+  date_supp: { type: Date, required: false },
+  isRecurent: [isRecurentShema],
 });
 
 // Schéma pour les Calendriers (Calendar)
@@ -29,7 +42,11 @@ const calendarSchema = new mongoose.Schema({
   color: { type: String, required: true },
   appointments: [appointmentSchema],
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  sharedWith: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   isShared: { type: Boolean, default: false },
+  actif: { type: Boolean, default: true },
+  date_supp: { type: Date, required: false },
+  mode: { type: String, enum: ["perso", "entreprise"], required: true,default:"perso" },
 });
 
 // Shéma pour les Calendriers partagé
@@ -43,25 +60,9 @@ const sharedCalendarSchema = new mongoose.Schema({
   role: { type: String, enum: ["editor", "viewer"], default: "viewer" },
 });
 
-// Shéma pour les rendez-vous partagé
-const sharedAppointmentSchema = new mongoose.Schema({
-  calendarId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Calendar",
-    required: true,
-  },
-  appointmentId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Appointment",
-    required: true,
-  },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-});
-
 // Création des modèles
 const User = mongoose.model("User", userSchema);
 const Calendar = mongoose.model("Calendar", calendarSchema);
 const sharedCalendar = mongoose.model("sharedCalendar", sharedCalendarSchema);
-const sharedAppointment = mongoose.model("sharedAppointment", sharedAppointmentSchema);
 
-module.exports = { User, Calendar, sharedCalendar, sharedAppointment};
+module.exports = { User, Calendar, sharedCalendar };

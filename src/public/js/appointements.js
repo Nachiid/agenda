@@ -890,3 +890,9 @@ document
 document.getElementById("btnCancelShareRdv").addEventListener("click", () => {
   document.getElementById("shareAppointmentModal").classList.add("hidden");
 });
+
+
+  document.getElementById("toggleRecurrent").addEventListener("click", () => {
+    const block = document.getElementById("recurrentOptions");
+    block.style.display = block.style.display === "none" ? "block" : "none";
+  });

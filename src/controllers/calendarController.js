@@ -38,7 +38,8 @@ exports.showCalendar = async (req, res) => {
 exports.getAllCalendarsIdsTitles = async (req, res) => {
   try {
     const userID = req.user.id;
-    const calendars = await model.getAllCalendarsIdsTitles(userID);
+    //envoie du mode dans body ( actif ou pas actif)
+    const calendars = await model.getAllCalendarsIdsTitles(userID); // + argument actif ou pas 0/1
     return res.status(200).json({ calendars });
   } catch (error) {
     console.error("Erreur getAllCalendars:", error);

@@ -15,14 +15,14 @@ async function addAppointmentsByEmail(email) {
       return;
     }
 
-    // Récupère tous les calendriers de l'utilisateur
+    // 📅 Récupération des calendriers
     const calendars = await Calendar.find({ userId: user._id });
     if (!calendars.length) {
       console.log("Aucun calendrier trouvé pour cet utilisateur.");
       return;
     }
 
-    // Générateur de rendez-vous aléatoires
+    // Titres aléatoires
     const randomTitles = [
       "Réunion équipe",
       "Appel client",
@@ -37,39 +37,46 @@ async function addAppointmentsByEmail(email) {
     ];
 
     for (const calendar of calendars) {
-      const newAppointments = [];
+  const newAppointments = [];
 
-      // On génère des rendez-vous sur 3 mois différents
-      for (let monthOffset = -1; monthOffset <= 5; monthOffset++) {
-        for (let i = 0; i < 10; i++) {
-          const baseDate = new Date();
-          baseDate.setMonth(baseDate.getMonth() + monthOffset);
-          baseDate.setDate(Math.floor(Math.random() * 25) + 1);
-          baseDate.setHours(8 + Math.floor(Math.random() * 8), 0, 0, 0);
+  // 🔧 IMPORTANT : corriger les anciens calendriers sans `mode`
+  if (!calendar.mode) {
+    calendar.mode = calendar.title === "travail" ? "entreprise" : "perso";
+  }
 
-          const start = new Date(baseDate);
-          const end = new Date(start);
-          end.setHours(start.getHours() + 1 + Math.floor(Math.random() * 2)); // 1h à 3h max
+  // Génération RDV
+  for (let monthOffset = -1; monthOffset <= 5; monthOffset++) {
+    for (let i = 0; i < 10; i++) {
+      const baseDate = new Date();
+      baseDate.setMonth(baseDate.getMonth() + monthOffset);
+      baseDate.setDate(Math.floor(Math.random() * 25) + 1);
+      baseDate.setHours(8 + Math.floor(Math.random() * 8), 0, 0, 0);
 
-          const randomTitle =
-            randomTitles[Math.floor(Math.random() * randomTitles.length)];
+      const start = new Date(baseDate);
+      const end = new Date(start);
+      end.setHours(start.getHours() + (1 + Math.floor(Math.random() * 2)));
 
-          newAppointments.push({
-            name: `${randomTitle} (${calendar.title})`,
-            date_debut: start,
-            date_fin: end,
-            description: `Rendez-vous pour "${randomTitle}" prévu le ${start.toLocaleDateString()} à ${start.getHours()}h.`,
-          });
-        }
-      }
+      const randomTitle =
+        randomTitles[Math.floor(Math.random() * randomTitles.length)];
 
-      // Sauvegarde dans le calendrier
-      calendar.appointments.push(...newAppointments);
-      await calendar.save();
-      console.log(
-        `${newAppointments.length} RDV ajoutés à "${calendar.title}"`
-      );
+      newAppointments.push({
+        name: `${randomTitle} (${calendar.title})`,
+        date_debut: start,
+        date_fin: end,
+        description: `Rendez-vous lié à "${randomTitle}" programmé le ${start.toLocaleDateString()} à ${start.getHours()}h.`,
+        actif: true,
+        isRecurent: [],
+      });
     }
+  }
+
+  // Sauvegarde du calendrier
+  calendar.appointments.push(...newAppointments);
+  await calendar.save();
+
+  console.log(`${newAppointments.length} RDV ajoutés à "${calendar.title}"`);
+}
+
   } catch (err) {
     console.error("Erreur lors de l’insertion des rendez-vous :", err);
   } finally {

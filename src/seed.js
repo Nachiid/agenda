@@ -1,6 +1,8 @@
 require("dotenv").config({ path: "../.env" });
+const mongoose = require("mongoose");
 const connectDB = require("./models/connexionDB");
 const model = require("./models/model");
+
 const { User, Calendar } = require("./models/db");
 
 async function seedAll() {
@@ -42,6 +44,8 @@ async function seedAll() {
     ];
 
     const createdUsers = [];
+
+    // Créer les utilisateurs via le model sécurisé (hash password)
     for (const u of usersData) {
       const user = await model.register(
         u.firstName,
@@ -53,56 +57,62 @@ async function seedAll() {
       console.log("-> utilisateur créé :", user.email);
     }
 
-    // Créer 3 calendriers par utilisateur
+    // Types de calendriers à créer
     const calendarTypes = [
-      { title: "perso", color: "#3498db" },
-      { title: "amis", color: "#2ecc71" },
-      { title: "famille", color: "#e74c3c" },
-      { title: "travail", color: "#34495e"},
-      { title: "Rendez-vous partagés", color: "grey" , isShared : true},
-
+      { title: "perso", color: "#3498db", mode: "perso" },
+      { title: "amis", color: "#2ecc71", mode: "perso" },
+      { title: "famille", color: "#e74c3c", mode: "perso" },
+      { title: "travail", color: "#34495e", mode: "entreprise" },
+      { title: "Rendez-vous partagés", color: "grey", isShared: true, mode: "entreprise" },
     ];
 
-    const calendars = [];
+    const calendarsToInsert = [];
+
+    // Création des calendriers
     for (const user of createdUsers) {
       for (const t of calendarTypes) {
-        // Générer des rendez-vous aléatoires pour l'utilisateur "aymen"
         const appointments = [];
+
+        // Générer 5 rendez-vous pour AYMER
         if (user.firstName.toLowerCase() === "aymen") {
           for (let i = 0; i < 5; i++) {
             const start = new Date();
-            start.setDate(start.getDate() + i); // aujourd'hui + i jours
-            start.setHours(9 + i, 0); // heure de début 9h + i
+            start.setDate(start.getDate() + i);
+            start.setHours(9 + i, 0);
+
             const end = new Date(start);
-            end.setHours(end.getHours() + 1); // durée 1h
+            end.setHours(end.getHours() + 1);
+
             appointments.push({
               name: `Rendez-vous ${i + 1}`,
               date_debut: start,
               date_fin: end,
               description: `Description du rendez-vous ${i + 1}`,
-
+              actif: true,
+              isRecurent: [], // conforme à ton nouveau schéma
             });
           }
         }
 
-        calendars.push({
+        calendarsToInsert.push({
           title: t.title,
           color: t.color,
           userId: user._id,
           appointments,
-   
+          mode: t.mode,
+          isShared: t.isShared || false,
+          sharedWith: [], // vide par défaut
         });
       }
     }
 
-    await Calendar.insertMany(calendars);
-    console.log(
-      "Calendriers créés avec rendez-vous pour l’utilisateur Aymen"
-    );
+    await Calendar.insertMany(calendarsToInsert);
+
+    console.log("Calendriers créés avec rendez-vous pour l’utilisateur Aymen");
+
   } catch (err) {
     console.error("Erreur pendant le seedAll :", err);
   } finally {
-    const mongoose = require("mongoose");
     await mongoose.disconnect();
     console.log("Déconnecté de MongoDB");
   }
