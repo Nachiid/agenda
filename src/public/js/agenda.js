@@ -48,13 +48,6 @@ function updateCalendarView(calendars, calendar) {
 
   try {
     calendars.forEach((cal) => {
-      // Mettre à jour le titre du calendrier affiché (ou afficher "Multi-calendriers")
-      //const titleDiv = document.querySelector(".calendar-title");
-      //if (titleDiv) {
-      //  titleDiv.textContent =
-      //    calendars.length === 1 ? cal.title : "Calendriers combinés";
-      //}
-
       addActiveCalendarIdLocal(cal._id);
 
       // Ajouter chaque rendez-vous du calendrier
@@ -65,13 +58,13 @@ function updateCalendarView(calendars, calendar) {
             title: r.name,
             start: r.date_debut,
             end: r.date_fin,
-
             backgroundColor: cal.color,
             borderColor: cal.color,
             textColor: "#fff",
             extendedProps: {
               description: r.description || "",
               calendarId: cal._id,
+              event_role: cal.role,
             },
             display: "auto",
           });
@@ -86,7 +79,7 @@ function updateCalendarView(calendars, calendar) {
   }
 }
 
-/**
+/**updateCalendarView
  * supprimer les événements d’un calendrier spécifique
  */
 
@@ -146,7 +139,7 @@ function createCalendarElement(cal, calendar) {
 
   if (cal.mode === "personnel") {
     calendarListDiv = document.getElementById("calendar-list");
-  } else {
+  } else if (cal.mode === "entreprise") {
     calendarListDiv = document.getElementById("calendar-list-entrep");
   }
 
@@ -268,32 +261,30 @@ function createCalendarElement(cal, calendar) {
   const menu = document.createElement("div");
   menu.classList.add("menu", "hidden");
 
-  // Bouton modifier
+  console.log(cal);
   const editBtn = document.createElement("button");
-  editBtn.classList.add("menu-edit", "edit-btn-cal");
-  editBtn.dataset.id = cal._id;
-  editBtn.innerHTML = `<i class="fas fa-pen"></i> Modifier`;
-  menu.appendChild(editBtn);
-
-  // Bouton supprimer
-  const deleteBtn = document.createElement("button");
-  deleteBtn.classList.add("menu-delete", "delete-btn-cal");
-  deleteBtn.dataset.id = cal._id;
-  deleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i> Supprimer`;
-  menu.appendChild(deleteBtn);
-
-  // Bouton partager
   const shareBtn = document.createElement("button");
-  shareBtn.classList.add("menu-share-cal");
-  shareBtn.dataset.id = cal._id;
-  shareBtn.innerHTML = `<i class="fas fa-share-alt"></i> Partager`;
-  menu.appendChild(shareBtn);
+  if (cal.role === "Owner" || cal.role === "Editor") {
+    // Bouton modifier
 
-  shareBtn.addEventListener("click", () => {
-    console.log(cal.mode);
+    editBtn.classList.add("menu-edit", "edit-btn-cal");
+    editBtn.dataset.id = cal._id;
+    editBtn.innerHTML = `<i class="fas fa-pen"></i> Modifier`;
+    menu.appendChild(editBtn);
 
-    openSharePopup(cal._id, cal.mode);
-  });
+    // Bouton partager
+
+    shareBtn.classList.add("menu-share-cal");
+    shareBtn.dataset.id = cal._id;
+    shareBtn.innerHTML = `<i class="fas fa-share-alt"></i> Partager`;
+    menu.appendChild(shareBtn);
+
+    shareBtn.addEventListener("click", () => {
+      console.log(cal.mode);
+
+      openSharePopup(cal._id, cal.mode);
+    });
+  }
 
   document.body.appendChild(menu);
   // Bouton Exporter
@@ -308,6 +299,13 @@ function createCalendarElement(cal, calendar) {
     const calendarId = e.currentTarget.dataset.id;
     window.location.href = `/user/calendar/export/${calendarId}`;
   });
+
+  // Bouton supprimer
+  const deleteBtn = document.createElement("button");
+  deleteBtn.classList.add("menu-delete", "delete-btn-cal");
+  deleteBtn.dataset.id = cal._id;
+  deleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i> Supprimer`;
+  menu.appendChild(deleteBtn);
 
   calDiv.appendChild(menuWrapper);
 
@@ -392,6 +390,9 @@ function updateCalendarCheckboxes() {
 }
 
 function openEventDetailsPopup(event, mode) {
+  const editBtn = document.querySelector(".detail-edit");
+  const deleteBtn = document.querySelector(".delete-edit");
+
   if (mode === "update") {
     const rdv = {
       _id: event.id,
@@ -400,8 +401,17 @@ function openEventDetailsPopup(event, mode) {
       date_debut: event.start,
       date_fin: event.end,
       calendar_id: event.extendedProps.calendarId,
+      role: event.extendedProps.event_role,
     };
-
+  console.log("mode ", rdv.role);
+    // Cacher les boutons si rôle Viewer
+    if (rdv.role === "Viewer") {
+      editBtn.style.display = "none";
+      deleteBtn.style.display = "none";
+    } else {
+      editBtn.style.display = "inline-block"; // ou "block" selon ton style
+      deleteBtn.style.display = "inline-block";
+    }
     const popup = document.getElementById("eventDetailsModal");
     renderCalendarField("edit", rdv.calendar_id);
     popup.classList.remove("hidden");
@@ -463,6 +473,8 @@ function openEventDetailsPopup(event, mode) {
     // ==========================
     document.addEventListener("click", async (e) => {
       const btnShare = e.target.closest(".menu-share");
+      console.log(e.target.closest);
+
       if (!btnShare) return;
 
       document.getElementById("shareAppointmentModal").dataset.id = rdv._id;
@@ -550,7 +562,11 @@ function updateCalendar({ type, eventData }) {
         start: eventData.date_debut,
         end: eventData.date_fin,
         description: eventData.description,
+        event_role: "Editor",
       });
+
+      console.log(calendar.event - role);
+
       break;
   }
 }
@@ -1041,7 +1057,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       const titleInput = document.getElementById("newCalendarTitle");
       const mode = document.getElementById("calendarType").value;
       const title = titleInput.value.trim();
-      console.log(mode);
 
       if (!title) return showMessage("Veuillez saisir un titre", "error");
 
@@ -1151,36 +1166,6 @@ document.addEventListener("click", (e) => {
     }
   });
 });
-
-// --- Réinitialise les événements actuels ---
-//calendar.removeAllEvents();
-/*
-
-
-document.addEventListener("appointmentsUpdated", async () => {
-  const calendarId = getActiveCalendarIdsLocal()[0];
-
-  if (!calendarId) {
-    console.error("Aucun ID calendrier");
-    return;
-  }
-
-  const res = await fetch("http://localhost:3000/user/agenda", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ calendarId }),
-  });
-
-  if (!res.ok) {
-    console.error("Erreur backend :", res.status);
-    return;
-  }
-
-  const data = await res.json();
-  updateCalendarView(data.calendar, calendar);
-});
-*/
 
 /* ------------------------------------------------------------
     PARTAGE AGENDA
@@ -1329,15 +1314,16 @@ const persoDiv = document.getElementById("calendar-list");
 const entrepDiv = document.getElementById("calendar-list-entrep");
 const event = document.querySelector("#evenement_a_venir");
 
-const labels = ["Personnel", "Entreprise", "Tous"];
+const labels = ["Mes calendrier Personnel", "Mes calendrier Professionel"];
+
+const mode = document.querySelector(".calendar-mode");
 
 triToggle.addEventListener("click", () => {
   let state = parseInt(triToggle.dataset.state);
 
   state = (state + 1) % 2;
   triToggle.dataset.state = state;
-
-  toggleLabel.textContent = labels[state];
+  mode.textContent = labels[state];
 
   applyCalendarFilter(state);
 });

@@ -42,7 +42,6 @@ const calendarSchema = new mongoose.Schema({
   color: { type: String, required: true },
   appointments: [appointmentSchema],
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  sharedWith: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   isShared: { type: Boolean, default: false },
   actif: { type: Boolean, default: true },
   date_supp: { type: Date, required: false },

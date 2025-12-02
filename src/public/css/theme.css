@@ -1,0 +1,119 @@
+/* a tester */
+
+:root {
+  /* Couleurs principales */
+  --primary: #4f46e5;
+  --primary-light: #667ce7;
+  --primary-dark: #6f60bf;
+
+  /* Dégradé navbar clair */
+  --navbar-gradient: linear-gradient(to right, #667ce7 0%, #6f60bf 100%);
+
+  /* Arrière-plan général */
+  --bg-body: #f3f4f6;
+  --bg-card: #ffffff;
+  --bg-soft: #f9fafb;
+
+  /* Texte */
+  --text-title: #1f2937;
+  --text-body: #4b5563;
+  --text-muted: #6b7280;
+
+  /* Bordures / ombres */
+  --border-color: rgba(0, 0, 0, 0.08);
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  /* Boutons */
+  --btn-primary-bg: #4f46e5;
+  --btn-primary-hover: #3730a3;
+
+  --btn-secondary-bg: #e5e7eb;
+  --btn-secondary-hover: #d1d5db;
+
+  --btn-danger-bg: #d64545;
+  --btn-danger-hover: #f87171;
+
+  /* Switch */
+  --switch-off: #ccc;
+  --switch-on: #4f46e5;
+}
+
+
+:root.dark {
+  /* Couleurs principales (version sombre) */
+  --primary: #2d2f57;
+  --primary-light: #8a7fff;
+  --primary-dark: #3a2757;
+
+  /* Dégradé navbar sombre (bleu foncé → violet foncé) */
+  --navbar-gradient: linear-gradient(to right, #2d2f57 0%, #3a2757 100%);
+
+  /* Arrière-plan général */
+  --bg-body: #1e1f2a;
+  --bg-card: #2a2c3b;
+  --bg-soft: #232433;
+
+  /* Texte */
+  --text-title: #f3f4f6;
+  --text-body: #d1d5db;
+  --text-muted: #9ca3af;
+
+  /* Bordures / ombres */
+  --border-color: rgba(255, 255, 255, 0.12);
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.4);
+
+  /* Boutons */
+  --btn-primary-bg: #7b6eff;
+  --btn-primary-hover: #5f53d9;
+
+  --btn-secondary-bg: #3a3c4b;
+  --btn-secondary-hover: #505268;
+
+  --btn-danger-bg: #c73d3d;
+  --btn-danger-hover: #e57373;
+
+  /* Switch */
+  --switch-off: #555;
+  --switch-on: #7b6eff;
+}
+
+
+
+:root {
+  /* Couleurs principales du thème */
+  --color-primary: #4f46e5;          /* bleu principal */
+  --color-primary-hover: #3730a3;    /* bleu au hover */
+  --color-primary-gradient-start: #667ce7;
+  --color-primary-gradient-end: #6f60bf;
+
+  --color-secondary: #6f60bf;        /* violet secondaire */
+  --color-secondary-gradient-start: #667eea;
+  --color-secondary-gradient-end: #764ba2;
+
+  /* Couleurs de texte */
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #111827;
+  --color-text-muted: #6b7280;
+
+  /* Couleurs de fond */
+  --color-bg: #ffffff;
+  --color-bg-light: #f9fafb;
+  --color-bg-medium: #e5e7eb;
+  --color-bg-dark: #d1d5db;
+
+  /* Couleurs d’alerte / danger */
+  --color-danger: #d64545;
+  --color-danger-hover: #f87171;
+
+  /* Couleurs overlay */
+  --color-overlay: rgba(0, 0, 0, 0.4);
+  --color-border-light: rgba(255, 255, 255, 0.2);
+  --color-backdrop: rgba(255, 255, 255, 0.12);
+  --color-backdrop-hover: rgba(255, 255, 255, 0.15);
+  --color-active: rgba(79, 70, 229, 0.35);
+  --color-input-focus: rgba(79, 70, 229, 0.2);
+
+  /* Couleurs toggles / sliders */
+  --color-toggle-on: var(--color-primary);
+  --color-toggle-off: #ccc;
+}

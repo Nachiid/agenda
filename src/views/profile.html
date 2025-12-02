@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=330, initial-scale=1.0" />
     <title>Mon Agenda - Profil</title>
+    <link rel="stylesheet" href="/css/theme.css" />
     <link rel="stylesheet" href="/css/profile-style.css" />
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="css/global-style.css" />
@@ -69,6 +70,7 @@
             <a href="agenda" class="nav-link">Agenda</a>
             <a href="/profile" class="nav-link active">Profil</a>
             <button class="nav-link" onclick="logout()">Se déconnecter</button>
+            <button id="theme-toggle" class="theme-btn">🌓</button>
           </div>
         </div>
       </nav>
@@ -194,10 +196,7 @@
           <button class="btn btn-secondary" id="btnChangePassword">
             Changer le mot de passe
           </button>
-          <button
-            class="btn btn-danger"
-            id="btnDeleteAccount"
-          >
+          <button class="btn btn-danger" id="btnDeleteAccount">
             Supprimer le compte
           </button>
         </div>
@@ -275,5 +274,6 @@
     <script src="js/global.js" defer></script>
     <script src="/js/profile.js" defer></script>
     <script src="/js/logout.js" defer></script>
+    <script src="/js/theme.js" defer></script>
   </body>
 </html>

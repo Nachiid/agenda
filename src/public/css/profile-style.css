@@ -99,99 +99,7 @@ body {
   background: rgba(79, 70, 229, 0.35);
 }
 
-/* ===== RESPONSIVE ===== */
-/* Responsive pour 650px et moins */
-@media (max-width: 650px) {
-  /* Cacher le logo et le texte */
-  .logo svg,
-  .logo-text {
-    display: none;
-  }
 
-  /* Navbar content en flex wrap pour avoir liens et barre de recherche sur deux lignes */
-  .nav-content {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0;
-  }
-
-  /* Zone gauche : bouton uniquement */
-  .left-area {
-    display: flex;
-    align-items: center;
-    order: 1;
-    flex: 0 0 auto; /* prend sa largeur naturelle */
-  }
-
-  /* Zone droite : liens sur toute la largeur */
-  .nav-links {
-    display: flex;
-    align-items: center;
-    order: 2;
-    flex: 1 1 100%; /* prend toute la largeur de la navbar */
-    justify-content: space-between; /* répartis sur toute la ligne */
-    gap: 2.5rem; /* espace initial entre liens */
-    margin-top: 0.5rem;
-  }
-
-  /* Réduire le gap sur les écrans plus petits */
-  @media (max-width: 500px) {
-    .nav-links {
-      gap: 1.2rem; /* liens plus proches */
-    }
-  }
-
-  @media (max-width: 400px) {
-    .nav-links {
-      gap: 0.8rem; /* encore plus rapprochés */
-    }
-  }
-
-  /* Barre de recherche sur toute la largeur */
-  .nav-search-area {
-    order: 3;
-    width: 100%;
-    display: flex;
-    justify-content: flex-start;
-    margin-top: 0.5rem;
-  }
-
-  .nav-search-area form#appointments_search {
-    width: 100%;
-    display: flex;
-    flex: 1 1 auto;
-  }
-
-  .search-wrapper {
-    width: 100%;
-    display: flex;
-    justify-content: flex-start;
-  }
-
-  .search-container {
-    flex: 1 1 auto;
-    min-width: 0;
-    display: flex;
-    align-items: center;
-  }
-
-  .search-container input {
-    width: 100%;
-    box-sizing: border-box;
-  }
-}
-
-/* Pour écrans encore plus petits, réduire progressivement gap et input */
-@media (max-width: 400px) {
-  .nav-links {
-    gap: 0.5rem;
-  }
-
-  .search-wrapper {
-    max-width: 100%;
-  }
-}
 
 /* PROFILE CONTAINER */
 .profile-container {
@@ -363,48 +271,6 @@ body {
   transform: translateX(24px);
 }
 
-/* MOBILE RESPONSIVE */
-@media (max-width: 768px) {
-  /* Formulaire passe sur une seule colonne */
-  .profile-form {
-    grid-template-columns: 1fr;
-  }
-
-  .profile-form button {
-    grid-column: span 1;
-  }
-
-  /* Préférences alignées verticalement */
-  .preference-item,
-  .preference-item-view {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  /* Avatar centré */
-  .profile-header {
-    text-align: center;
-    justify-content: center;
-  }
-}
-
-/* PETITS TÉLÉPHONES */
-@media (max-width: 480px) {
-  .avatar-circle {
-    width: 70px;
-    height: 70px;
-    font-size: 1.8rem;
-  }
-
-  .profile-name {
-    font-size: 1.4rem;
-  }
-
-  .profile-section {
-    padding: 1.5rem;
-  }
-}
 
 /* MODAL - overlay et centrage */
 .modal {
@@ -521,25 +387,7 @@ body {
   background-color: #d1d5db;
 }
 
-/* RESPONSIVE */
-@media (max-width: 480px) {
-  .modal-content {
-    padding: 1.5rem;
-    width: 95%;
-  }
 
-  .modal-content h2 {
-    font-size: 1.3rem;
-  }
-
-  .form-actions {
-    flex-direction: column;
-  }
-
-  .form-actions .btn {
-    flex: 1 1 100%;
-  }
-}
 
 
 /* MODAL DELETE ACCOUNT */
@@ -622,25 +470,7 @@ body {
   background-color: #f87171;
 }
 
-/* RESPONSIVE */
-@media (max-width: 480px) {
-  .custom-modal-content {
-    padding: 1.5rem;
-    width: 95%;
-  }
 
-  .custom-modal-content h3 {
-    font-size: 1.25rem;
-  }
-
-  .modal-buttons {
-    flex-direction: column;
-  }
-
-  .modal-buttons button {
-    flex: 1 1 100%;
-  }
-}
 
 /* Conteneur flex pour les boutons de sécurité */
 .profile-section .btn-container {
@@ -682,7 +512,182 @@ body {
 }
 
 
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 1.5rem;
+    width: 95%;
+  }
 
+  .modal-content h2 {
+    font-size: 1.3rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions .btn {
+    flex: 1 1 100%;
+  }
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 768px) {
+  /* Formulaire passe sur une seule colonne */
+  .profile-form {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-form button {
+    grid-column: span 1;
+  }
+
+  /* Préférences alignées verticalement */
+  .preference-item,
+  .preference-item-view {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  /* Avatar centré */
+  .profile-header {
+    text-align: center;
+    justify-content: center;
+  }
+}
+
+/* PETITS TÉLÉPHONES */
+@media (max-width: 480px) {
+  .avatar-circle {
+    width: 70px;
+    height: 70px;
+    font-size: 1.8rem;
+  }
+
+  .profile-name {
+    font-size: 1.4rem;
+  }
+
+  .profile-section {
+    padding: 1.5rem;
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+/* Responsive pour 650px et moins */
+@media (max-width: 650px) {
+  /* Cacher le logo et le texte */
+  .logo svg,
+  .logo-text {
+    display: none;
+  }
+
+  /* Navbar content en flex wrap pour avoir liens et barre de recherche sur deux lignes */
+  .nav-content {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* Zone gauche : bouton uniquement */
+  .left-area {
+    display: flex;
+    align-items: center;
+    order: 1;
+    flex: 0 0 auto; /* prend sa largeur naturelle */
+  }
+
+  /* Zone droite : liens sur toute la largeur */
+  .nav-links {
+    display: flex;
+    align-items: center;
+    order: 2;
+    flex: 1 1 100%; /* prend toute la largeur de la navbar */
+    justify-content: space-between; /* répartis sur toute la ligne */
+    gap: 2.5rem; /* espace initial entre liens */
+    margin-top: 0.5rem;
+  }
+
+  /* Réduire le gap sur les écrans plus petits */
+  @media (max-width: 500px) {
+    .nav-links {
+      gap: 1.2rem; /* liens plus proches */
+    }
+  }
+
+  @media (max-width: 400px) {
+    .nav-links {
+      gap: 0.8rem; /* encore plus rapprochés */
+    }
+  }
+
+  /* Barre de recherche sur toute la largeur */
+  .nav-search-area {
+    order: 3;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 0.5rem;
+  }
+
+  .nav-search-area form#appointments_search {
+    width: 100%;
+    display: flex;
+    flex: 1 1 auto;
+  }
+
+  .search-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .search-container {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-container input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* Pour écrans encore plus petits, réduire progressivement gap et input */
+@media (max-width: 400px) {
+  .nav-links {
+    gap: 0.5rem;
+  }
+
+  .search-wrapper {
+    max-width: 100%;
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  .custom-modal-content {
+    padding: 1.5rem;
+    width: 95%;
+  }
+
+  .custom-modal-content h3 {
+    font-size: 1.25rem;
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+  }
+
+  .modal-buttons button {
+    flex: 1 1 100%;
+  }
+}
 /* Responsive : boutons empilés sur petit écran */
 @media (max-width: 640px) {
   .profile-section .btn-container {
