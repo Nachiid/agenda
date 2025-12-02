@@ -39,7 +39,7 @@ exports.getAllCalendarsIdsTitles = async (req, res) => {
   try {
     const userID = req.user.id;
     //envoie du mode dans body ( actif ou pas actif)
-    const calendars = await model.getAllCalendardgitsIdsTitles(userID); // + argument actif ou pas 0/1 test
+    const calendars = await model.getAllCalendarsIdsTitles(userID); // + argument actif ou pas 0/1 test
     return res.status(200).json({ calendars });
   } catch (error) {
     console.error("Erreur getAllCalendars:", error);
@@ -125,7 +125,7 @@ exports.updateCalendarTitle = async (req, res) => {
 exports.addCalendar = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { title } = req.body;
+    const { title, mode } = req.body;
 
     if (!title) {
       return res
@@ -133,12 +133,20 @@ exports.addCalendar = async (req, res) => {
         .json({ error: "Le titre du calendrier est requis" });
     }
 
-    const newCalendar = await model.createCalendar(userId, title, []);
+    if (!mode) {
+      return res.status(400).json({ error: "Le mode est invalide" });
+    }
+    console.log("contro" + mode);
+    if (mode == "personnel" || mode == "entreprise") {
+      const newCalendar = await model.createCalendar(userId, title, mode, []);
 
-    return res.status(201).json({
-      message: title + "a été créé ",
-      calendar: newCalendar,
-    });
+      return res.status(201).json({
+        message: title + "a été créé ",
+        calendar: newCalendar,
+      });
+    } else {
+      return res.status(400).json({ error: "Le mode est invalide" });
+    }
   } catch (error) {
     console.error("Erreur addCalendar:", error);
     return res
@@ -167,13 +175,20 @@ exports.searchUsers = async (req, res) => {
 exports.shareCalendar = async (req, res) => {
   try {
     const ownerId = req.user.id;
-    const { calendarId, email } = req.body;
+    const { calendarId, email, role } = req.body;
 
     if (!calendarId || !email) {
       return res.status(400).json({ error: "Données invalides" });
     }
 
-    const result = await model.shareCalendar(calendarId, ownerId, email);
+    let result;
+    if(role){
+     result = await model.shareCalendar(calendarId, ownerId, email, role);
+
+    }else{
+     result = await model.shareCalendar(calendarId, ownerId, email);
+
+    }
 
     if (!result)
       return res

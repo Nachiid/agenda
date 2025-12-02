@@ -124,11 +124,18 @@
               <button class="dropdown-item" id="btnNewCalendar">
                 Créer un calendrier
               </button>
+
+              <button
+                class="dropdown-item btn btn-primary btn-full import"
+                id="btnImporter"
+              >
+                Importer un calendrier
+              </button>
             </div>
           </div>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section" id="evenement_a_venir">
           <h3 class="sidebar-title">Événements à venir</h3>
           <div id="upcomingEvents" class="upcoming-events"></div>
         </div>
@@ -136,15 +143,26 @@
         <!-- Liste des calendriers -->
         <div class="sidebar-section calendars-list">
           <div class="sidebar-section">
-            <h3 class="sidebar-title">Mes calendrier</h3>
+            <div class="tri-toggle" id="triToggle" data-state="0">
+              <div class="toggle-knob"></div>
+            </div>
+            <span id="toggleLabel"></span>
+
             <button class="btn btn-primary btn-full hidden" id="btnModCalendar">
               Modifier Calendrier
             </button>
-            <button class="btn btn-primary btn-full import" id="btnImporter">
-              Importer un calendrier
-            </button>
           </div>
-          <div class="calendar-list" id="calendar-list"></div>
+          <div class="calendar-list" id="calendar-list">
+            <h3 class="sidebar-title">Mes calendrier Personnel</h3>
+          </div>
+
+          <div
+            class="calendar-list-entrep"
+            id="calendar-list-entrep"
+            style="display: none"
+          >
+            <h3 class="sidebar-title">Mes calendrier entreprise</h3>
+          </div>
         </div>
       </aside>
 
@@ -205,8 +223,8 @@
             <label for="calendarType">Type</label>
             <select id="calendarType" required>
               <option value="">-- Sélectionner --</option>
-              <option value="perso" selected>Personnel</option>
-              <option value="pro">Professionnel</option>
+              <option value="personnel" selected>Personnel</option>
+              <option value="entreprise">Professionnel</option>
             </select>
           </div>
           <div class="modal-actions">
@@ -215,6 +233,28 @@
               type="button"
               class="btn btn-secondary"
               id="btnCancelNewCalendar"
+            >
+              Annuler
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="importModal" class="modal hidden">
+      <div class="modal-content">
+        <h2 class="modal-title">Importer un calendrier</h2>
+        <form id="importForm" class="event-form">
+          <div class="form-group">
+            <label for="importFile">Fichier de calendrier (.ics)</label>
+            <input type="file" id="importFile" accept=".ics" required />
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="btn btn-primary">Importer</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              id="btnCancelImport"
             >
               Annuler
             </button>
@@ -306,7 +346,6 @@
       </div>
     </div>
 
-    
     <div id="eventDetailsModal" class="modal hidden">
       <div class="modal-content">
         <h2 class="details-title"></h2>
@@ -321,27 +360,6 @@
         <button class="btn-close">Fermer</button>
       </div>
     </div>
-    <div id="importModal" class="modal hidden">
-      <div class="modal-content">
-        <h2 class="modal-title">Importer un calendrier</h2>
-        <form id="importForm" class="event-form">
-          <div class="form-group">
-            <label for="importFile">Fichier de calendrier (.ics)</label>
-            <input type="file" id="importFile" accept=".ics" required />
-          </div>
-          <div class="modal-actions">
-            <button type="submit" class="btn btn-primary">Importer</button>
-            <button
-              type="button"
-              class="btn btn-secondary"
-              id="btnCancelImport"
-            >
-              Annuler
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
 
     <!-- === POPUP PARTAGE AGENDA === -->
     <div id="shareCalendarModal" class="modal hidden">
@@ -352,6 +370,22 @@
 
         <div id="shareUserResults"></div>
 
+        <button id="btnCancelShare">Annuler</button>
+        <button id="btnConfirmShare">Envoyer</button>
+      </div>
+    </div>
+
+    <!-- === POPUP PARTAGE AGENDA === -->
+    <div id="shareCalendarProModal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Partager le calendrier</h3>
+
+        <input type="text" id="shareEmailInput" placeholder="email..." />
+
+        <div id="shareUserResults"></div>
+    
+        
+        
         <button id="btnCancelShare">Annuler</button>
         <button id="btnConfirmShare">Envoyer</button>
       </div>

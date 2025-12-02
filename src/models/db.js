@@ -46,7 +46,7 @@ const calendarSchema = new mongoose.Schema({
   isShared: { type: Boolean, default: false },
   actif: { type: Boolean, default: true },
   date_supp: { type: Date, required: false },
-  mode: { type: String, enum: ["perso", "entreprise"], required: true,default:"perso" },
+  mode: { type: String, enum: ["personnel", "entreprise", "TEST"], required: true,default:"TEST" },
 });
 
 // Shéma pour les Calendriers partagé

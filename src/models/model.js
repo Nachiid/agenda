@@ -262,7 +262,7 @@ exports.getFirstCalendar = async function (userId) {
 */
 exports.getAllCalendarsIdsTitles = async function (userId) {
   const ownedCalendars = await Calendar.find({ userId })
-    .select("_id title color")
+    .select("_id title color mode")
     .lean();
   const sharedIds = await sharedCalendar
     .find({ userId })
@@ -271,7 +271,7 @@ exports.getAllCalendarsIdsTitles = async function (userId) {
   const sharedCalendars = await Calendar.find({
     _id: { $in: sharedIds },
   })
-    .select("_id title color")
+    .select("_id title color mode")
     .lean();
 
   const all = [...ownedCalendars, ...sharedCalendars];
@@ -296,6 +296,7 @@ exports.getCalendarById = async function (calendarId) {
 exports.createCalendar = async function (
   userId,
   title,
+  mode,
   appointments = [],
   isShared = false
 ) {
@@ -325,6 +326,7 @@ exports.createCalendar = async function (
     title,
     color,
     userId,
+    mode,
     appointments,
     isShared,
   });
@@ -455,24 +457,21 @@ exports.searchUsersByEmailPrefix = async function (prefix) {
 };
 
 // Partager un calendrier
-exports.shareCalendar = async function (calendarId, ownerId, email) {
+exports.shareCalendar = async function (calendarId, ownerId, email, role = "viewer") {
 
-  receiverId = await User.findOne({email : email});
-
+  const receiver = await User.findOne({ email: email });
+  if (!receiver) return null; // ou throw new Error("Utilisateur introuvable");
 
   const calendar = await Calendar.findOne({
     _id: calendarId,
     userId: ownerId,
   });
+  if (!calendar) return null; // ou throw new Error("Unauthorized");
 
-  if (!calendar) {
-    return null; // ou throw new Error("Unauthorized");
-  }
-
-  // 2. Ajouter l'entrée dans sharedCalendar (évite doublons)
+  // Vérifie si déjà partagé et récupère le rôle existant
   const shared = await sharedCalendar.findOneAndUpdate(
-    { calendarId: calendarId, userId: receiverId }, // clé unique
-    { $setOnInsert: { role: "viewer" } }, // ajouté seulement si nouveau
+    { calendarId: calendarId, userId: receiver._id }, // clé unique
+    { $setOnInsert: { role: role } }, // insertion seulement si nouveau
     { upsert: true, new: true }
   );
 

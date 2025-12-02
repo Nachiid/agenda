@@ -33,7 +33,7 @@ const importIcs = async (req, res) => {
       calendarTitle = originalName.replace(/\.[^/.]+$/, "");
     }
     calendarTitle = calendarTitle + " Importé";
-    const calendar = await createCalendar(req.user.id, calendarTitle);
+    const calendar = await createCalendar(req.user.id, calendarTitle, "personnel");
 
     for (const event of Object.values(events)) {
       if (

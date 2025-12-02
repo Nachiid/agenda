@@ -1143,3 +1143,39 @@ body {
   display: none;
 }
 
+
+
+
+.tri-toggle {
+  width: 60px;
+  height: 32px;
+  background: #ddd;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background 0.25s ease;
+}
+
+.tri-toggle .toggle-knob {
+  width: 28px;
+  height: 28px;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  left: 2px;
+  transition: left 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Positions des 3 états */
+.tri-toggle[data-state="0"] .toggle-knob {
+  left: 2px;
+}
+
+.tri-toggle[data-state="1"] .toggle-knob {
+  left: 31px;
+}
+
+

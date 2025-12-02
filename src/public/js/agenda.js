@@ -105,59 +105,36 @@ function removeCalendarEvents(calendarId, calendar) {
 /**
  * Gère l'affichage des calendriers avec max 4 visibles et un bouton "Afficher plus / moins"
  */
-function renderCalendarListUI(calendarListDiv) {
+function renderCalendarListUI(listDivs) {
   const MAX_VISIBLE = 4;
 
-  // Récupère tous les items
-  const allItems = Array.from(calendarListDiv.querySelectorAll(".event-item2"));
+  // Accepte un seul élément ou un tableau
+  const divArray = Array.isArray(listDivs) ? listDivs : [listDivs];
 
-  // Retirer tout hiddenDiv et toggleBtn existants
-  const existingHidden = calendarListDiv.querySelector(".hidden-calendars");
-  if (existingHidden) {
-    // Déplace les enfants vers calendarListDiv pour ne rien perdre
-    while (existingHidden.firstChild) {
-      calendarListDiv.appendChild(existingHidden.firstChild);
+  divArray.forEach((div) => {
+    if (!div) return;
+
+    const items = Array.from(div.querySelectorAll(".event-item2"));
+
+    // Réinitialisation propre
+    div.style.maxHeight = "";
+    div.style.overflowY = "";
+
+    if (items.length <= MAX_VISIBLE) {
+      // Pas de scroll si 4 ou moins
+      return;
     }
-    existingHidden.remove();
-  }
-  const existingToggle = calendarListDiv.querySelector(".btn-toggle-hidden");
-  if (existingToggle) existingToggle.remove();
 
-  // Créer un nouveau hiddenDiv si nécessaire
-  const hiddenDiv = document.createElement("div");
-  hiddenDiv.classList.add("hidden-calendars");
-  hiddenDiv.style.display = "none";
-
-  allItems.forEach((item, index) => {
-    if (index >= MAX_VISIBLE) {
-      hiddenDiv.appendChild(item);
+    // Calcul précis de la hauteur des 4 premiers items
+    let height = 0;
+    for (let i = 0; i < MAX_VISIBLE; i++) {
+      height += items[i].offsetHeight;
     }
+
+    // Appliquer le scroll uniquement AU conteneur, pas au parent
+    div.style.maxHeight = height + "px";
+    div.style.overflowY = "auto";
   });
-
-  // Ajouter le hiddenDiv et le bouton si besoin
-  if (allItems.length > MAX_VISIBLE) {
-    const toggleBtn = document.createElement("button");
-    toggleBtn.classList.add(
-      "btn",
-      "btn-secondary",
-      "btn-full",
-      "btn-toggle-hidden"
-    );
-    toggleBtn.textContent = "Afficher plus";
-
-    toggleBtn.addEventListener("click", () => {
-      if (hiddenDiv.style.display === "none") {
-        hiddenDiv.style.display = "block";
-        toggleBtn.textContent = "Afficher moins";
-      } else {
-        hiddenDiv.style.display = "none";
-        toggleBtn.textContent = "Afficher plus";
-      }
-    });
-
-    calendarListDiv.appendChild(hiddenDiv);
-    calendarListDiv.appendChild(toggleBtn);
-  }
 }
 
 /**
@@ -165,13 +142,20 @@ function renderCalendarListUI(calendarListDiv) {
  */
 
 function createCalendarElement(cal, calendar) {
-  const calendarListDiv = document.getElementById("calendar-list");
+  let calendarListDiv;
+
+  if (cal.mode === "personnel") {
+    calendarListDiv = document.getElementById("calendar-list");
+  } else {
+    calendarListDiv = document.getElementById("calendar-list-entrep");
+  }
 
   if (!calendarListDiv) return;
 
   const calDiv = document.createElement("div");
   calDiv.classList.add("event-item2");
   calDiv.dataset.id = cal._id;
+  calDiv.dataset.mode = cal.mode;
 
   // Partie gauche
   const leftDiv = document.createElement("div");
@@ -306,7 +290,9 @@ function createCalendarElement(cal, calendar) {
   menu.appendChild(shareBtn);
 
   shareBtn.addEventListener("click", () => {
-    openSharePopup(cal._id);
+    console.log(cal.mode);
+
+    openSharePopup(cal._id, cal.mode);
   });
 
   document.body.appendChild(menu);
@@ -361,7 +347,12 @@ function createCalendarElement(cal, calendar) {
         return;
       }
       calDiv.remove();
-      renderCalendarListUI(calendarListDiv);
+
+      renderCalendarListUI([
+        document.getElementById("calendar-list"),
+        document.getElementById("calendar-list-entrep"),
+      ]);
+
       removeCalendarEvents(calendarId, calendar);
 
       showMessage(data.message, "success");
@@ -485,19 +476,22 @@ function openEventDetailsPopup(event, mode) {
     });
 
     btnShare.addEventListener("click", async (e) => {
-  if (!btnShare) return;
+      if (!btnShare) return;
 
-  document.getElementById("shareAppointmentModal").dataset.rdvId = btnShare.dataset.id;
+      document.getElementById("shareAppointmentModal").dataset.rdvId =
+        btnShare.dataset.id;
 
-  document.getElementById("shareRdvEmailInput").value = "";
-  document.getElementById("shareRdvUserResults").innerHTML = "";
+      document.getElementById("shareRdvEmailInput").value = "";
+      document.getElementById("shareRdvUserResults").innerHTML = "";
 
-  document.getElementById("shareAppointmentModal").classList.remove("hidden");
-});
-// ==========================
-// ==========================
-// ==========================
-// ==========================
+      document
+        .getElementById("shareAppointmentModal")
+        .classList.remove("hidden");
+    });
+    // ==========================
+    // ==========================
+    // ==========================
+    // ==========================
   } else if (mode === "add") {
     const eventModal = document.getElementById("eventModal");
     renderCalendarField("add");
@@ -849,7 +843,12 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       // Appel de la fonction qui gère la limite à 4 et le bouton "Afficher plus / moins"
       updateCalendarCheckboxes(getActiveCalendarIdsLocal());
-      renderCalendarListUI(calendarListDiv);
+
+      // Appliquer le scroll aux deux listes
+      renderCalendarListUI([
+        document.getElementById("calendar-list"),
+        document.getElementById("calendar-list-entrep"),
+      ]);
       await window.fetchAppointments(getActiveCalendarIdsLocal());
     }
   } catch (err) {
@@ -1040,7 +1039,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       e.preventDefault();
 
       const titleInput = document.getElementById("newCalendarTitle");
+      const mode = document.getElementById("calendarType").value;
       const title = titleInput.value.trim();
+      console.log(mode);
+
       if (!title) return showMessage("Veuillez saisir un titre", "error");
 
       try {
@@ -1048,7 +1050,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify({ title }),
+          body: JSON.stringify({ title, mode }),
         });
 
         const data = await res.json();
@@ -1066,8 +1068,12 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         // --- Création du nouvel élément calendrier ---
         createCalendarElement(cal, calendar);
-        // --- Mise à jour du bouton "Afficher plus / moins" ---
-        renderCalendarListUI(calendarListDiv);
+
+        // Appliquer le scroll aux deux listes
+        renderCalendarListUI([
+          document.getElementById("calendar-list"),
+          document.getElementById("calendar-list-entrep"),
+        ]);
       } catch (err) {
         console.error(err);
         showMessage("Erreur serveur, réessayez plus tard.", "error");
@@ -1180,14 +1186,28 @@ document.addEventListener("appointmentsUpdated", async () => {
     PARTAGE AGENDA
 ------------------------------------------------------------ */
 
-function openSharePopup(calendarId) {
+function openSharePopup(calendarId, mode) {
   const modal = document.getElementById("shareCalendarModal");
   modal.classList.remove("hidden");
   modal.dataset.calendarId = calendarId;
 
-  // reset
+  const modalContent = modal.querySelector(".modal-content");
   document.getElementById("shareEmailInput").value = "";
   document.getElementById("shareUserResults").innerHTML = "";
+  const existingSelect = modalContent.querySelector("#shareRoleSelect");
+  if (existingSelect) existingSelect.remove();
+  if (mode === "entreprise") {
+    const roleSelect = document.createElement("select");
+    roleSelect.id = "shareRoleSelect";
+    roleSelect.innerHTML = `
+      <option value="viewer">Viewer</option>
+      <option value="editor">Editor</option>
+    `;
+    modalContent.insertBefore(
+      roleSelect,
+      modal.querySelector("#btnCancelShare")
+    );
+  }
 }
 
 document.getElementById("btnCancelShare").addEventListener("click", () => {
@@ -1261,7 +1281,14 @@ document
   .getElementById("btnConfirmShare")
   .addEventListener("click", async () => {
     const email = emailInput.value;
-    console.log(email);
+    let role = "Viewer";
+    const shareRoleSelect = document.getElementById("shareRoleSelect");
+
+    if (shareRoleSelect) {
+      role = shareRoleSelect.value;
+    }
+
+    console.log(role);
     const calendarId =
       document.getElementById("shareCalendarModal").dataset.calendarId;
 
@@ -1278,7 +1305,7 @@ document
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ calendarId, email }),
+        body: JSON.stringify({ calendarId, email, role }),
       });
 
       const data = await res.json();
@@ -1294,3 +1321,40 @@ document
       showMessage("Erreur lors du partage", "error");
     }
   });
+
+const triToggle = document.getElementById("triToggle");
+const toggleLabel = document.getElementById("toggleLabel");
+
+const persoDiv = document.getElementById("calendar-list");
+const entrepDiv = document.getElementById("calendar-list-entrep");
+const event = document.querySelector("#evenement_a_venir");
+
+const labels = ["Personnel", "Entreprise", "Tous"];
+
+triToggle.addEventListener("click", () => {
+  let state = parseInt(triToggle.dataset.state);
+
+  state = (state + 1) % 2;
+  triToggle.dataset.state = state;
+
+  toggleLabel.textContent = labels[state];
+
+  applyCalendarFilter(state);
+});
+
+function applyCalendarFilter(state) {
+  switch (state) {
+    case 0: // Personnel
+      persoDiv.style.display = "block";
+      entrepDiv.style.display = "none";
+      event.style.display = "block";
+      break;
+
+    case 1: // Entreprise
+      persoDiv.style.display = "none";
+      entrepDiv.style.display = "block";
+      event.style.display = "block";
+
+      break;
+  }
+}

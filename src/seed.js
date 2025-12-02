@@ -59,11 +59,11 @@ async function seedAll() {
 
     // Types de calendriers à créer
     const calendarTypes = [
-      { title: "perso", color: "#3498db", mode: "perso" },
-      { title: "amis", color: "#2ecc71", mode: "perso" },
-      { title: "famille", color: "#e74c3c", mode: "perso" },
+      { title: "personnel", color: "#3498db", mode: "personnel" },
+      { title: "amis", color: "#2ecc71", mode: "personnel" },
+      { title: "famille", color: "#e74c3c", mode: "personnel" },
       { title: "travail", color: "#34495e", mode: "entreprise" },
-      { title: "Rendez-vous partagés", color: "grey", isShared: true, mode: "entreprise" },
+      { title: "Rendez-vous partagés", color: "grey", isShared: true, mode: "personnel" },
     ];
 
     const calendarsToInsert = [];
