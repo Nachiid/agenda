@@ -110,7 +110,7 @@ exports.softDeleteAppointment = async function (id_rdv) {
     },
     { arrayFilters: [{ "elem._id": new mongoose.Types.ObjectId(id_rdv) }] }
   );
-  return result.modifiedCount > 0 ? { _id: id_rdv } : null;
+  return result;
 };
 
 /**
@@ -127,7 +127,7 @@ exports.restoreAppointment = async function (id_rdv) {
         },
         { arrayFilters: [{ "elem._id": new mongoose.Types.ObjectId(id_rdv) }] }
     );
-    return result.modifiedCount > 0 ? { _id: id_rdv } : null;
+    return result;
 };
 
 /**

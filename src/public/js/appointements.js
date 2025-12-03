@@ -572,8 +572,8 @@ document.addEventListener("click", async (e) => {
         if (!res.ok) {
           const errorData = await res.json();
           let errorMessage = errorData.message || "Erreur lors de la suppression";
-          if (errorData.error) {
-            errorMessage += `: ${errorData.error}`;
+          if (errorData.debug_info) {
+            errorMessage += ` (Debug: ${JSON.stringify(errorData.debug_info)})`;
           }
           showMessage(errorMessage, "error");
           return;
@@ -665,8 +665,8 @@ document.addEventListener("deleteAppointmentFromPopup", async (e) => {
     if (!res.ok) {
         const errorData = await res.json();
         let errorMessage = errorData.message || "Erreur lors de la suppression";
-        if (errorData.error) {
-            errorMessage += `: ${errorData.error}`;
+        if (errorData.debug_info) {
+            errorMessage += ` (Debug: ${JSON.stringify(errorData.debug_info)})`;
         }
         showMessage(errorMessage, "error");
         return;

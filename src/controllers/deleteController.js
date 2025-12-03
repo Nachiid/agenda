@@ -24,11 +24,18 @@ exports.softDelete = async (req, res) => {
             return res.status(400).json({ message: "Type d'élément non valide." });
         }
 
-        if (!result) {
-            return res.status(404).json({ message: "Élément non trouvé ou déjà supprimé." });
+        if (!result || result.modifiedCount === 0) {
+            return res.status(404).json({ 
+                message: "Élément non trouvé ou aucune modification effectuée.",
+                debug_info: result 
+            });
         }
 
-        res.status(200).json({ message: `L'élément a été mis à la corbeille.`, item: result });
+        res.status(200).json({ 
+            message: `L'élément a été mis à la corbeille.`, 
+            item: { _id: id },
+            debug_info: result 
+        });
 
     } catch (error) {
         console.error(`Erreur lors de la mise à la corbeille de ${item_type}:`, error);
