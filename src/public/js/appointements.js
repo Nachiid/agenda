@@ -569,28 +569,16 @@ document.addEventListener("click", async (e) => {
           credentials: "include"
         });
         
-        const data = await res.json();
-
         if (!res.ok) {
           const errorData = await res.json();
-          let errorMessage = errorData.message || "Erreur lors de la suppression";
-          if (errorData.debug_info) {
-            errorMessage += ` (Debug: ${JSON.stringify(errorData.debug_info)})`;
-          }
-          showMessage(errorMessage, "error");
+          showMessage(errorData.message || "Erreur lors de la suppression", "error");
           return;
         }
-
         // Met à jour la liste des événements côté frontend
         updateEventList({ type: "delete", eventData: { _id: id_rdv } });
         // Pour la suppression
         updateCalendar({ type: "delete", eventData: { _id: id_rdv } });
-        
-        // Affiche le message de succès et les informations de débogage
-        const successMessage = `Rendez-vous placé dans la corbeille. Debug: ${JSON.stringify(data.debug_info)}`;
-        alert(successMessage); // Utiliser alert pour s'assurer que l'information est vue
         showMessage("Rendez-vous placé dans la corbeille.", "success");
-
       } catch (err) {
         console.error(err);
         showMessage("Erreur lors de la suppression", "error");
@@ -674,11 +662,7 @@ document.addEventListener("deleteAppointmentFromPopup", async (e) => {
 
     if (!res.ok) {
         const errorData = await res.json();
-        let errorMessage = errorData.message || "Erreur lors de la suppression";
-        if (errorData.debug_info) {
-            errorMessage += ` (Debug: ${JSON.stringify(errorData.debug_info)})`;
-        }
-        showMessage(errorMessage, "error");
+        showMessage(errorData.message || "Erreur lors de la suppression", "error");
         return;
     }
 
@@ -692,8 +676,6 @@ document.addEventListener("deleteAppointmentFromPopup", async (e) => {
       eventData: { _id: id_rdv },
     });
 
-    const successMessage = `Rendez-vous placé dans la corbeille. Debug: ${JSON.stringify(data.debug_info)}`;
-    alert(successMessage);
     showMessage("Rendez-vous placé dans la corbeille.", "success");
     
   } catch (err) {

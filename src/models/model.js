@@ -110,7 +110,7 @@ exports.softDeleteAppointment = async function (id_rdv) {
     },
     { arrayFilters: [{ "elem._id": new mongoose.Types.ObjectId(id_rdv) }] }
   );
-  return result;
+  return result.modifiedCount > 0 ? { _id: id_rdv } : null;
 };
 
 /**
@@ -127,7 +127,7 @@ exports.restoreAppointment = async function (id_rdv) {
         },
         { arrayFilters: [{ "elem._id": new mongoose.Types.ObjectId(id_rdv) }] }
     );
-    return result;
+    return result.modifiedCount > 0 ? { _id: id_rdv } : null;
 };
 
 /**
@@ -559,10 +559,9 @@ exports.getTrash = async function (userId) {
         date_supp: { $gte: thirtyDaysAgo },
     }).lean();
 
-    // 2. Récupérer les rendez-vous inactifs dans les calendriers actifs
+    // 2. Récupérer les rendez-vous inactifs dans tous les calendriers de l'utilisateur
     const calendarsWithDeletedAppointments = await Calendar.find({
         userId,
-        actif: true,
         "appointments.actif": false,
         "appointments.date_supp": { $gte: thirtyDaysAgo },
     }).lean();
