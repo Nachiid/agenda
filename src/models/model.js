@@ -97,39 +97,37 @@ exports.addAppointment = async function (calendarId, appointmentData) {
 };
 
 /**
- * Marque un rendez-vous comme inactif (suppression réversible).
+ * Marque un rendez-vous comme inactif (suppression réversible) en utilisant une mise à jour atomique.
  */
 exports.softDeleteAppointment = async function (id_rdv) {
-  const calendar = await Calendar.findOne({ "appointments._id": id_rdv });
-  if (!calendar) return null;
-
-  const appointment = calendar.appointments.id(id_rdv);
-  if (!appointment) return null;
-
-  appointment.actif = false;
-  appointment.date_supp = new Date();
-
-  calendar.markModified('appointments');
-  await calendar.save();
-  return appointment;
+  const result = await Calendar.updateOne(
+    { "appointments._id": id_rdv },
+    { 
+      $set: { 
+        "appointments.$[elem].actif": false,
+        "appointments.$[elem].date_supp": new Date()
+      } 
+    },
+    { arrayFilters: [{ "elem._id": new mongoose.Types.ObjectId(id_rdv) }] }
+  );
+  return result.modifiedCount > 0 ? { _id: id_rdv } : null;
 };
 
 /**
- * Restaure un rendez-vous qui était en corbeille.
+ * Restaure un rendez-vous qui était en corbeille en utilisant une mise à jour atomique.
  */
 exports.restoreAppointment = async function (id_rdv) {
-    const calendar = await Calendar.findOne({ "appointments._id": id_rdv, "appointments.actif": false });
-    if (!calendar) return null;
-
-    const appointment = calendar.appointments.id(id_rdv);
-    if (!appointment) return null;
-
-    appointment.actif = true;
-    appointment.date_supp = null;
-
-    calendar.markModified('appointments');
-    await calendar.save();
-    return appointment;
+    const result = await Calendar.updateOne(
+        { "appointments._id": id_rdv, "appointments.actif": false },
+        { 
+            $set: { 
+                "appointments.$[elem].actif": true,
+                "appointments.$[elem].date_supp": null
+            } 
+        },
+        { arrayFilters: [{ "elem._id": new mongoose.Types.ObjectId(id_rdv) }] }
+    );
+    return result.modifiedCount > 0 ? { _id: id_rdv } : null;
 };
 
 /**
