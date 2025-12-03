@@ -571,7 +571,11 @@ document.addEventListener("click", async (e) => {
         
         if (!res.ok) {
           const errorData = await res.json();
-          showMessage(errorData.message || "Erreur lors de la suppression", "error");
+          let errorMessage = errorData.message || "Erreur lors de la suppression";
+          if (errorData.error) {
+            errorMessage += `: ${errorData.error}`;
+          }
+          showMessage(errorMessage, "error");
           return;
         }
         // Met à jour la liste des événements côté frontend
@@ -660,7 +664,11 @@ document.addEventListener("deleteAppointmentFromPopup", async (e) => {
 
     if (!res.ok) {
         const errorData = await res.json();
-        showMessage(errorData.message || "Erreur lors de la suppression", "error");
+        let errorMessage = errorData.message || "Erreur lors de la suppression";
+        if (errorData.error) {
+            errorMessage += `: ${errorData.error}`;
+        }
+        showMessage(errorMessage, "error");
         return;
     }
 

@@ -357,7 +357,11 @@ function createCalendarElement(cal, calendar) {
       });
       const data = await res.json();
       if (!res.ok) {
-        showMessage(data.message || "Erreur lors de la suppression.", "error");
+        let errorMessage = data.message || "Erreur lors de la suppression.";
+        if (data.error) {
+            errorMessage += `: ${data.error}`;
+        }
+        showMessage(errorMessage, "error");
         return;
       }
       calDiv.remove();
