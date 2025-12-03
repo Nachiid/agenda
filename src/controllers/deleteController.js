@@ -32,8 +32,7 @@ exports.softDelete = async (req, res) => {
 
     } catch (error) {
         console.error(`Erreur lors de la mise à la corbeille de ${item_type}:`, error);
-        // Temporairement, renvoyer le message d'erreur réel pour le débogage
-        res.status(500).json({ message: "Erreur serveur lors de la suppression.", error: error.message });
+        res.status(500).json({ message: "Erreur serveur lors de la suppression." });
     }
 };
 

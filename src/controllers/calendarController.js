@@ -125,15 +125,15 @@ exports.updateCalendarTitle = async (req, res) => {
 exports.addCalendar = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { title } = req.body;
+    const { title, mode } = req.body;
 
-    if (!title) {
+    if (!title || !mode) {
       return res
         .status(400)
-        .json({ error: "Le titre du calendrier est requis" });
+        .json({ error: "Le titre et le type du calendrier sont requis" });
     }
 
-    const newCalendar = await model.createCalendar(userId, title, []);
+    const newCalendar = await model.createCalendar(userId, title, mode, []);
 
     return res.status(201).json({
       message: title + "a été créé ",

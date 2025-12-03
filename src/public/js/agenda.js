@@ -1045,14 +1045,17 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       const titleInput = document.getElementById("newCalendarTitle");
       const title = titleInput.value.trim();
+      const mode = document.getElementById("calendarType").value;
+
       if (!title) return showMessage("Veuillez saisir un titre", "error");
+      if (!mode) return showMessage("Veuillez sélectionner un type", "error");
 
       try {
         const res = await fetch("/user/calendar/create", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify({ title }),
+          body: JSON.stringify({ title, mode }),
         });
 
         const data = await res.json();
