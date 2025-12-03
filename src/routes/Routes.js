@@ -5,6 +5,7 @@ const userController = require("../controllers/userController");
 const appointmentController = require("../controllers/appointmentController");
 const calendarController = require("../controllers/calendarController");
 const importController = require("../controllers/importController");
+const deleteController = require("../controllers/deleteController");
 const auth = require("../middleware/auth");
 const multer = require("multer");
 const storage = multer.memoryStorage();
@@ -105,6 +106,19 @@ router.get("/search", auth, calendarController.searchUsers);
 router.post("/calendar/share", auth, calendarController.shareCalendar);
 //PARTAGE DE RDV
 router.post("/shareAppointment", auth, appointmentController.shareAppointment);
+
+
+//===================================================================================
+// GESTION CORBEILLE (SOFT DELETE)
+
+// Placer un élément (calendrier ou rdv) dans la corbeille
+router.post("/delete/:item_type/:id", auth, deleteController.softDelete);
+
+// Restaurer un élément de la corbeille
+router.post("/restore/:item_type/:id", auth, deleteController.restoreItem);
+
+// Récupérer le contenu de la corbeille
+router.get("/trash", auth, deleteController.getTrash);
 
 
 module.exports = router;

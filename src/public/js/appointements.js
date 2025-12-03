@@ -559,25 +559,26 @@ document.addEventListener("click", async (e) => {
     if (btnDelete) {
       const id_rdv = btnDelete.dataset.id;
       const confirmed = await showConfirm(
-        "Voulez-vous vraiment supprimer ce rendez-vous ?"
+        "Voulez-vous vraiment placer ce rendez-vous dans la corbeille ?"
       );
       if (!confirmed) return;
       try {
-        const res = await fetch(`http://localhost:3000/deletAppointment`, {
-          method: "DELETE",
+        const res = await fetch(`/delete/appointment/${id_rdv}`, {
+          method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ id_rdv }),
+          credentials: "include"
         });
+        
         if (!res.ok) {
-          showMessage("Erreur lors de la suppression", "error");
+          const errorData = await res.json();
+          showMessage(errorData.message || "Erreur lors de la suppression", "error");
           return;
         }
         // Met à jour la liste des événements côté frontend
         updateEventList({ type: "delete", eventData: { _id: id_rdv } });
         // Pour la suppression
         updateCalendar({ type: "delete", eventData: { _id: id_rdv } });
-        showMessage("Rendez-vous supprimé", "success");
+        showMessage("Rendez-vous placé dans la corbeille.", "success");
       } catch (err) {
         console.error(err);
         showMessage("Erreur lors de la suppression", "error");
@@ -646,21 +647,21 @@ document.addEventListener("deleteAppointmentFromPopup", async (e) => {
   const id_rdv = e.detail.id;
 
   const confirmed = await showConfirm(
-    "Voulez-vous vraiment supprimer ce rendez-vous ?"
+    "Voulez-vous vraiment placer ce rendez-vous dans la corbeille ?"
   );
   if (!confirmed) return;
 
   try {
-    const res = await fetch("/deletAppointment", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ id_rdv }),
+    const res = await fetch(`/delete/appointment/${id_rdv}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
     });
 
     if (!res.ok) {
-      showMessage("Erreur lors de la suppression", "error");
-      return;
+        const errorData = await res.json();
+        showMessage(errorData.message || "Erreur lors de la suppression", "error");
+        return;
     }
 
     updateEventList({
@@ -673,7 +674,7 @@ document.addEventListener("deleteAppointmentFromPopup", async (e) => {
       eventData: { _id: id_rdv },
     });
 
-    showMessage("Rendez-vous supprimé", "success");
+    showMessage("Rendez-vous placé dans la corbeille.", "success");
   } catch (err) {
     console.error(err);
     showMessage("Erreur lors de la suppression", "error");

@@ -97,21 +97,37 @@ exports.addAppointment = async function (calendarId, appointmentData) {
 };
 
 /**
- * Supprime un rendez-vous d'un calendrier.
- * */
-
-exports.deleteAppointment = async function (id_rdv) {
+ * Marque un rendez-vous comme inactif (suppression réversible).
+ */
+exports.softDeleteAppointment = async function (id_rdv) {
   const calendar = await Calendar.findOne({ "appointments._id": id_rdv });
   if (!calendar) return null;
 
-  const index = calendar.appointments.findIndex(
-    (a) => a._id.toString() === id_rdv
-  );
-  if (index === -1) return null;
+  const appointment = calendar.appointments.id(id_rdv);
+  if (!appointment) return null;
 
-  const removed = calendar.appointments.splice(index, 1)[0];
+  appointment.actif = false;
+  appointment.date_supp = new Date();
+
   await calendar.save();
-  return removed;
+  return appointment;
+};
+
+/**
+ * Restaure un rendez-vous qui était en corbeille.
+ */
+exports.restoreAppointment = async function (id_rdv) {
+    const calendar = await Calendar.findOne({ "appointments._id": id_rdv, "appointments.actif": false });
+    if (!calendar) return null;
+
+    const appointment = calendar.appointments.id(id_rdv);
+    if (!appointment) return null;
+
+    appointment.actif = true;
+    appointment.date_supp = null;
+
+    await calendar.save();
+    return appointment;
 };
 
 /**
@@ -148,8 +164,8 @@ exports.getUserAppointment = async function (idUser, idAppointement) {
 };
 
 exports.searchUserAppointments = async function (userId, name) {
-  // Chercher tous les calendriers du user
-  const calendars = await Calendar.find({ userId });
+  // Chercher tous les calendriers actifs du user
+  const calendars = await Calendar.find({ userId, actif: true });
 
   if (!calendars || calendars.length === 0) return [];
 
@@ -157,7 +173,8 @@ exports.searchUserAppointments = async function (userId, name) {
 
   calendars.forEach((calendar) => {
     calendar.appointments.forEach((app) => {
-      if (app.name && app.name.toLowerCase().includes(name.toLowerCase())) {
+      // On ne cherche que dans les rdv actifs
+      if (app.actif && app.name && app.name.toLowerCase().includes(name.toLowerCase())) {
         results.push({
           calendarId: calendar._id,
           calendarTitle: calendar.title,
@@ -187,16 +204,23 @@ exports.getCalendars = async function (ids) {
 };
 */
 exports.getCalendars = async function (ids, userId) {
-  // 1. Calendriers dont l'utilisateur est propriétaire
-  const ownedCalendars = await Calendar.find({ _id: { $in: ids } }).lean();
+  const objectIds = ids.map(id => new mongoose.Types.ObjectId(id));
+
+  // 1. Calendriers dont l'utilisateur est propriétaire et qui sont actifs
+  const ownedCalendars = await Calendar.find({ 
+    _id: { $in: objectIds },
+    userId: userId,
+    actif: true 
+  }).lean();
 
   // 2. IDs des calendriers partagés
   const sharedRows = await sharedCalendar.find({ userId }).lean();
   const sharedIds = sharedRows.map((s) => s.calendarId);
 
-  // 3. Récupérer les calendriers partagés QUI SONT dans ids
+  // 3. Récupérer les calendriers partagés QUI SONT dans ids et qui sont actifs
   const sharedCalendars = await Calendar.find({
     _id: { $in: sharedIds.filter((id) => ids.includes(id.toString())) },
+    actif: true
   }).lean();
 
   // 4. Fusionner les résultats (sans doublons)
@@ -224,14 +248,16 @@ exports.getProfilCal = async function (id_cal) {
  */
 
 exports.getUserCalendar = async function (calendarId, userId) {
-  let calendar = await Calendar.findOne({ _id: calendarId, userId });
+  let calendar = await Calendar.findOne({ _id: calendarId, userId, actif: true });
   if (calendar) return calendar;
+
   const isShared = await sharedCalendar.findOne({
     calendarId: calendarId,
     userId: userId,
   });
+
   if (isShared) {
-    return await Calendar.findById(calendarId);
+    return await Calendar.findOne({ _id: calendarId, actif: true });
   }
   return null;
 };
@@ -240,7 +266,7 @@ exports.getUserCalendar = async function (calendarId, userId) {
  * Renvoie le premier calendrier de user.
  */
 exports.getFirstCalendar = async function (userId) {
-  const calendar = await Calendar.findOne({ userId: userId });
+  const calendar = await Calendar.findOne({ userId: userId, actif: true });
   return calendar;
 };
 
@@ -261,20 +287,21 @@ exports.getFirstCalendar = async function (userId) {
 
 */
 exports.getAllCalendarsIdsTitles = async function (userId) {
-  const ownedCalendars = await Calendar.find({ userId })
+  const ownedCalendars = await Calendar.find({ userId, actif: true })
     .select("_id title color")
     .lean();
   const sharedIds = await sharedCalendar
     .find({ userId })
     .distinct("calendarId");
 
-  const sharedCalendars = await Calendar.find({
+  const sharedCalendarsInfo = await Calendar.find({
     _id: { $in: sharedIds },
+    actif: true
   })
     .select("_id title color")
     .lean();
 
-  const all = [...ownedCalendars, ...sharedCalendars];
+  const all = [...ownedCalendars, ...sharedCalendarsInfo];
 
   const map = new Map();
   all.forEach((cal) => map.set(cal._id.toString(), cal));
@@ -283,11 +310,11 @@ exports.getAllCalendarsIdsTitles = async function (userId) {
 };
 
 exports.getCalandar = async function (id_cal) {
-  return await Calendar.findById(id_cal);
+  return await Calendar.findOne({_id: id_cal, actif: true});
 };
 
 exports.getCalendarById = async function (calendarId) {
-  return await Calendar.findById(calendarId).populate("appointments");
+  return await Calendar.findOne({_id: calendarId, actif: true}).populate("appointments");
 };
 
 /**
@@ -332,15 +359,25 @@ exports.createCalendar = async function (
 };
 
 /**
- * Supprime un calendrier pour un utilisateur donné.
+ * Marque un calendrier comme inactif (suppression réversible).
  */
-exports.deleteCalendar = async function (userId, calendarId) {
-  const deletedCalendar = await Calendar.findOneAndDelete({
-    _id: calendarId,
-    userId: userId,
-  });
+exports.softDeleteCalendar = async function (userId, calendarId) {
+    return await Calendar.findOneAndUpdate(
+        { _id: calendarId, userId: userId },
+        { $set: { actif: false, date_supp: new Date() } },
+        { new: true }
+    );
+};
 
-  return deletedCalendar ? true : false;
+/**
+ * Restaure un calendrier qui était en corbeille.
+ */
+exports.restoreCalendar = async function (userId, calendarId) {
+    return await Calendar.findOneAndUpdate(
+        { _id: calendarId, userId: userId, actif: false },
+        { $set: { actif: true, date_supp: null } },
+        { new: true }
+    );
 };
 
 /**
@@ -405,8 +442,6 @@ exports.changePassword = async function (userId, currentPassword, newPassword) {
 
 /**
  * Supprime un utilisateur et tous ses calendriers associés.
- * @param {string} userId - L'ID de l'utilisateur à supprimer.
- * @returns {Promise<Object|null>} L'utilisateur supprimé.
  */
 exports.supprimerProfile = async function (userId) {
   
@@ -502,4 +537,62 @@ exports.addSharedAppointment = async function (email, appointmentData) {
   // sauvegarder
   const saved = await sharedCal.save();
   return saved;
+};
+
+
+//===================================================================================
+// GESTION DE LA CORBEILLE
+
+/**
+ * Récupère tous les éléments (calendriers et rdv) supprimés par un utilisateur
+ * il y a moins de 30 jours.
+ */
+exports.getTrash = async function (userId) {
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    // 1. Récupérer les calendriers inactifs
+    const deletedCalendars = await Calendar.find({
+        userId,
+        actif: false,
+        date_supp: { $gte: thirtyDaysAgo },
+    }).lean();
+
+    // 2. Récupérer les rendez-vous inactifs dans les calendriers actifs
+    const calendarsWithDeletedAppointments = await Calendar.find({
+        userId,
+        actif: true,
+        "appointments.actif": false,
+        "appointments.date_supp": { $gte: thirtyDaysAgo },
+    }).lean();
+
+    const deletedAppointments = calendarsWithDeletedAppointments.flatMap(cal =>
+        cal.appointments
+            .filter(app => !app.actif && new Date(app.date_supp) >= thirtyDaysAgo)
+            .map(app => ({ ...app, calendarTitle: cal.title, calendarId: cal._id }))
+    );
+
+    return {
+        calendars: deletedCalendars,
+        appointments: deletedAppointments,
+    };
+};
+
+/**
+ * Supprime définitivement les éléments en corbeille depuis plus de 30 jours.
+ * Ceci est destiné à être exécuté périodiquement (ex: via une tâche cron).
+ */
+exports.purgeOldItems = async function () {
+    const limitDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    // 1. Supprimer définitivement les vieux calendriers inactifs
+    await Calendar.deleteMany({
+        actif: false,
+        date_supp: { $lte: limitDate },
+    });
+
+    // 2. Supprimer définitivement les vieux rdv inactifs dans les calendriers actifs
+    await Calendar.updateMany(
+        { "appointments.actif": false, "appointments.date_supp": { $lte: limitDate } },
+        { $pull: { appointments: { actif: false, date_supp: { $lte: limitDate } } } }
+    );
 };

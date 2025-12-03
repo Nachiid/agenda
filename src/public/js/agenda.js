@@ -346,25 +346,25 @@ function createCalendarElement(cal, calendar) {
     e.stopPropagation();
     const calendarId = calDiv.dataset.id;
     const confirmed = await showConfirm(
-      `Voulez-vous vraiment supprimer ce calendrier ?`
+      `Voulez-vous vraiment placer ce calendrier dans la corbeille ?`
     );
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`/user/calendar/delete/${calendarId}`, {
-        method: "DELETE",
+      const res = await fetch(`/delete/calendar/${calendarId}`, {
+        method: "POST",
         credentials: "include",
       });
       const data = await res.json();
       if (!res.ok) {
-        showMessage(data.error, "error");
+        showMessage(data.message || "Erreur lors de la suppression.", "error");
         return;
       }
       calDiv.remove();
       renderCalendarListUI(calendarListDiv);
       removeCalendarEvents(calendarId, calendar);
 
-      showMessage(data.message, "success");
+      showMessage("Calendrier placé dans la corbeille.", "success");
       if (getActiveCalendarIdsLocal().length === 0) {
         const firstCalendarDiv = document.querySelector(".event-item2");
         if (firstCalendarDiv) {
