@@ -109,6 +109,7 @@ exports.softDeleteAppointment = async function (id_rdv) {
   appointment.actif = false;
   appointment.date_supp = new Date();
 
+  calendar.markModified('appointments');
   await calendar.save();
   return appointment;
 };
@@ -126,6 +127,7 @@ exports.restoreAppointment = async function (id_rdv) {
     appointment.actif = true;
     appointment.date_supp = null;
 
+    calendar.markModified('appointments');
     await calendar.save();
     return appointment;
 };
@@ -323,6 +325,7 @@ exports.getCalendarById = async function (calendarId) {
 exports.createCalendar = async function (
   userId,
   title,
+  mode,
   appointments = [],
   isShared = false
 ) {
@@ -352,6 +355,7 @@ exports.createCalendar = async function (
     title,
     color,
     userId,
+    mode,
     appointments,
     isShared,
   });
