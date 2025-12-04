@@ -60,11 +60,7 @@
         <div class="nav-links">
           <a href="agenda" class="nav-link active">Agenda</a>
           <a href="/profile" class="nav-link">Profil</a>
-          <!--=================================================corbeille -->
-          <button class="btn btn-secondary btn-full" id="btnTrash">
-            🗑️ Corbeille
-          </button>
-
+          <button class="nav-link" id="btnTrash">Corbeille</button>
           <button class="nav-link" onclick="logout()">Se déconnecter</button>
         </div>
       </div>
@@ -143,11 +139,15 @@
   </div>
   <!-- === POPUP corbeille === -->
   <div id="trashModal" class="modal hidden">
-    <div class="modal-content">
-      <h3>Éléments supprimés (moins de 30 jours)</h3>
-      <div id="trashContent"></div>
-
-      <button id="btnCloseTrash" class="btn-secondary">Fermer</button>
+    <div class="modal-content trash-modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Corbeille</h3>
+        <p class="modal-subtitle">Éléments supprimés récemment (30 jours max)</p>
+      </div>
+      <div id="trashContent" class="trash-list-container"></div>
+      <div class="modal-actions">
+        <button id="btnCloseTrash" class="btn btn-secondary">Fermer</button>
+      </div>
     </div>
   </div>
 

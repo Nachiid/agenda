@@ -228,7 +228,12 @@ exports.getCalendars = async function (ids, userId) {
 
   // suppression des doublons par _id
   const map = new Map();
-  all.forEach((cal) => map.set(cal._id.toString(), cal));
+  all.forEach((cal) => {
+    if (cal.appointments) {
+      cal.appointments = cal.appointments.filter(app => app.actif);
+    }
+    map.set(cal._id.toString(), cal);
+  });
 
   return Array.from(map.values());
 };
@@ -248,25 +253,33 @@ exports.getProfilCal = async function (id_cal) {
  */
 
 exports.getUserCalendar = async function (calendarId, userId) {
-  let calendar = await Calendar.findOne({ _id: calendarId, userId, actif: true });
-  if (calendar) return calendar;
+  let calendar = await Calendar.findOne({ _id: calendarId, userId, actif: true }).lean();
+  
+  if (!calendar) {
+    const isShared = await sharedCalendar.findOne({
+      calendarId: calendarId,
+      userId: userId,
+    });
 
-  const isShared = await sharedCalendar.findOne({
-    calendarId: calendarId,
-    userId: userId,
-  });
-
-  if (isShared) {
-    return await Calendar.findOne({ _id: calendarId, actif: true });
+    if (isShared) {
+      calendar = await Calendar.findOne({ _id: calendarId, actif: true }).lean();
+    }
   }
-  return null;
+
+  if (calendar && calendar.appointments) {
+    calendar.appointments = calendar.appointments.filter(app => app.actif);
+  }
+  return calendar || null;
 };
 
 /**
  * Renvoie le premier calendrier de user.
  */
 exports.getFirstCalendar = async function (userId) {
-  const calendar = await Calendar.findOne({ userId: userId, actif: true });
+  const calendar = await Calendar.findOne({ userId: userId, actif: true }).lean();
+  if (calendar && calendar.appointments) {
+    calendar.appointments = calendar.appointments.filter(app => app.actif);
+  }
   return calendar;
 };
 
@@ -314,7 +327,11 @@ exports.getCalandar = async function (id_cal) {
 };
 
 exports.getCalendarById = async function (calendarId) {
-  return await Calendar.findOne({_id: calendarId, actif: true}).populate("appointments");
+  const calendar = await Calendar.findOne({_id: calendarId, actif: true}).lean();
+  if (calendar && calendar.appointments) {
+    calendar.appointments = calendar.appointments.filter(app => app.actif);
+  }
+  return calendar;
 };
 
 /**

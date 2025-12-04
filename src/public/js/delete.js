@@ -33,11 +33,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 const result = await response.json();
 
                 if (response.ok) {
-                    alert(result.message);
                     // Recharge le contenu de la corbeille pour refléter la suppression
                     loadTrashContent();
-                    // On pourrait aussi vouloir rafraîchir la vue principale (liste des calendriers, etc.)
-                    // window.location.reload(); // Solution simple mais un peu brutale
+                    // Rafraîchir la vue principale sans recharger la page
+                    if (window.refreshCalendarViewGlobal) {
+                        await window.refreshCalendarViewGlobal();
+                    }
                 } else {
                     throw new Error(result.message || "Erreur lors de la restauration.");
                 }
