@@ -1,4 +1,5 @@
 let calendar; // variable globale
+window.calendar = calendar;
 /**
  * Met à jour le data-attribute avec la liste d'IDs
  */
@@ -264,7 +265,6 @@ function createCalendarElement(cal, calendar) {
 
   const editBtn = document.createElement("button");
   const shareBtn = document.createElement("button");
-  console.log(" cale role : " + cal.role);
   if (cal.role === "Owner" || cal.role === "Editor") {
     // Bouton modifier
 
@@ -401,6 +401,8 @@ function openEventDetailsPopup(event, mode) {
       calendar_id: event.extendedProps.calendarId,
       role: event.extendedProps.event_role,
     };
+
+    //renderCalendarField("edit");
     // Cacher les boutons si rôle Viewer
     if (rdv.role === "Viewer") {
       editBtn.style.display = "none";
@@ -410,9 +412,8 @@ function openEventDetailsPopup(event, mode) {
       deleteBtn.style.display = "inline-block";
     }
     const popup = document.getElementById("eventDetailsModal");
-    renderCalendarField("edit", rdv.calendar_id);
     popup.classList.remove("hidden");
-
+    renderCalendarField("edit", rdv.calendar_id);
     popup.querySelector(".details-title").textContent = rdv.name;
     popup.querySelector(".details-description").textContent =
       rdv.description || "Aucune description";
@@ -495,9 +496,6 @@ function openEventDetailsPopup(event, mode) {
         .getElementById("shareAppointmentModal")
         .classList.remove("hidden");
     });
-    // ==========================
-    // ==========================
-    // ==========================
     // ==========================
   } else if (mode === "add") {
     const eventModal = document.getElementById("eventModal");
@@ -988,8 +986,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       const newTitle = document.getElementById("calendarTitle").value.trim();
 
-      //modif le bouton s'affiche que si 1 seul calendrier est actif a faire apres
-      //maj le bouton modif est supprimer ! mais faut adapter pour que modifier dans menu fonctionne
       const calendarId =
         calendarForm.dataset.editingId || getActiveCalendarIdsLocal()[0];
 

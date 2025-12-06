@@ -48,15 +48,14 @@ exports.deletAppointment = async (req, res) => {
   try {
     const { id_rdv } = req.body;
     const userID = req.user.id;
-    const cldr = await model.getUserAppointment(userID, id_rdv);
-    const rdv = await model.deleteAppointment(id_rdv);
+    const rdv = await model.deleteAppointment(id_rdv, userID);
+
     if (!rdv) {
-      return res.status(404).json({ error: "RDV pas trouvé" });
-    } else if (!cldr) {
-      return res
-        .status(500)
-        .json({ error: "RDV n'appartient pas a ce utilisateur " });
+      return res.status(404).json({
+        error: "Vous n'avez pas le droit de supprimer ce rendez-vous",
+      });
     }
+
     return res.status(200).json({ rdv });
   } catch (error) {
     return res.status(500).json({ error });
@@ -65,24 +64,25 @@ exports.deletAppointment = async (req, res) => {
 
 exports.updateAppointment = async (req, res) => {
   try {
-    const { id_rdv, name, date_debut, date_fin, description } = req.body;
+    const { id_rdv, name, date_debut, date_fin, description, calendarId } = req.body;
     const userID = req.user.id;
-    const cldr = await model.getUserAppointment(userID, id_rdv);
     if (!id_rdv) {
-      return res.status(400).json({ error: "L'ID du RDV est requis" });
-    } else if (!cldr) {
-      return res
-        .status(500)
-        .json({ error: "RDV n'appartient pas a ce utilisateur " });
+      return res.status(400).json({ error: "L'id du rendez-vous est requis" });
     }
-    const updatedRdv = await model.updateAppointment(id_rdv, {
-      name,
-      date_debut,
-      date_fin,
-      description,
-    });
+    const updatedRdv = await model.updateAppointment(
+      id_rdv,
+      {
+        name,
+        date_debut,
+        date_fin,
+        description,
+      },
+      userID,
+      calendarId
+    );
+    
     if (!updatedRdv) {
-      return res.status(404).json({ error: "RDV pas trouvé" });
+      return res.status(404).json({ error: "Vous avez pas le droit à effectuer cette action" });
     }
     return res
       .status(200)
@@ -115,7 +115,6 @@ exports.getAppointments = async (req, res) => {
       })
       .filter((a) => new Date(a.date_debut) >= now) // rdv futurs
       .sort((a, b) => new Date(a.date_debut) - new Date(b.date_debut));
-      
 
     const first = allAppointments.slice(0, 10);
 
@@ -149,7 +148,7 @@ exports.searchAppointment = async (req, res) => {
 exports.shareAppointment = async (req, res) => {
   try {
     const { email, appointment } = req.body;
-    
+
     if (!email || !appointment) {
       return res.status(400).json({ error: "Données manquantes." });
     }
@@ -157,9 +156,8 @@ exports.shareAppointment = async (req, res) => {
     // Appel du modèle (logique dans model.js)
     const updatedCalendar = await model.addSharedAppointment(
       email,
-      appointment,
+      appointment
     );
-
 
     return res.json({
       success: true,

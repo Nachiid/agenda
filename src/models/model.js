@@ -99,18 +99,40 @@ exports.addAppointment = async function (calendarId, appointmentData) {
 /**
  * Supprime un rendez-vous d'un calendrier.
  * */
-
-exports.deleteAppointment = async function (id_rdv) {
+exports.deleteAppointment = async function (id_rdv, userId) {
+  // Récupération du calendrier contenant le rendez-vous
   const calendar = await Calendar.findOne({ "appointments._id": id_rdv });
-  if (!calendar) return null;
+  if (!calendar) return false;
 
+  // Vérifier si l'utilisateur est propriétaire
+  const isOwner = calendar.userId.toString() === userId.toString();
+  let isEditor = false;
+
+  // Si pas propriétaire : vérifier dans SharedCalendar
+  if (!isOwner) {
+    const shared = await sharedCalendar.findOne({
+      calendarId: calendar._id,
+      userId: userId,
+      role: "Editor",
+    });
+
+    if (shared) isEditor = true;
+
+    // Si ni owner ni Editor
+    if (!isEditor) return false;
+  }
+
+  // Localisation du rendez-vous
   const index = calendar.appointments.findIndex(
     (a) => a._id.toString() === id_rdv
   );
-  if (index === -1) return null;
 
+  if (index === -1) return false;
+
+  // Suppression du rendez-vous
   const removed = calendar.appointments.splice(index, 1)[0];
   await calendar.save();
+
   return removed;
 };
 
@@ -118,24 +140,50 @@ exports.deleteAppointment = async function (id_rdv) {
  * Met à jour un rendez-vous existant dans un calendrier.
  * Modifie les champs titre, dates et description si présents dans les données fournies.
  */
-exports.updateAppointment = async function (id_rdv, data) {
-  const calendar = await Calendar.findOne({ "appointments._id": id_rdv });
-  if (!calendar) return null;
+exports.updateAppointment = async function (id_rdv, data, userId, calendarId) {
+  // Vérifier d'abord si ce calendrier existe
+  const calendar = await Calendar.findById(calendarId);
+  if (!calendar) {
+    return false;
+  }
+  // Vérifier si l'utilisateur est propriétaire
+  const isOwner = calendar.userId.toString() === userId.toString();
 
+  let isEditor = false;
+
+  // Si pas propriétaire vérifier le rôle dans SharedCalendar
+  if (!isOwner) {
+    const shared = await sharedCalendar.findOne({
+      calendarId: calendarId,
+      userId: userId,
+      role: "Editor",
+    });
+
+    if (shared) isEditor = true;
+
+    // Si ni Owner ni Editor → accès refusé
+    if (!isEditor) return false;
+  }
+
+  // Localiser le rendez-vous dans le calendrier
   const index = calendar.appointments.findIndex(
     (a) => a._id.toString() === id_rdv
   );
-  if (index === -1) return null;
+  if (index === -1) return false;
 
   const rdv = calendar.appointments[index];
+
+  // Mise à jour des champs modifiés
   if (data.name !== undefined) rdv.name = data.name;
   if (data.date_debut !== undefined) rdv.date_debut = new Date(data.date_debut);
   if (data.date_fin !== undefined) rdv.date_fin = new Date(data.date_fin);
   if (data.description !== undefined) rdv.description = data.description;
 
+  // Sauvegarde
   await calendar.save();
   return rdv;
 };
+
 /**
  * vérifier si le rdv appartien a un utilisateur donneé
  */
@@ -171,35 +219,20 @@ exports.searchUserAppointments = async function (userId, name) {
 };
 
 // plusieur calandars
-
-/**
- * 
- * 
- * 
-
-              changelent de getCalendars 
-
-
- */
-/*
-exports.getCalendars = async function (ids) {
-  return await Calendar.find({ _id: { $in: ids } }).lean();
-};
-*/
 exports.getCalendars = async function (ids, userId) {
-  // 1. Calendriers dont l'utilisateur est propriétaire
+  // Calendriers dont l'utilisateur est propriétaire
   const ownedCalendars = await Calendar.find({ _id: { $in: ids } }).lean();
 
-  // 2. IDs des calendriers partagés
+  // IDs des calendriers partagés
   const sharedRows = await sharedCalendar.find({ userId }).lean();
   const sharedIds = sharedRows.map((s) => s.calendarId);
 
-  // 3. Récupérer les calendriers partagés QUI SONT dans ids
+  // Récupérer les calendriers partagés QUI SONT dans ids
   const sharedCalendars = await Calendar.find({
     _id: { $in: sharedIds.filter((id) => ids.includes(id.toString())) },
   }).lean();
 
-  // 4. Fusionner les résultats (sans doublons)
+  // Fusionner les résultats (sans doublons)
   const all = [...ownedCalendars, ...sharedCalendars];
 
   // suppression des doublons par _id
@@ -259,19 +292,6 @@ exports.getFirstCalendar = async function (userId) {
 /**
  * Renvoie les id, titres et couleurs de tous les calendriers d'un utilisateur
  */
-/*=========================================================================================changement dans 
-
-
-
-
-
-            changement dans getAllCalendarsIdsTitles : on affiche les calidriers crées et partagés 
-
-
-
-
-
-*/
 exports.getAllCalendarsIdsTitles = async function (userId, actif = true) {
   if (actif) {
     //  Calendriers possédés actifs
@@ -377,14 +397,6 @@ exports.createCalendar = async function (
 /**
  * Supprime un calendrier pour un utilisateur donné.
  */
-exports.deleteCalendar = async function (userId, calendarId) {
-  const deletedCalendar = await Calendar.findOneAndDelete({
-    _id: calendarId,
-    userId: userId,
-  });
-
-  return deletedCalendar ? true : false;
-};
 
 exports.deleteCalendar = async function (userId, calendarId) {
   // Vérifier si le user est propriétaire
