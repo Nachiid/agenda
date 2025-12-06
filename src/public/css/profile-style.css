@@ -1,7 +1,74 @@
+:root {
+  /* Dégradés */
+  --gradient-theme-start: #667ce7;
+  --gradient-theme-end: #6f60bf;
+
+  --profil-background: #000000;
+  --profil-input: #6b7280;
+  --profil-text-input: red;
+
+
+
+
+
+
+  /*Pallete des couleurs */
+  /* Blancs et nuances */
+  --white: #ffffff;
+  --white-85: rgba(255, 255, 255, 0.85);
+  --white-15: rgba(255, 255, 255, 0.15);
+  --white-12: rgba(255, 255, 255, 0.12);
+  --white-20: rgba(255, 255, 255, 0.2);
+
+  /* Gris */
+  --gray-light: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --gray-bg: #f9fafb;
+  --gray-border: #d1d5db;
+
+  /* Violet / bleu foncé */
+  --purple: #4f46e5;
+  --purple-hover: #3730a3;
+  --purple-light: rgba(79, 70, 229, 0.35);
+
+  /* Rouge */
+  --red: #d64545;
+  --red-hover: #f87171;
+
+  /* Autres */
+  --toggle-bg: #ccc;
+}
+
+
+
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+  color: #1f2937;
+  background: linear-gradient(135deg, var(--gradient-theme-start ) 0%, var(--gradient-theme-end) 100%);
+  min-height: 100vh;
+}
+
+
+
+
+/*style pro */
 body {
   min-width: 330px;
   overflow-x: auto;
 }
+
+
 
 /* ====== NAVBAR ====== */
 /* Wrapper qui empêche de voir le contenu derrière */
@@ -11,18 +78,22 @@ body {
   left: 0;
   width: 100%;
   height: 5rem; /* ajuster selon la hauteur de la navbar */
-  background: linear-gradient(to right, #667ce7 0%, #6f60bf 100%);
-  z-index: 999; /* en dessous de la navbar elle-même */
+  background: linear-gradient(
+    to right,
+    var(--gradient-theme-start) 0%,
+    var(--gradient-theme-end) 100%
+  );
+  z-index: 999;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 1.1rem;
 }
 
 .navbar {
   position: fixed;
-  top: 1.3rem; 
+  top: 1.3rem;
   left: 50%;
   transform: translateX(-50%);
-  width: calc(100% - 2rem); 
+  width: calc(100% - 2rem);
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -62,14 +133,6 @@ body {
   color: white;
 }
 
-.aside-toggle {
-  background: transparent;
-  border: none;
-  font-size: 1.2rem;
-  color: white;
-  cursor: pointer;
-}
-
 /* ===== ZONE DROITE ===== */
 .nav-links {
   display: flex;
@@ -99,8 +162,6 @@ body {
   background: rgba(79, 70, 229, 0.35);
 }
 
-
-
 /* PROFILE CONTAINER */
 .profile-container {
   width: 100%;
@@ -112,7 +173,7 @@ body {
 
 /* PROFILE HEADER */
 .profile-header {
-  background: white;
+  background: var(--profil-background);
   border-radius: 1rem;
   padding: 2rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -131,7 +192,12 @@ body {
   width: 90px;
   height: 90px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(
+    to right,
+    var(--gradient-theme-start) 0%,
+    var(--gradient-theme-end) 100%
+  );
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -165,7 +231,7 @@ body {
 }
 
 .profile-section {
-  background: white;
+  background: var(--profil-background);
   border-radius: 1rem;
   padding: 2rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -200,7 +266,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background: #f9fafb;
+  background: var(--profil-input);
   border-radius: 0.5rem;
   flex-wrap: wrap;
 }
@@ -246,7 +312,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: var(--profil-background);
   transition: 0.4s;
   border-radius: 26px;
 }
@@ -258,7 +324,7 @@ body {
   width: 20px;
   left: 3px;
   bottom: 3px;
-  background-color: white;
+  background:var(--profil-background);
   transition: 0.4s;
   border-radius: 50%;
 }
@@ -270,7 +336,6 @@ body {
 .toggle-switch input:checked + .toggle-slider:before {
   transform: translateX(24px);
 }
-
 
 /* MODAL - overlay et centrage */
 .modal {
@@ -331,13 +396,25 @@ body {
 .profile-form input {
   padding: 0.55rem 0.75rem;
   border: 1px solid #d1d5db;
+  background-color: var( --profil-input);
   border-radius: 6px;
   font-size: 0.95rem;
-  color: #111827;
+  color: var( --profil-text-input);
   outline: none;
   transition: 0.2s;
 }
 
+
+.form-input{
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #d1d5db;
+  background-color: var( --profil-input);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: var( --profil-text-input);
+  outline: none;
+  transition: 0.2s;
+}
 .profile-form input:focus {
   border-color: #4f46e5;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
@@ -356,11 +433,11 @@ body {
   justify-content: space-between;
   gap: 0.5rem;
   margin-top: 1rem;
-  flex-wrap: wrap; /* responsive */
+  flex-wrap: wrap;
 }
 
 .form-actions .btn {
-  flex: 1 1 48%; /* deux boutons sur une ligne, responsive */
+  flex: 1 1 48%;
   padding: 0.6rem 1rem;
   font-size: 0.95rem;
   border-radius: 6px;
@@ -368,26 +445,6 @@ body {
   cursor: pointer;
   transition: 0.3s;
 }
-
-.btn-primary {
-  background-color: #4f46e5;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #3730a3;
-}
-
-.btn-secondary {
-  background-color: #e5e7eb;
-  color: #111827;
-}
-
-.btn-secondary:hover {
-  background-color: #d1d5db;
-}
-
-
 
 
 /* MODAL DELETE ACCOUNT */
@@ -470,8 +527,6 @@ body {
   background-color: #f87171;
 }
 
-
-
 /* Conteneur flex pour les boutons de sécurité */
 .profile-section .btn-container {
   display: flex;
@@ -510,7 +565,6 @@ body {
   transform: translateY(0);
   box-shadow: none;
 }
-
 
 /* RESPONSIVE */
 @media (max-width: 480px) {
@@ -700,6 +754,3 @@ body {
     box-sizing: border-box;
   }
 }
-
-
-
