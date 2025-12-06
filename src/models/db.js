@@ -56,7 +56,7 @@ const sharedCalendarSchema = new mongoose.Schema({
     required: true,
   },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  role: { type: String, enum: ["editor", "viewer"], default: "viewer" },
+  role: { type: String, enum: ["Editor", "Viewer"], default: "Viewer" },
 });
 
 // Création des modèles

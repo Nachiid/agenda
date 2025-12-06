@@ -153,15 +153,13 @@
             </button>
           </div>
           <h3 class="sidebar-title calendar-mode">Mes calendrier Personnel</h3>
-          <div class="calendar-list" id="calendar-list">
-          </div>
+          <div class="calendar-list" id="calendar-list"></div>
 
           <div
             class="calendar-list-entrep"
             id="calendar-list-entrep"
             style="display: none"
-          >
-          </div>
+          ></div>
         </div>
       </aside>
 
@@ -311,13 +309,15 @@
               id="calendarFieldContainer"
             ></div>
           </div>
+
+          <!--
           <div class="form-group">
             <button type="button" id="toggleRecurrent" class="btn">
               Récurrent ?
             </button>
           </div>
 
-          <div id="recurrentOptions" style="display: none; margin-top: 10px">
+           <div id="recurrentOptions" style="display: none; margin-top: 10px">
             <div class="form-group">
               <label for="recurrenceType">Type de récurrence</label>
               <select id="recurrenceType" required>
@@ -334,7 +334,7 @@
               <input type="date" id="recurrenceEnd" />
             </div>
           </div>
-
+        -->
           <div class="modal-actions">
             <button type="button" class="btn btn-secondary" id="btnCancel">
               Annuler
@@ -354,7 +354,8 @@
 
         <div class="btn-row">
           <button class="btn-edit detail-edit">Modifier</button>
-          <button class="btn-delete delete-edit" data-id="evt123">Supprimer</button>
+          <button class="btn-delete delete-edit" data-id="">Supprimer</button>
+          <button class="btn-share" data-id="">Partager</button>
         </div>
         <button class="btn-close">Fermer</button>
       </div>

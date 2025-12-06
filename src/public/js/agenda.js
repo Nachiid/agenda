@@ -149,6 +149,7 @@ function createCalendarElement(cal, calendar) {
   calDiv.classList.add("event-item2");
   calDiv.dataset.id = cal._id;
   calDiv.dataset.mode = cal.mode;
+  calDiv.dataset.role = cal.role;
 
   // Partie gauche
   const leftDiv = document.createElement("div");
@@ -261,9 +262,9 @@ function createCalendarElement(cal, calendar) {
   const menu = document.createElement("div");
   menu.classList.add("menu", "hidden");
 
-  console.log(cal);
   const editBtn = document.createElement("button");
   const shareBtn = document.createElement("button");
+  console.log(" cale role : " + cal.role);
   if (cal.role === "Owner" || cal.role === "Editor") {
     // Bouton modifier
 
@@ -273,15 +274,12 @@ function createCalendarElement(cal, calendar) {
     menu.appendChild(editBtn);
 
     // Bouton partager
-
     shareBtn.classList.add("menu-share-cal");
     shareBtn.dataset.id = cal._id;
     shareBtn.innerHTML = `<i class="fas fa-share-alt"></i> Partager`;
     menu.appendChild(shareBtn);
 
     shareBtn.addEventListener("click", () => {
-      console.log(cal.mode);
-
       openSharePopup(cal._id, cal.mode);
     });
   }
@@ -403,13 +401,12 @@ function openEventDetailsPopup(event, mode) {
       calendar_id: event.extendedProps.calendarId,
       role: event.extendedProps.event_role,
     };
-  console.log("mode ", rdv.role);
     // Cacher les boutons si rôle Viewer
     if (rdv.role === "Viewer") {
       editBtn.style.display = "none";
       deleteBtn.style.display = "none";
     } else {
-      editBtn.style.display = "inline-block"; // ou "block" selon ton style
+      editBtn.style.display = "inline-block";
       deleteBtn.style.display = "inline-block";
     }
     const popup = document.getElementById("eventDetailsModal");
@@ -466,16 +463,14 @@ function openEventDetailsPopup(event, mode) {
         .slice(0, 5);
     };
 
-    // ==========================
-    // ==========================
-    // ==========================
-    // ==========================
-    // ==========================
+    const btnShare = popup.querySelector(".btn-share");
+    btnShare.dataset.id = rdv._id;
+
     document.addEventListener("click", async (e) => {
-      const btnShare = e.target.closest(".menu-share");
-      console.log(e.target.closest);
+      const btnShare = e.target.closest(".btn-share");
 
       if (!btnShare) return;
+
 
       document.getElementById("shareAppointmentModal").dataset.id = rdv._id;
 
@@ -564,8 +559,6 @@ function updateCalendar({ type, eventData }) {
         description: eventData.description,
         event_role: "Editor",
       });
-
-      console.log(calendar.event - role);
 
       break;
   }
@@ -749,8 +742,8 @@ document.addEventListener("DOMContentLoaded", async function () {
           59
         );
 
-        console.log("Start Of Day :", startOfDay);
-        console.log("End Of Day   :", endOfDay);
+        //console.log("Start Of Day :", startOfDay);
+        //console.log("End Of Day   :", endOfDay);
         openEventDetailsPopup(
           {
             start: info.start,
@@ -1080,7 +1073,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (!calendarListDiv) return;
 
         const cal = data.calendar;
-
+        cal.role = "Owner";
         // --- Création du nouvel élément calendrier ---
         createCalendarElement(cal, calendar);
 
@@ -1185,8 +1178,8 @@ function openSharePopup(calendarId, mode) {
     const roleSelect = document.createElement("select");
     roleSelect.id = "shareRoleSelect";
     roleSelect.innerHTML = `
-      <option value="viewer">Viewer</option>
-      <option value="editor">Editor</option>
+      <option value="Viewer">Viewer</option>
+      <option value="Editor">Editor</option>
     `;
     modalContent.insertBefore(
       roleSelect,
@@ -1273,7 +1266,6 @@ document
       role = shareRoleSelect.value;
     }
 
-    console.log(role);
     const calendarId =
       document.getElementById("shareCalendarModal").dataset.calendarId;
 
