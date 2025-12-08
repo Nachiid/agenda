@@ -21,6 +21,8 @@ function getActiveCalendarIdsLocal() {
   }
 }
 window.getActiveCalendarIdsLocal = getActiveCalendarIdsLocal;
+
+
 /**
  * Ajoute un ID à la liste des calendriers actifs
  */
@@ -328,18 +330,22 @@ function createCalendarElement(cal, calendar) {
     e.stopPropagation();
     const calendarId = calDiv.dataset.id;
     const confirmed = await showConfirm(
-      `Voulez-vous vraiment supprimer ce calendrier ?`
+      `Voulez-vous vraiment placer ce calendrier dans la corbeille ?`
     );
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`/user/calendar/delete/${calendarId}`, {
-        method: "DELETE",
+      const res = await fetch(`/delete/calendar/${calendarId}`, {
+        method: "POST",
         credentials: "include",
       });
       const data = await res.json();
       if (!res.ok) {
-        showMessage(data.error, "error");
+        let errorMessage = data.message || "Erreur lors de la suppression.";
+        if (data.error) {
+            errorMessage += `: ${data.error}`;
+        }
+        showMessage(errorMessage, "error");
         return;
       }
       calDiv.remove();
@@ -351,7 +357,7 @@ function createCalendarElement(cal, calendar) {
 
       removeCalendarEvents(calendarId, calendar);
 
-      showMessage(data.message, "success");
+      showMessage("Calendrier placé dans la corbeille.", "success");
       if (getActiveCalendarIdsLocal().length === 0) {
         const firstCalendarDiv = document.querySelector(".event-item2");
         if (firstCalendarDiv) {
@@ -367,6 +373,7 @@ function createCalendarElement(cal, calendar) {
   calendarListDiv.appendChild(calDiv);
 }
 
+window.createCalendarElement = createCalendarElement;
 /**
  * Met à jour les cases à cocher des calendriers
  * en fonction des IDs stockés dans le localStorage
@@ -1048,6 +1055,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const title = titleInput.value.trim();
 
       if (!title) return showMessage("Veuillez saisir un titre", "error");
+      if (!mode) return showMessage("Veuillez sélectionner un type", "error");
 
       try {
         const res = await fetch("/user/calendar/create", {

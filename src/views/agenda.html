@@ -1,410 +1,322 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mon Agenda - Tableau de bord</title>
-    <link rel="stylesheet" href="css/agenda-style.css" />
-    <link rel="stylesheet" href="css/global-style.css" />
 
-    <!-- Font Awesome Free -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    />
-    <!-- Tippy.js CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mon Agenda - Tableau de bord</title>
+  <link rel="stylesheet" href="css/agenda-style.css" />
+  <link rel="stylesheet" href="css/global-style.css" />
 
-    <!-- Tippy.js JS -->
-    <script src="https://unpkg.com/@popperjs/core@2"></script>
-    <script src="https://unpkg.com/tippy.js@6"></script>
-    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+  <!-- Font Awesome Free -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Tippy.js CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
 
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.js"></script>
-  </head>
+  <!-- Tippy.js JS -->
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+  <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
 
-  <body class="dashboard-body">
-    <!-- Navigation -->
-    <div class="navbar-wrapper">
-      <nav class="navbar">
-        <div class="nav-content">
-          <!-- Zone gauche : logo + bouton -->
-          <div class="left-area">
-            <button class="aside-toggle">??</button>
-            <div class="logo">
-              <svg
-                width="40"
-                height="40"
-                viewBox="0 0 40 40"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect width="40" height="40" rx="8" fill="#4F46E5" />
-                <path
-                  d="M12 10H28C29.1046 10 30 10.8954 30 12V28C30 29.1046 29.1046 30 28 30H12C10.8954 30 10 29.1046 10 28V12C10 10.8954 10.8954 10 12 10Z"
-                  stroke="white"
-                  stroke-width="2"
-                />
-                <line
-                  x1="10"
-                  y1="16"
-                  x2="30"
-                  y2="16"
-                  stroke="white"
-                  stroke-width="2"
-                />
-                <line
-                  x1="16"
-                  y1="8"
-                  x2="16"
-                  y2="12"
-                  stroke="white"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                />
-                <line
-                  x1="24"
-                  y1="8"
-                  x2="24"
-                  y2="12"
-                  stroke="white"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                />
-              </svg>
-              <span class="logo-text">Mon Agenda</span>
-            </div>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.js"></script>
+</head>
+
+<body class="dashboard-body">
+  <!-- Navigation -->
+  <div class="navbar-wrapper">
+    <nav class="navbar">
+      <div class="nav-content">
+        <!-- Zone gauche : logo + bouton -->
+        <div class="left-area">
+          <button class="aside-toggle">??</button>
+          <div class="logo">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="40" height="40" rx="8" fill="#4F46E5" />
+              <path
+                d="M12 10H28C29.1046 10 30 10.8954 30 12V28C30 29.1046 29.1046 30 28 30H12C10.8954 30 10 29.1046 10 28V12C10 10.8954 10.8954 10 12 10Z"
+                stroke="white" stroke-width="2" />
+              <line x1="10" y1="16" x2="30" y2="16" stroke="white" stroke-width="2" />
+              <line x1="16" y1="8" x2="16" y2="12" stroke="white" stroke-width="2" stroke-linecap="round" />
+              <line x1="24" y1="8" x2="24" y2="12" stroke="white" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <span class="logo-text">Mon Agenda</span>
           </div>
+        </div>
 
-          <!-- Zone centrale : recherche -->
-          <div class="nav-search-area">
-            <div id="appointments_search" class="form">
-              <div class="search-wrapper">
-                <div class="search-container">
-                  <i class="fas fa-search search-icon"></i>
-                  <input
-                    type="text"
-                    id="appointments_name"
-                    placeholder="Rechercher un RDV"
-                    required
-                  />
-                </div>
-                <ul id="appointments_results" class="suggestions-list"></ul>
+        <!-- Zone centrale : recherche -->
+        <div class="nav-search-area">
+          <div id="appointments_search" class="form">
+            <div class="search-wrapper">
+              <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="appointments_name" placeholder="Rechercher un RDV" required />
               </div>
+              <ul id="appointments_results" class="suggestions-list"></ul>
             </div>
           </div>
+        </div>
 
-          <!-- Zone droite : liens -->
-          <div class="nav-links">
-            <a href="agenda" class="nav-link active">Agenda</a>
-            <a href="/profile" class="nav-link">Profil</a>
-            <button class="nav-link" onclick="logout()">Se déconnecter</button>
+        <!-- Zone droite : liens -->
+        <div class="nav-links">
+          <a href="agenda" class="nav-link active">Agenda</a>
+          <button class="nav-link" id="btnTrash">Corbeille</button>
+
+          <a href="/profile" class="nav-link">Profil</a>
+          <button class="nav-link" onclick="logout()">Se déconnecter</button>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="dashboard-container">
+    <!-- Sidebar à gauche -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="create-wrapper">
+          <button class="btn btn-primary btn-full create-main-btn" id="btnCreateMenu">
+            Créer ?
+          </button>
+
+          <div class="create-dropdown hidden" id="createDropdown">
+            <button class="dropdown-item" id="btnNewEvent">
+              Créer un événement
+            </button>
+            <button class="dropdown-item" id="btnNewCalendar">
+              Créer un calendrier
+            </button>
+
+            <button class="dropdown-item btn btn-primary btn-full import" id="btnImporter">
+              Importer un calendrier
+            </button>
           </div>
         </div>
-      </nav>
-    </div>
+      </div>
 
-    <!-- Contenu principal -->
-    <div class="dashboard-container">
-      <!-- Sidebar à gauche -->
-      <aside class="sidebar">
+      <div class="sidebar-section" id="evenement_a_venir">
+        <h3 class="sidebar-title">Événements à venir</h3>
+        <div id="upcomingEvents" class="upcoming-events"></div>
+      </div>
+
+      <!-- Liste des calendriers -->
+      <div class="sidebar-section calendars-list">
         <div class="sidebar-section">
-          <div class="create-wrapper">
-            <button
-              class="btn btn-primary btn-full create-main-btn"
-              id="btnCreateMenu"
-            >
-              Créer ?
-            </button>
+          <div class="tri-toggle" id="triToggle" data-state="0">
+            <div class="toggle-knob"></div>
+          </div>
+          <span id="toggleLabel"></span>
 
-            <div class="create-dropdown hidden" id="createDropdown">
-              <button class="dropdown-item" id="btnNewEvent">
-                Créer un événement
-              </button>
-              <button class="dropdown-item" id="btnNewCalendar">
-                Créer un calendrier
-              </button>
+          <button class="btn btn-primary btn-full hidden" id="btnModCalendar">
+            Modifier Calendrier
+          </button>
+        </div>
+        <h3 class="sidebar-title calendar-mode">Mes calendrier Personnel</h3>
+        <div class="calendar-list" id="calendar-list"></div>
 
-              <button
-                class="dropdown-item btn btn-primary btn-full import"
-                id="btnImporter"
-              >
-                Importer un calendrier
-              </button>
-            </div>
+        <div class="calendar-list-entrep" id="calendar-list-entrep" style="display: none"></div>
+      </div>
+    </aside>
+
+    <!-- Zone principale (calendrier à droite) -->
+    <main class="main-content">
+      <div class="calendar-header">
+        <h1 class="calendar-title hidden"></h1>
+      </div>
+      <div id="calendar-wrapper">
+        <div id="calendar"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- === POPUP NOUVEL CALENDRIER === -->
+  <div id="calendarModal" class="modal hidden">
+    <div class="modal-content">
+      <h2 class="modal-title">Modifier le calendrier</h2>
+      <form id="calendarForm" class="event-form">
+        <div class="form-group">
+          <label for="calendarTitle">Nom du calendrier</label>
+          <input type="text" id="calendarTitle" placeholder="Ex : Travail, Famille..." required />
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary">Modifier</button>
+          <button type="button" class="btn btn-secondary" id="btnCancelCalendar">
+            Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- === POPUP NOUVEAU CALENDRIER === -->
+  <div id="newCalendarModal" class="modal hidden">
+    <div class="modal-content">
+      <h2 class="modal-title">Créer un nouveau calendrier</h2>
+      <form id="newCalendarForm" class="event-form">
+        <div class="form-group">
+          <label for="newCalendarTitle">Nom du calendrier</label>
+          <input type="text" id="newCalendarTitle" placeholder="Ex : Projets, Loisirs..." required />
+        </div>
+        <div class="form-group">
+          <label for="calendarType">Type</label>
+          <select id="calendarType" required>
+            <option value="">-- Sélectionner --</option>
+            <option value="personnel" selected>Personnel</option>
+            <option value="entreprise">Professionnel</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary">Créer</button>
+          <button type="button" class="btn btn-secondary" id="btnCancelNewCalendar">
+            Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="importModal" class="modal hidden">
+    <div class="modal-content">
+      <h2 class="modal-title">Importer un calendrier</h2>
+      <form id="importForm" class="event-form">
+        <div class="form-group">
+          <label for="importFile">Fichier de calendrier (.ics)</label>
+          <input type="file" id="importFile" accept=".ics" required />
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary">Importer</button>
+          <button type="button" class="btn btn-secondary" id="btnCancelImport">
+            Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- === POPUP NOUVEL ÉVÉNEMENT === -->
+  <div id="eventModal" class="modal hidden">
+    <div class="modal-content">
+      <h2 class="modal-title">Créer un nouvel événement</h2>
+      <form id="eventForm" class="event-form">
+        <div class="form-group">
+          <label for="eventTitle">Nom de l’événement</label>
+          <input type="text" id="eventTitle" placeholder="Ex : Réunion d’équipe" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="eventDateStart">Date début</label>
+            <input type="date" id="eventDateStart" required />
+          </div>
+          <div class="form-group half">
+            <label for="eventTimeStart">Heure début</label>
+            <input type="time" id="eventTimeStart" required />
           </div>
         </div>
 
-        <div class="sidebar-section" id="evenement_a_venir">
-          <h3 class="sidebar-title">Événements à venir</h3>
-          <div id="upcomingEvents" class="upcoming-events"></div>
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="eventDateEnd">Date fin</label>
+            <input type="date" id="eventDateEnd" required />
+          </div>
+          <div class="form-group half">
+            <label for="eventTimeEnd">Heure fin</label>
+            <input type="time" id="eventTimeEnd" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="eventComment">Commentaire</label>
+          <textarea id="eventComment" rows="3" placeholder="Détails de l’événement..."></textarea>
+        </div>
+        <div class="form-group">
+          <div class="calendarFieldContainer" id="calendarFieldContainer"></div>
         </div>
 
-        <!-- Liste des calendriers -->
-        <div class="sidebar-section calendars-list">
-          <div class="sidebar-section">
-            <div class="tri-toggle" id="triToggle" data-state="0">
-              <div class="toggle-knob"></div>
-            </div>
-            <span id="toggleLabel"></span>
-
-            <button class="btn btn-primary btn-full hidden" id="btnModCalendar">
-              Modifier Calendrier
-            </button>
-          </div>
-          <h3 class="sidebar-title calendar-mode">Mes calendrier Personnel</h3>
-          <div class="calendar-list" id="calendar-list"></div>
-
-          <div
-            class="calendar-list-entrep"
-            id="calendar-list-entrep"
-            style="display: none"
-          ></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="btnCancel">
+            Annuler
+          </button>
+          <button type="submit" class="btn btn-primary">Ajouter</button>
         </div>
-      </aside>
-
-      <!-- Zone principale (calendrier à droite) -->
-      <main class="main-content">
-        <div class="calendar-header">
-          <h1 class="calendar-title hidden"></h1>
-        </div>
-        <div id="calendar-wrapper">
-          <div id="calendar"></div>
-        </div>
-      </main>
+      </form>
     </div>
+  </div>
 
-    <!-- === POPUP NOUVEL CALENDRIER === -->
-    <div id="calendarModal" class="modal hidden">
-      <div class="modal-content">
-        <h2 class="modal-title">Modifier le calendrier</h2>
-        <form id="calendarForm" class="event-form">
-          <div class="form-group">
-            <label for="calendarTitle">Nom du calendrier</label>
-            <input
-              type="text"
-              id="calendarTitle"
-              placeholder="Ex : Travail, Famille..."
-              required
-            />
-          </div>
-          <div class="modal-actions">
-            <button type="submit" class="btn btn-primary">Modifier</button>
-            <button
-              type="button"
-              class="btn btn-secondary"
-              id="btnCancelCalendar"
-            >
-              Annuler
-            </button>
-          </div>
-        </form>
+  <div id="eventDetailsModal" class="modal hidden">
+    <div class="modal-content">
+      <h2 class="details-title"></h2>
+
+      <p class="details-date"></p>
+      <p class="details-description"></p>
+
+      <div class="btn-row">
+        <button class="btn-edit detail-edit">Modifier</button>
+        <button class="btn-delete delete-edit" data-id="">Supprimer</button>
+        <button class="btn-share" data-id="">Partager</button>
+      </div>
+      <button class="btn-close">Fermer</button>
+    </div>
+  </div>
+
+  <!-- === POPUP PARTAGE AGENDA === -->
+  <div id="shareCalendarModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Partager le calendrier</h3>
+
+      <input type="text" id="shareEmailInput" placeholder="email..." />
+
+      <div id="shareUserResults"></div>
+
+      <button id="btnCancelShare">Annuler</button>
+      <button id="btnConfirmShare">Envoyer</button>
+    </div>
+  </div>
+
+  <!-- === POPUP PARTAGE AGENDA === -->
+  <div id="shareCalendarProModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Partager le calendrier</h3>
+
+      <input type="text" id="shareEmailInput" placeholder="email..." />
+
+      <div id="shareUserResults"></div>
+
+      <button id="btnCancelShare">Annuler</button>
+      <button id="btnConfirmShare">Envoyer</button>
+    </div>
+  </div>
+
+  <!-- === POPUP PARTAGE RENDEZ-VOUS === -->
+  <div id="shareAppointmentModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Partager ce rendez-vous</h3>
+
+      <input type="text" id="shareRdvEmailInput" placeholder="email..." />
+
+      <div id="shareRdvUserResults"></div>
+
+      <button id="btnSendShareRdv">Envoyer</button>
+      <button id="btnCancelShareRdv">Annuler</button>
+    </div>
+  </div>
+
+    <!-- === POPUP corbeille === -->
+  <div id="trashModal" class="modal hidden">
+    <div class="modal-content trash-modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Corbeille</h3>
+        <p class="modal-subtitle">Éléments supprimés récemment (30 jours max)</p>
+      </div>
+      <div id="trashContent" class="trash-list-container"></div>
+      <div class="modal-actions">
+        <button id="btnCloseTrash" class="btn btn-secondary">Fermer</button>
       </div>
     </div>
+  </div>
 
-    <!-- === POPUP NOUVEAU CALENDRIER === -->
-    <div id="newCalendarModal" class="modal hidden">
-      <div class="modal-content">
-        <h2 class="modal-title">Créer un nouveau calendrier</h2>
-        <form id="newCalendarForm" class="event-form">
-          <div class="form-group">
-            <label for="newCalendarTitle">Nom du calendrier</label>
-            <input
-              type="text"
-              id="newCalendarTitle"
-              placeholder="Ex : Projets, Loisirs..."
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label for="calendarType">Type</label>
-            <select id="calendarType" required>
-              <option value="">-- Sélectionner --</option>
-              <option value="personnel" selected>Personnel</option>
-              <option value="entreprise">Professionnel</option>
-            </select>
-          </div>
-          <div class="modal-actions">
-            <button type="submit" class="btn btn-primary">Créer</button>
-            <button
-              type="button"
-              class="btn btn-secondary"
-              id="btnCancelNewCalendar"
-            >
-              Annuler
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+</body>
+<script src="js/global.js" defer></script>
+<script src="js/delete.js" defer></script>
+<script src="js/agenda.js" defer></script>
+<script src="js/appointements.js" defer></script>
+<script src="js/logout.js" defer></script>
 
-    <div id="importModal" class="modal hidden">
-      <div class="modal-content">
-        <h2 class="modal-title">Importer un calendrier</h2>
-        <form id="importForm" class="event-form">
-          <div class="form-group">
-            <label for="importFile">Fichier de calendrier (.ics)</label>
-            <input type="file" id="importFile" accept=".ics" required />
-          </div>
-          <div class="modal-actions">
-            <button type="submit" class="btn btn-primary">Importer</button>
-            <button
-              type="button"
-              class="btn btn-secondary"
-              id="btnCancelImport"
-            >
-              Annuler
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- === POPUP NOUVEL ÉVÉNEMENT === -->
-    <div id="eventModal" class="modal hidden">
-      <div class="modal-content">
-        <h2 class="modal-title">Créer un nouvel événement</h2>
-        <form id="eventForm" class="event-form">
-          <div class="form-group">
-            <label for="eventTitle">Nom de l’événement</label>
-            <input
-              type="text"
-              id="eventTitle"
-              placeholder="Ex : Réunion d’équipe"
-              required
-            />
-          </div>
-          <div class="form-row">
-            <div class="form-group half">
-              <label for="eventDateStart">Date début</label>
-              <input type="date" id="eventDateStart" required />
-            </div>
-            <div class="form-group half">
-              <label for="eventTimeStart">Heure début</label>
-              <input type="time" id="eventTimeStart" required />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group half">
-              <label for="eventDateEnd">Date fin</label>
-              <input type="date" id="eventDateEnd" required />
-            </div>
-            <div class="form-group half">
-              <label for="eventTimeEnd">Heure fin</label>
-              <input type="time" id="eventTimeEnd" required />
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="eventComment">Commentaire</label>
-            <textarea
-              id="eventComment"
-              rows="3"
-              placeholder="Détails de l’événement..."
-            ></textarea>
-          </div>
-          <div class="form-group">
-            <div
-              class="calendarFieldContainer"
-              id="calendarFieldContainer"
-            ></div>
-          </div>
-
-          <!--
-          <div class="form-group">
-            <button type="button" id="toggleRecurrent" class="btn">
-              Récurrent ?
-            </button>
-          </div>
-
-           <div id="recurrentOptions" style="display: none; margin-top: 10px">
-            <div class="form-group">
-              <label for="recurrenceType">Type de récurrence</label>
-              <select id="recurrenceType" required>
-                <option value="">-- Sélectionner --</option>
-                <option value="daily">Quotidien</option>
-                <option value="weekly">Hebdomadaire</option>
-                <option value="monthly">Mensuel</option>
-                <option value="yearly">Annuel</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="recurrenceEnd">Date de fin (optionnel)</label>
-              <input type="date" id="recurrenceEnd" />
-            </div>
-          </div>
-        -->
-          <div class="modal-actions">
-            <button type="button" class="btn btn-secondary" id="btnCancel">
-              Annuler
-            </button>
-            <button type="submit" class="btn btn-primary">Ajouter</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <div id="eventDetailsModal" class="modal hidden">
-      <div class="modal-content">
-        <h2 class="details-title"></h2>
-
-        <p class="details-date"></p>
-        <p class="details-description"></p>
-
-        <div class="btn-row">
-          <button class="btn-edit detail-edit">Modifier</button>
-          <button class="btn-delete delete-edit" data-id="">Supprimer</button>
-          <button class="btn-share" data-id="">Partager</button>
-        </div>
-        <button class="btn-close">Fermer</button>
-      </div>
-    </div>
-
-    <!-- === POPUP PARTAGE AGENDA === -->
-    <div id="shareCalendarModal" class="modal hidden">
-      <div class="modal-content">
-        <h3>Partager le calendrier</h3>
-
-        <input type="text" id="shareEmailInput" placeholder="email..." />
-
-        <div id="shareUserResults"></div>
-
-        <button id="btnCancelShare">Annuler</button>
-        <button id="btnConfirmShare">Envoyer</button>
-      </div>
-    </div>
-
-    <!-- === POPUP PARTAGE AGENDA === -->
-    <div id="shareCalendarProModal" class="modal hidden">
-      <div class="modal-content">
-        <h3>Partager le calendrier</h3>
-
-        <input type="text" id="shareEmailInput" placeholder="email..." />
-
-        <div id="shareUserResults"></div>
-
-        <button id="btnCancelShare">Annuler</button>
-        <button id="btnConfirmShare">Envoyer</button>
-      </div>
-    </div>
-
-    <!-- === POPUP PARTAGE RENDEZ-VOUS === -->
-    <div id="shareAppointmentModal" class="modal hidden">
-      <div class="modal-content">
-        <h3>Partager ce rendez-vous</h3>
-
-        <input type="text" id="shareRdvEmailInput" placeholder="email..." />
-
-        <div id="shareRdvUserResults"></div>
-
-        <button id="btnSendShareRdv">Envoyer</button>
-        <button id="btnCancelShareRdv">Annuler</button>
-      </div>
-    </div>
-  </body>
-  <script src="js/global.js" defer></script>
-  <script src="js/agenda.js" defer></script>
-  <script src="js/appointements.js" defer></script>
-  <script src="js/logout.js" defer></script>
 </html>

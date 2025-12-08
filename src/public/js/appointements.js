@@ -549,32 +549,34 @@ window.fetchAppointments = fetchAppointments;
 document.addEventListener("click", async (e) => {
   const btnDelete = e.target.closest(".menu-delete");
 
-  if (btnDelete) {
-    const id_rdv = btnDelete.dataset.id;
-    const confirmed = await showConfirm(
-      "Voulez-vous vraiment supprimer ce rendez-vous ?"
-    );
-    if (!confirmed) return;
-    try {
-      const res = await fetch(`http://localhost:3000/deletAppointment`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ id_rdv }),
-      });
-      if (!res.ok) {
+    if (btnDelete) {
+      const id_rdv = btnDelete.dataset.id;
+      const confirmed = await showConfirm(
+        "Voulez-vous vraiment placer ce rendez-vous dans la corbeille ?"
+      );
+      if (!confirmed) return;
+      try {
+        const res = await fetch(`/delete/appointment/${id_rdv}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include"
+        });
+        
+        if (!res.ok) {
+          const errorData = await res.json();
+          showMessage(errorData.message || "Erreur lors de la suppression", "error");
+          return;
+        }
+        // Met à jour la liste des événements côté frontend
+        updateEventList({ type: "delete", eventData: { _id: id_rdv } });
+        // Pour la suppression
+        updateCalendar({ type: "delete", eventData: { _id: id_rdv } });
+        showMessage("Rendez-vous placé dans la corbeille.", "success");
+      } catch (err) {
+        console.error(err);
         showMessage("Erreur lors de la suppression", "error");
         return;
       }
-      // Met à jour la liste des événements côté frontend
-      updateEventList({ type: "delete", eventData: { _id: id_rdv } });
-      // Pour la suppression
-      updateCalendar({ type: "delete", eventData: { _id: id_rdv } });
-      showMessage("Rendez-vous supprimé", "success");
-    } catch (err) {
-      console.error(err);
-      showMessage("Erreur lors de la suppression", "error");
-    }
   }
 
   const btnEdit = e.target.closest(".menu-edit");
@@ -602,7 +604,6 @@ document.addEventListener("click", async (e) => {
     eventModal.querySelector(".btn.btn-primary").textContent = "Modifier";
     const start = new Date(rdv.date_debut);
     const end = new Date(rdv.date_fin);
-    //const cal_id = document.getElementById("eventCalendar");
     document.getElementById("eventTitle").value = rdv.name;
     document.getElementById("eventComment").value = rdv.description;
     document.getElementById("eventDateStart").value = start
@@ -617,7 +618,6 @@ document.addEventListener("click", async (e) => {
     document.getElementById("eventTimeEnd").value = end
       .toTimeString()
       .slice(0, 5);
-    //document.getElementById("eventCalendar").value =cal_id;
   }
 });
 
@@ -640,21 +640,23 @@ document.addEventListener("deleteAppointmentFromPopup", async (e) => {
   const id_rdv = e.detail.id;
 
   const confirmed = await showConfirm(
-    "Voulez-vous vraiment supprimer ce rendez-vous ?"
+    "Voulez-vous vraiment placer ce rendez-vous dans la corbeille ?"
   );
   if (!confirmed) return;
 
   try {
-    const res = await fetch("/deletAppointment", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ id_rdv }),
+    const res = await fetch(`/delete/appointment/${id_rdv}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
     });
 
+    const data = await res.json();
+
     if (!res.ok) {
-      showMessage("Erreur lors de la suppression", "error");
-      return;
+        const errorData = await res.json();
+        showMessage(errorData.message || "Erreur lors de la suppression", "error");
+        return;
     }
 
     updateEventList({
@@ -667,7 +669,8 @@ document.addEventListener("deleteAppointmentFromPopup", async (e) => {
       eventData: { _id: id_rdv },
     });
 
-    showMessage("Rendez-vous supprimé", "success");
+    showMessage("Rendez-vous placé dans la corbeille.", "success");
+    
   } catch (err) {
     console.error(err);
     showMessage("Erreur lors de la suppression", "error");

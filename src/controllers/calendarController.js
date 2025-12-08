@@ -127,10 +127,10 @@ exports.addCalendar = async (req, res) => {
     const userId = req.user.id;
     const { title, mode } = req.body;
 
-    if (!title) {
+    if (!title || !mode) {
       return res
         .status(400)
-        .json({ error: "Le titre du calendrier est requis" });
+        .json({ error: "Le titre et le type du calendrier sont requis" });
     }
 
     if (!mode) {
