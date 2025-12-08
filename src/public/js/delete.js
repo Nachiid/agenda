@@ -36,9 +36,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Recharge le contenu de la corbeille pour refléter la suppression
                     loadTrashContent();
                     // Rafraîchir la vue principale sans recharger la page
-                    if (window.refreshCalendarViewGlobal) {
-                        await window.refreshCalendarViewGlobal();
+                    if(type === "calendar"){
+                         window.createCalendarElement(result.item, window.calendar);
                     }
+                    
                 } else {
                     throw new Error(result.message || "Erreur lors de la restauration.");
                 }

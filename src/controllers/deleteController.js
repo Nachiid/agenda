@@ -62,7 +62,7 @@ exports.restoreItem = async (req, res) => {
             return res.status(404).json({ message: "Élément non trouvé dans la corbeille ou droits insuffisants." });
         }
 
-        res.status(200).json({ message: `L'élément a été restauré.`, item: result });
+        return res.status(200).json({ message: `L'élément a été restauré.`, item: result });
 
     } catch (error) {
         console.error(`Erreur lors de la restauration de ${item_type}:`, error);
@@ -78,6 +78,7 @@ exports.getTrash = async (req, res) => {
     const userId = req.user.id;
     try {
         const trashContent = await model.getTrash(userId);
+        const deleted = await model.purgeOldItems();
         res.status(200).json(trashContent);
     } catch (error) {
         console.error("Erreur lors de la récupération de la corbeille:", error);

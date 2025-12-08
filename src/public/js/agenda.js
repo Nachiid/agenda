@@ -1,4 +1,7 @@
 let calendar; // variable globale
+
+window.calendar = calendar;
+
 /**
  * Met à jour le data-attribute avec la liste d'IDs
  */
@@ -21,41 +24,6 @@ function getActiveCalendarIdsLocal() {
 }
 window.getActiveCalendarIdsLocal = getActiveCalendarIdsLocal;
 
-/**
- * Rafraîchit la vue du calendrier globalement
- */
-async function refreshCalendarViewGlobal() {
-  const activeIds = getActiveCalendarIdsLocal();
-  // Si aucun calendrier n'est actif, on ne fait rien ou on peut recharger celui par défaut
-  if (activeIds.length === 0) return;
-
-  try {
-    const res = await fetch(`/user/agenda`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ calendarIds: activeIds }),
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      console.error("Erreur lors du rafraîchissement :", data.error);
-      return;
-    }
-
-    if (calendar) {
-      calendar.removeAllEvents(); // Nettoyer les événements existants pour éviter les doublons
-      updateCalendarView(data.calendars, calendar);
-    }
-
-    if (window.fetchAppointments) {
-      await window.fetchAppointments(activeIds);
-    }
-  } catch (err) {
-    console.error("Erreur lors du rafraîchissement global du calendrier :", err);
-  }
-}
-window.refreshCalendarViewGlobal = refreshCalendarViewGlobal;
 
 /**
  * Ajoute un ID à la liste des calendriers actifs
@@ -421,6 +389,7 @@ function createCalendarElement(cal, calendar) {
   calendarListDiv.appendChild(calDiv);
 }
 
+window.createCalendarElement = createCalendarElement;
 /**
  * Met à jour les cases à cocher des calendriers
  * en fonction des IDs stockés dans le localStorage
