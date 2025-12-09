@@ -23,6 +23,7 @@ const isRecurentShema = new mongoose.Schema({
   },
   date_fin: { type: Date, required: false },
   avoided: { type: [String], default: [] },
+  excludedDates: { type: [Date], default: [] },
 });
 
 // Schéma pour les rendez-vous (Appointment) — sous-document uniquement

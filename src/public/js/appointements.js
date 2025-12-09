@@ -409,6 +409,20 @@ eventForm.addEventListener("submit", async (e) => {
     null;
   console.log("cal ia envoyer : " + calendarId);
   const id_rdv = eventForm.dataset.editingId; // si existe → update
+  
+  // Si on édite une instance spécifique d'une récurrence
+  const instanceDate = eventForm.dataset.instanceDate;
+
+  // Récupération des données de récurrence
+  const isRecurrent = document.getElementById("toggleRecurrent").checked;
+  let recurrenceData = [];
+  if (isRecurrent) {
+    recurrenceData = [{
+      type: document.getElementById("recurrenceFreq").value,
+      date_fin: document.getElementById("recurrenceEnd").value || null
+    }];
+  }
+
   const rdv = {
     name: document.getElementById("eventTitle").value.trim(),
     date_debut: `${document.getElementById("eventDateStart").value}T${
@@ -419,6 +433,8 @@ eventForm.addEventListener("submit", async (e) => {
     }`,
     description: document.getElementById("eventComment").value.trim(),
     calendarId: calendarId,
+    isRecurent: recurrenceData,
+    date_to_exclude: instanceDate || null // Envoi de la date originale pour exclusion si nécessaire
   };
   if (id_rdv) {
     try {
@@ -437,19 +453,35 @@ eventForm.addEventListener("submit", async (e) => {
         throw new Error(updatedData.message || "Erreur lors de l’opération");
 
       // Mise à jour de la liste et du calendrier
-      updateEventList({
-        type: "update",
-        eventData: updatedData.rdv,
-      });
+      if (instanceDate) {
+          // Si on a créé une exception, il faut recharger le calendrier complet
+          // pour voir l'ancien event (avec date exclue) ET le nouveau
+          const activeIds = window.getActiveCalendarIdsLocal();
+          const calRes = await fetch(`/user/agenda`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ calendarIds: activeIds }),
+          });
+          const calData = await calRes.json();
+          window.updateCalendarView(calData.calendars, window.calendar);
+          // Aussi rafraichir la liste latérale
+          window.fetchAppointments(activeIds);
+      } else {
+          updateEventList({
+            type: "update",
+            eventData: updatedData.rdv,
+          });
 
-      window.updateCalendar({
-        type: "update",
-        eventData: updatedData.rdv,
-      });
+          window.updateCalendar({
+            type: "update",
+            eventData: updatedData.rdv,
+          });
+      }
 
       showMessage("Rendez-vous modifié avec succès", "success");
       eventModal.classList.add("hidden");
       delete eventForm.dataset.editingId;
+      delete eventForm.dataset.instanceDate;
     } catch (err) {
       console.error(err);
       showMessage(err.message || "Erreur lors de l’opération", "error");
@@ -502,6 +534,19 @@ eventForm.addEventListener("submit", async (e) => {
     delete eventForm.dataset.editingId;
   }
 });
+
+// Gestion de l'affichage des options de récurrence
+const toggleRecurrent = document.getElementById("toggleRecurrent");
+const recurrentOptions = document.getElementById("recurrentOptions");
+if (toggleRecurrent && recurrentOptions) {
+  toggleRecurrent.addEventListener("change", () => {
+    if (toggleRecurrent.checked) {
+      recurrentOptions.classList.remove("hidden");
+    } else {
+      recurrentOptions.classList.add("hidden");
+    }
+  });
+}
 
 // ==========================
 // Liste RDV
@@ -638,24 +683,69 @@ function findCalendarOfAppointment(rdvId) {
 
 document.addEventListener("deleteAppointmentFromPopup", async (e) => {
   const id_rdv = e.detail.id;
+  const btnDelete = document.querySelector(`.btn-delete[data-id="${id_rdv}"]`);
+  const instanceDate = btnDelete ? btnDelete.dataset.instanceDate : null;
 
+  // Si instanceDate existe, c'est une récurrence
+  if (instanceDate) {
+      // Afficher le modal de choix
+      const recurModal = document.getElementById("recurrenceDeleteModal");
+      recurModal.classList.remove("hidden");
+      
+      const btnOne = document.getElementById("btnDeleteOne");
+      const btnSeries = document.getElementById("btnDeleteSeries");
+      const btnCancel = document.getElementById("btnCancelRecurDelete");
+      
+      // Clean previous listeners to avoid duplicates (crude but effective for now)
+      const newBtnOne = btnOne.cloneNode(true);
+      btnOne.parentNode.replaceChild(newBtnOne, btnOne);
+      const newBtnSeries = btnSeries.cloneNode(true);
+      btnSeries.parentNode.replaceChild(newBtnSeries, btnSeries);
+      const newBtnCancel = btnCancel.cloneNode(true);
+      btnCancel.parentNode.replaceChild(newBtnCancel, btnCancel);
+      
+      newBtnCancel.addEventListener("click", () => recurModal.classList.add("hidden"));
+      
+      // Supprimer juste l'occurrence
+      newBtnOne.addEventListener("click", () => {
+          recurModal.classList.add("hidden");
+          performDelete(id_rdv, instanceDate);
+      });
+      
+      // Supprimer toute la série
+      newBtnSeries.addEventListener("click", () => {
+          recurModal.classList.add("hidden");
+          performDelete(id_rdv, null); // null = série complète
+      });
+      
+      return;
+  }
+
+  // Comportement normal
   const confirmed = await showConfirm(
     "Voulez-vous vraiment placer ce rendez-vous dans la corbeille ?"
   );
   if (!confirmed) return;
+  
+  performDelete(id_rdv, null);
+});
 
+async function performDelete(id_rdv, date_to_exclude) {
   try {
+    const body = {};
+    if (date_to_exclude) body.date_to_exclude = date_to_exclude;
+    
     const res = await fetch(`/delete/appointment/${id_rdv}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
+        body: JSON.stringify(body)
     });
 
     const data = await res.json();
 
     if (!res.ok) {
-        const errorData = await res.json();
-        showMessage(errorData.message || "Erreur lors de la suppression", "error");
+        showMessage(data.message || "Erreur lors de la suppression", "error");
         return;
     }
 
@@ -664,10 +754,28 @@ document.addEventListener("deleteAppointmentFromPopup", async (e) => {
       eventData: { _id: id_rdv },
     });
     // Pour la suppression
-    updateCalendar({
-      type: "delete",
-      eventData: { _id: id_rdv },
-    });
+    // Si exclusion, on doit re-fetch car le RDV n'est pas vraiment supprimé, juste caché une date
+    if (date_to_exclude) {
+         // Recharger le calendrier pour voir la disparition de l'occurrence
+         // C'est le plus simple pour rrule
+         window.fetchAppointments(window.getActiveCalendarIdsLocal());
+         // Rafraichir view fullcalendar
+         // On peut juste re-fetcher tout
+         const activeIds = window.getActiveCalendarIdsLocal();
+          const calRes = await fetch(`/user/agenda`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ calendarIds: activeIds }),
+          });
+          const calData = await calRes.json();
+          window.updateCalendarView(calData.calendars, window.calendar);
+
+    } else {
+        updateCalendar({
+          type: "delete",
+          eventData: { _id: id_rdv },
+        });
+    }
 
     showMessage("Rendez-vous placé dans la corbeille.", "success");
     
@@ -675,7 +783,7 @@ document.addEventListener("deleteAppointmentFromPopup", async (e) => {
     console.error(err);
     showMessage("Erreur lors de la suppression", "error");
   }
-});
+}
 
 // ======================chercher un rdv ================
 
@@ -888,9 +996,3 @@ document
 document.getElementById("btnCancelShareRdv").addEventListener("click", () => {
   document.getElementById("shareAppointmentModal").classList.add("hidden");
 });
-/*
-document.getElementById("toggleRecurrent").addEventListener("click", () => {
-  const block = document.getElementById("recurrentOptions");
-  block.style.display = block.style.display === "none" ? "block" : "none";
-});
-*/

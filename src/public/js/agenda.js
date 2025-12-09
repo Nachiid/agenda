@@ -56,11 +56,9 @@ function updateCalendarView(calendars, calendar) {
       // Ajouter chaque rendez-vous du calendrier
       if (Array.isArray(cal.appointments)) {
         cal.appointments.forEach((r) => {
-          calendar.addEvent({
+          let eventObj = {
             id: r._id,
             title: r.name,
-            start: r.date_debut,
-            end: r.date_fin,
             backgroundColor: cal.color,
             borderColor: cal.color,
             textColor: "#fff",
@@ -68,9 +66,43 @@ function updateCalendarView(calendars, calendar) {
               description: r.description || "",
               calendarId: cal._id,
               event_role: cal.role,
+              isRecurent: r.isRecurent || []
             },
             display: "auto",
-          });
+          };
+
+          if (r.isRecurent && r.isRecurent.length > 0) {
+            const recurrence = r.isRecurent[0];
+            
+            // Gestion des dates exclues
+            const excluded = recurrence.excludedDates || [];
+            
+            // On peut passer exdate à rrule
+            // FullCalendar rrule plugin expects `exdate` as array of strings or Date objects
+            // inside the `rrule` object property? No, extended props or separate property?
+            // According to FullCalendar RRule docs, `exdate` is a property of the rrule object provided to the plugin
+            
+            eventObj.rrule = {
+              freq: recurrence.type,
+              dtstart: r.date_debut,
+              until: recurrence.date_fin
+            };
+            
+            if (excluded.length > 0) {
+                 // Convertir en format ISO string pour être sûr
+                 eventObj.exdate = excluded; 
+                 // Note: FullCalendar 6 RRule plugin handles `exdate` at top level of event object or inside rrule?
+                 // Usually top level `exdate` array.
+            }
+
+            const duration = new Date(r.date_fin) - new Date(r.date_debut);
+            eventObj.duration = duration;
+          } else {
+            eventObj.start = r.date_debut;
+            eventObj.end = r.date_fin;
+          }
+          
+          calendar.addEvent(eventObj);
         });
       }
     });
@@ -432,6 +464,13 @@ function openEventDetailsPopup(event, mode) {
 
     const btnDelete = popup.querySelector(".btn-delete");
     btnDelete.dataset.id = rdv._id;
+    // Si c'est récurrent, on stocke aussi la date d'instance
+    if (rdv.role !== "Viewer" && event.extendedProps.isRecurent && event.extendedProps.isRecurent.length > 0) {
+        const instanceDate = popup.dataset.instanceDate; // Récupéré depuis eventClick
+        if (instanceDate) btnDelete.dataset.instanceDate = instanceDate;
+    } else {
+        delete btnDelete.dataset.instanceDate;
+    }
 
     // Dispatch custom event au clic
     btnDelete.onclick = () => {
@@ -452,6 +491,14 @@ function openEventDetailsPopup(event, mode) {
       // Modifier le titre DU popup ouvert
       eventModal.querySelector(".modal-title").textContent = "Modifier le RDV";
       eventModal.querySelector(".btn.btn-primary").textContent = "Modifier";
+      
+      // Si récurrent, on a besoin de la date spécifique de l'instance pour savoir quelle exception créer
+      if (popup.dataset.instanceDate) {
+          eventForm.dataset.instanceDate = popup.dataset.instanceDate;
+      } else {
+          delete eventForm.dataset.instanceDate;
+      }
+
       const start = new Date(rdv.date_debut);
       const end = new Date(rdv.date_fin);
 
@@ -469,6 +516,25 @@ function openEventDetailsPopup(event, mode) {
       document.getElementById("eventTimeEnd").value = end
         .toTimeString()
         .slice(0, 5);
+        
+      // Peupler les champs de récurrence
+      const toggleRecurrent = document.getElementById("toggleRecurrent");
+      const recurrentOptions = document.getElementById("recurrentOptions");
+      const isRecurrentData = event.extendedProps.isRecurent;
+      
+      if (isRecurrentData && isRecurrentData.length > 0) {
+        toggleRecurrent.checked = true;
+        recurrentOptions.classList.remove("hidden");
+        document.getElementById("recurrenceFreq").value = isRecurrentData[0].type;
+        if (isRecurrentData[0].date_fin) {
+             document.getElementById("recurrenceEnd").value = new Date(isRecurrentData[0].date_fin).toISOString().slice(0, 10);
+        }
+      } else {
+        toggleRecurrent.checked = false;
+        recurrentOptions.classList.add("hidden");
+        document.getElementById("recurrenceFreq").value = "daily"; // default
+        document.getElementById("recurrenceEnd").value = "";
+      }
     };
 
     const btnShare = popup.querySelector(".btn-share");
@@ -549,21 +615,63 @@ function updateCalendar({ type, eventData }) {
       const eventToUpdate = calendar.getEventById(eventData._id);
       if (eventToUpdate) {
         eventToUpdate.setProp("title", eventData.name);
-        eventToUpdate.setStart(eventData.date_debut);
-        eventToUpdate.setEnd(eventData.date_fin);
-        eventToUpdate.setExtendedProp("description", eventData.description);
+        
+        if (eventData.isRecurent && eventData.isRecurent.length > 0) {
+           // Si l'événement devient récurrent ou change de récurrence
+           // Le plus simple est souvent de supprimer et recréer pour rrule
+           eventToUpdate.remove();
+           const recurrence = eventData.isRecurent[0];
+           calendar.addEvent({
+              id: eventData._id,
+              title: eventData.name,
+              rrule: {
+                freq: recurrence.type,
+                dtstart: eventData.date_debut,
+                until: recurrence.date_fin
+              },
+              duration: new Date(eventData.date_fin) - new Date(eventData.date_debut),
+              extendedProps: { 
+                  description: eventData.description,
+                  isRecurent: eventData.isRecurent
+              },
+           });
+        } else {
+            // Si ce n'est plus récurrent, on s'assure qu'il est bien set
+            // Note: setStart/setEnd might not work well if transitioning from rrule to normal
+            // Safer to remove and re-add if structure changes significantly, but let's try basic update
+             eventToUpdate.setStart(eventData.date_debut);
+             eventToUpdate.setEnd(eventData.date_fin);
+             eventToUpdate.setExtendedProp("description", eventData.description);
+             eventToUpdate.setExtendedProp("isRecurent", eventData.isRecurent || []);
+        }
       }
       break;
 
     case "add":
-      calendar.addEvent({
+      let newEventObj = {
         id: eventData._id,
         title: eventData.name,
-        start: eventData.date_debut,
-        end: eventData.date_fin,
-        description: eventData.description,
+        extendedProps: {
+            description: eventData.description,
+            isRecurent: eventData.isRecurent || []
+        },
         event_role: "Editor",
-      });
+      };
+
+      if (eventData.isRecurent && eventData.isRecurent.length > 0) {
+        const recurrence = eventData.isRecurent[0];
+        newEventObj.rrule = {
+          freq: recurrence.type,
+          dtstart: eventData.date_debut,
+          until: recurrence.date_fin
+        };
+        newEventObj.duration = new Date(eventData.date_fin) - new Date(eventData.date_debut);
+      } else {
+        newEventObj.start = eventData.date_debut;
+        newEventObj.end = eventData.date_fin;
+      }
+      
+      calendar.addEvent(newEventObj);
 
       break;
   }
@@ -713,6 +821,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Clic sur un événement
     eventClick: function (info) {
+      // Stocker la date spécifique de l'instance cliquée
+      const popup = document.getElementById("eventDetailsModal");
+      if (popup) {
+          popup.dataset.instanceDate = info.event.start.toISOString();
+      }
       openEventDetailsPopup(info.event, "update");
     },
 

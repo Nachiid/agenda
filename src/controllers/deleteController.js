@@ -7,6 +7,7 @@ const model = require("../models/model");
 exports.softDelete = async (req, res) => {
     const { item_type, id } = req.params;
     const userId = req.user.id; 
+    const { date_to_exclude } = req.body; // Récupération date exclusion (optionnel)
 
     try {
         let result;
@@ -14,7 +15,7 @@ exports.softDelete = async (req, res) => {
             // On vérifie que le calendrier appartient bien à l'utilisateur
             result = await model.softDeleteCalendar(userId, id);
         } else if (item_type === 'appointment') {
-            result = await model.softDeleteAppointment(id, userId);
+            result = await model.softDeleteAppointment(id, userId, date_to_exclude);
         } else {
             return res.status(400).json({ message: "Type d'élément non valide." });
         }

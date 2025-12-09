@@ -19,6 +19,40 @@
   <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
 
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/rrule@2.6.4/dist/es5/rrule.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/rrule@6.1.7/index.global.min.js"></script>
+    .calendarFieldContainer {
+      margin-bottom: 1rem;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      color: #fff;
+      font-weight: 600;
+      margin-top: 1rem;
+    }
+    
+    .checkbox-label input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #4f46e5;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    /* === POPUP choix suppression récurrence === */
+    #recurrenceDeleteModal .modal-content {
+      text-align: center;
+    }
+    #recurrenceDeleteModal .btn-row {
+      justify-content: center;
+      margin-top: 1.5rem;
+      gap: 1rem;
+    }
+  </style>
 </head>
 
 <body class="dashboard-body">
@@ -230,6 +264,31 @@
           <div class="calendarFieldContainer" id="calendarFieldContainer"></div>
         </div>
 
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="toggleRecurrent" />
+            Répéter cet événement
+          </label>
+        </div>
+
+        <div id="recurrentOptions" class="hidden" style="margin-bottom: 15px; padding-left: 20px; border-left: 2px solid #ddd;">
+          <div class="form-row">
+            <div class="form-group half">
+              <label for="recurrenceFreq">Fréquence</label>
+              <select id="recurrenceFreq">
+                <option value="daily">Quotidien</option>
+                <option value="weekly">Hebdomadaire</option>
+                <option value="monthly">Mensuel</option>
+                <option value="yearly">Annuel</option>
+              </select>
+            </div>
+            <div class="form-group half">
+              <label for="recurrenceEnd">Date de fin de répétition</label>
+              <input type="date" id="recurrenceEnd" />
+            </div>
+          </div>
+        </div>
+
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary" id="btnCancel">
             Annuler
@@ -298,7 +357,20 @@
     </div>
   </div>
 
-    <!-- === POPUP corbeille === -->
+    <!-- === POPUP Choix Suppression Récurrence === -->
+  <div id="recurrenceDeleteModal" class="modal hidden">
+    <div class="modal-content">
+      <h3 class="modal-title">Suppression d'événement récurrent</h3>
+      <p>Voulez-vous supprimer uniquement cette occurrence ou toute la série ?</p>
+      <div class="btn-row">
+        <button id="btnDeleteOne" class="btn btn-primary">Juste cet événement</button>
+        <button id="btnDeleteSeries" class="btn btn-danger">Toute la série</button>
+        <button id="btnCancelRecurDelete" class="btn btn-secondary">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === POPUP corbeille === -->
   <div id="trashModal" class="modal hidden">
     <div class="modal-content trash-modal-content">
       <div class="modal-header">

@@ -80,6 +80,7 @@ exports.addAppointment = async function (calendarId, appointmentData) {
     date_debut: appointmentData.date_debut,
     date_fin: appointmentData.date_fin,
     description: appointmentData.description || "",
+    isRecurent: appointmentData.isRecurent || [],
   };
 
   // Ajouter au calendrier
@@ -99,7 +100,7 @@ exports.addAppointment = async function (calendarId, appointmentData) {
 /**
  * Supprime un rendez-vous d'un calendrier.
  * */
-exports.softDeleteAppointment = async function (id_rdv, userId) {
+exports.softDeleteAppointment = async function (id_rdv, userId, date_to_exclude = null) {
   // Récupération du calendrier contenant le rendez-vous
   const calendar = await Calendar.findOne({ "appointments._id": id_rdv });
   if (!calendar) return false;
@@ -122,7 +123,22 @@ exports.softDeleteAppointment = async function (id_rdv, userId) {
     if (!isEditor) return false;
   }
 
-  // Soft delete du rendez-vous
+  // Si une date spécifique est fournie pour une exclusion (récurrence)
+  if (date_to_exclude) {
+     const excludeDateObj = new Date(date_to_exclude);
+     
+     // On trouve le rdv
+     const appointment = calendar.appointments.find(a => a._id.toString() === id_rdv);
+     
+     if (appointment && appointment.isRecurent && appointment.isRecurent.length > 0) {
+        // On ajoute la date aux exclusions
+        appointment.isRecurent[0].excludedDates.push(excludeDateObj);
+        await calendar.save();
+        return { _id: id_rdv, excluded: true };
+     }
+  }
+
+  // Soft delete du rendez-vous (suppression totale)
   const result = await Calendar.updateOne(
     { "appointments._id": id_rdv },
     {
@@ -162,7 +178,7 @@ exports.restoreAppointment = async function (id_rdv) {
  * Met à jour un rendez-vous existant dans un calendrier.
  * Modifie les champs titre, dates et description si présents dans les données fournies.
  */
-exports.updateAppointment = async function (id_rdv, data, userId, calendarId) {
+exports.updateAppointment = async function (id_rdv, data, userId, calendarId, date_to_exclude = null) {
   // Vérifier d'abord si ce calendrier existe
   const calendar = await Calendar.findById(calendarId);
   if (!calendar) {
@@ -195,11 +211,40 @@ exports.updateAppointment = async function (id_rdv, data, userId, calendarId) {
 
   const rdv = calendar.appointments[index];
 
-  // Mise à jour des champs modifiés
+  // Cas spécial : modification d'une occurrence spécifique d'une récurrence
+  if (date_to_exclude && rdv.isRecurent && rdv.isRecurent.length > 0) {
+      // 1. Exclure la date de l'original
+      rdv.isRecurent[0].excludedDates.push(new Date(date_to_exclude));
+      
+      // 2. Créer un nouveau RDV avec les nouvelles données
+      const newAppointment = {
+        name: data.name || rdv.name,
+        date_debut: data.date_debut || new Date(date_to_exclude), // Si date changée, ok, sinon date de l'occurrence
+        date_fin: data.date_fin, // Doit être calculée correctement par le front
+        description: data.description !== undefined ? data.description : rdv.description,
+        isRecurent: [], // Le nouveau n'est pas récurrent par défaut (sauf si l'user le demande, mais ici on gère l'exception simple)
+        actif: true
+      };
+      
+      // Si l'utilisateur a redéfini une récurrence pour cette exception (split series), ce serait plus complexe
+      // Ici on suppose qu'on détache l'occurrence pour en faire un event unique.
+      if (data.isRecurent) {
+          newAppointment.isRecurent = data.isRecurent;
+      }
+
+      calendar.appointments.push(newAppointment);
+      await calendar.save();
+      
+      // On retourne le NOUVEAU rdv pour affichage
+      return calendar.appointments[calendar.appointments.length - 1];
+  }
+
+  // Mise à jour des champs modifiés (cas normal ou série entière)
   if (data.name !== undefined) rdv.name = data.name;
   if (data.date_debut !== undefined) rdv.date_debut = new Date(data.date_debut);
   if (data.date_fin !== undefined) rdv.date_fin = new Date(data.date_fin);
   if (data.description !== undefined) rdv.description = data.description;
+  if (data.isRecurent !== undefined) rdv.isRecurent = data.isRecurent;
 
   // Sauvegarde
   await calendar.save();

@@ -2,7 +2,7 @@ const model = require("../models/model");
 
 exports.rajouteAppointment = async (req, res) => {
   try {
-    const { calendarId, name, date_debut, date_fin, description } = req.body;
+    const { calendarId, name, date_debut, date_fin, description, isRecurent } = req.body;
     const userId = await model.getProfilCal(calendarId);
 
     if (!calendarId || !name || !date_debut || !date_fin) {
@@ -33,6 +33,7 @@ exports.rajouteAppointment = async (req, res) => {
       date_debut,
       date_fin,
       description,
+      isRecurent,
     });
 
     return res.status(200).json({
@@ -64,7 +65,7 @@ exports.deletAppointment = async (req, res) => {
 
 exports.updateAppointment = async (req, res) => {
   try {
-    const { id_rdv, name, date_debut, date_fin, description, calendarId } = req.body;
+    const { id_rdv, name, date_debut, date_fin, description, calendarId, isRecurent, date_to_exclude } = req.body;
     const userID = req.user.id;
     if (!id_rdv) {
       return res.status(400).json({ error: "L'id du rendez-vous est requis" });
@@ -76,9 +77,11 @@ exports.updateAppointment = async (req, res) => {
         date_debut,
         date_fin,
         description,
+        isRecurent,
       },
       userID,
-      calendarId
+      calendarId,
+      date_to_exclude
     );
     
     if (!updatedRdv) {
