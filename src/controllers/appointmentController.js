@@ -2,7 +2,8 @@ const model = require("../models/model");
 
 exports.rajouteAppointment = async (req, res) => {
   try {
-    const { calendarId, name, date_debut, date_fin, description, isRecurent } = req.body;
+    const { calendarId, name, date_debut, date_fin, description, isRecurent } =
+      req.body;
     const userId = await model.getProfilCal(calendarId);
 
     if (!calendarId || !name || !date_debut || !date_fin) {
@@ -65,7 +66,16 @@ exports.deletAppointment = async (req, res) => {
 
 exports.updateAppointment = async (req, res) => {
   try {
-    const { id_rdv, name, date_debut, date_fin, description, calendarId, isRecurent, date_to_exclude } = req.body;
+    const {
+      id_rdv,
+      name,
+      date_debut,
+      date_fin,
+      description,
+      calendarId,
+      isRecurent,
+      date_to_exclude,
+    } = req.body;
     const userID = req.user.id;
     if (!id_rdv) {
       return res.status(400).json({ error: "L'id du rendez-vous est requis" });
@@ -83,9 +93,11 @@ exports.updateAppointment = async (req, res) => {
       calendarId,
       date_to_exclude
     );
-    
+
     if (!updatedRdv) {
-      return res.status(404).json({ error: "Vous avez pas le droit à effectuer cette action" });
+      return res
+        .status(404)
+        .json({ error: "Vous avez pas le droit à effectuer cette action" });
     }
     return res
       .status(200)
@@ -99,9 +111,11 @@ exports.updateAppointment = async (req, res) => {
 exports.getAppointments = async (req, res) => {
   try {
     const { calendarIds } = req.body;
+    const userID = req.user.id;
 
     // Récupération de tous les calendriers
-    const calendars = await model.getCalendars(calendarIds);
+    const calendars = await model.getCalendars(calendarIds, userID);
+    console.log("calendars : " + calendars);
 
     const now = new Date();
 
@@ -113,10 +127,10 @@ exports.getAppointments = async (req, res) => {
           : [];
         return appointments.map((event) => ({
           ...event,
-          calendar_id: cal._id.toString(), // ou cal.cal_id selon ton modèle
+          calendar_id: cal._id.toString(),
         }));
       })
-      .filter((a) => new Date(a.date_debut) >= now) // rdv futurs
+      .filter((a) => new Date(a.date_debut) >= now)
       .sort((a, b) => new Date(a.date_debut) - new Date(b.date_debut));
 
     const first = allAppointments.slice(0, 10);

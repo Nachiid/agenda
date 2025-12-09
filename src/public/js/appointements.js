@@ -25,7 +25,6 @@ function renderCalendarField(mode, calendarId = null) {
   if (mode === "edit" && calendarId) {
     // On récupère le titre depuis le DOM
     let titleFound = null;
-    console.log("event click ");
 
     const calendarContainers = [
       "#calendar-list",
@@ -571,7 +570,7 @@ async function fetchAppointments(calendarIds) {
     if (!data || (Array.isArray(data) && data.length === 0)) {
     } else {
     }
-
+    console.log("data : " + data);
     data.forEach((evt) => {
       const div = createEventItemDiv(evt);
       upcomingEvents.appendChild(div);
