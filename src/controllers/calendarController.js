@@ -136,7 +136,6 @@ exports.addCalendar = async (req, res) => {
     if (!mode) {
       return res.status(400).json({ error: "Le mode est invalide" });
     }
-    console.log("contro" + mode);
     if (mode == "personnel" || mode == "entreprise") {
       const newCalendar = await model.createCalendar(userId, title, mode, []);
 

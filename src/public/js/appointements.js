@@ -25,7 +25,6 @@ function renderCalendarField(mode, calendarId = null) {
   if (mode === "edit" && calendarId) {
     // On récupère le titre depuis le DOM
     let titleFound = null;
-    console.log("event click ");
 
     const calendarContainers = [
       "#calendar-list",
@@ -407,7 +406,6 @@ eventForm.addEventListener("submit", async (e) => {
     document.getElementById("eventCalendar")?.value ||
     document.getElementById("eventCalendar")?.value ||
     null;
-  console.log("cal ia envoyer : " + calendarId);
   const id_rdv = eventForm.dataset.editingId; // si existe → update
   
   // Si on édite une instance spécifique d'une récurrence
@@ -447,7 +445,6 @@ eventForm.addEventListener("submit", async (e) => {
       });
 
       const updatedData = await res.json();
-      console.log(updatedData);
 
       if (!res.ok)
         throw new Error(updatedData.message || "Erreur lors de l’opération");
@@ -571,7 +568,6 @@ async function fetchAppointments(calendarIds) {
     if (!data || (Array.isArray(data) && data.length === 0)) {
     } else {
     }
-
     data.forEach((evt) => {
       const div = createEventItemDiv(evt);
       upcomingEvents.appendChild(div);
@@ -643,7 +639,6 @@ document.addEventListener("click", async (e) => {
     eventModal.classList.remove("hidden");
     eventForm.dataset.editingId = rdv._id;
     eventForm.dataset.cal_id = rdv.calendar_id;
-    console.log( "cal id " + rdv.calendar_id);
     // Modifier le titre DU popup ouvert
     eventModal.querySelector(".modal-title").textContent = "Modifier le RDV";
     eventModal.querySelector(".btn.btn-primary").textContent = "Modifier";
