@@ -71,6 +71,12 @@ function updateCalendarView(calendars, calendar) {
             display: "auto",
           };
 
+          const startTime = new Date(r.date_debut).getTime();
+          const endTime = new Date(r.date_fin).getTime();
+          if (endTime - startTime >= 86400000) {
+            eventObj.allDay = true;
+          }
+
           if (r.isRecurent && r.isRecurent.length > 0) {
             const recurrence = r.isRecurent[0];
             
@@ -504,15 +510,21 @@ function openEventDetailsPopup(event, mode) {
 
       document.getElementById("eventTitle").value = rdv.name;
       document.getElementById("eventComment").value = rdv.description;
-      document.getElementById("eventDateStart").value = start
-        .toISOString()
-        .slice(0, 10);
+      document.getElementById("eventDateStart").value =
+        start.getFullYear() +
+        "-" +
+        String(start.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(start.getDate()).padStart(2, "0");
       document.getElementById("eventTimeStart").value = start
         .toTimeString()
         .slice(0, 5);
-      document.getElementById("eventDateEnd").value = end
-        .toISOString()
-        .slice(0, 10);
+      document.getElementById("eventDateEnd").value =
+        end.getFullYear() +
+        "-" +
+        String(end.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(end.getDate()).padStart(2, "0");
       document.getElementById("eventTimeEnd").value = end
         .toTimeString()
         .slice(0, 5);
@@ -585,17 +597,23 @@ function openEventDetailsPopup(event, mode) {
     const end = new Date(event.end);
 
     // Remplissage automatique du popup
-    document.getElementById("eventDateStart").value = start
-      .toISOString()
-      .slice(0, 10);
+    document.getElementById("eventDateStart").value =
+      start.getFullYear() +
+      "-" +
+      String(start.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(start.getDate()).padStart(2, "0");
 
     document.getElementById("eventTimeStart").value = start
       .toTimeString()
       .slice(0, 5);
 
-    document.getElementById("eventDateEnd").value = end
-      .toISOString()
-      .slice(0, 10);
+    document.getElementById("eventDateEnd").value =
+      end.getFullYear() +
+      "-" +
+      String(end.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(end.getDate()).padStart(2, "0");
 
     document.getElementById("eventTimeEnd").value = end
       .toTimeString()
@@ -621,15 +639,17 @@ function updateCalendar({ type, eventData }) {
            // Le plus simple est souvent de supprimer et recréer pour rrule
            eventToUpdate.remove();
            const recurrence = eventData.isRecurent[0];
+           const duration = new Date(eventData.date_fin) - new Date(eventData.date_debut);
            calendar.addEvent({
               id: eventData._id,
               title: eventData.name,
+              allDay: duration >= 86400000,
               rrule: {
                 freq: recurrence.type,
                 dtstart: eventData.date_debut,
                 until: recurrence.date_fin
               },
-              duration: new Date(eventData.date_fin) - new Date(eventData.date_debut),
+              duration: duration,
               extendedProps: { 
                   description: eventData.description,
                   isRecurent: eventData.isRecurent
@@ -641,6 +661,10 @@ function updateCalendar({ type, eventData }) {
             // Safer to remove and re-add if structure changes significantly, but let's try basic update
              eventToUpdate.setStart(eventData.date_debut);
              eventToUpdate.setEnd(eventData.date_fin);
+             
+             const duration = new Date(eventData.date_fin) - new Date(eventData.date_debut);
+             eventToUpdate.setAllDay(duration >= 86400000);
+
              eventToUpdate.setExtendedProp("description", eventData.description);
              eventToUpdate.setExtendedProp("isRecurent", eventData.isRecurent || []);
         }
@@ -658,6 +682,11 @@ function updateCalendar({ type, eventData }) {
         event_role: "Editor",
       };
 
+      const duration = new Date(eventData.date_fin) - new Date(eventData.date_debut);
+      if (duration >= 86400000) {
+        newEventObj.allDay = true;
+      }
+
       if (eventData.isRecurent && eventData.isRecurent.length > 0) {
         const recurrence = eventData.isRecurent[0];
         newEventObj.rrule = {
@@ -665,7 +694,7 @@ function updateCalendar({ type, eventData }) {
           dtstart: eventData.date_debut,
           until: recurrence.date_fin
         };
-        newEventObj.duration = new Date(eventData.date_fin) - new Date(eventData.date_debut);
+        newEventObj.duration = duration;
       } else {
         newEventObj.start = eventData.date_debut;
         newEventObj.end = eventData.date_fin;
@@ -696,6 +725,104 @@ async function getUserPreference() {
   }
 }
 
+/**
+ * Initialise le calendrier des jours fériés
+ */
+function initHolidayCalendar(calendar) {
+  const calendarListDiv = document.getElementById("calendar-list");
+  if (!calendarListDiv) return;
+
+  const holidayCalId = "french-holidays";
+  
+  // Vérifier si déjà présent
+  if (calendarListDiv.querySelector(`[data-id="${holidayCalId}"]`)) return;
+
+  const calDiv = document.createElement("div");
+  calDiv.classList.add("event-item2");
+  calDiv.dataset.id = holidayCalId;
+  calDiv.dataset.mode = "personnel";
+  calDiv.dataset.role = "Viewer";
+
+  // Partie gauche
+  const leftDiv = document.createElement("div");
+  leftDiv.classList.add("event-left2");
+
+  // Checkbox
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = false; // Par défaut décoché, ou lire depuis localStorage si vous voulez persister
+
+  // Gestionnaire d'événements pour la checkbox
+  checkbox.addEventListener("change", async (e) => {
+    const isChecked = e.target.checked;
+    
+    if (isChecked) {
+      // 1. Vérifier si les événements sont déjà chargés (pour éviter de refetcher inutilement)
+      const existingEvents = calendar.getEvents().filter(ev => ev.extendedProps.calendarId === holidayCalId);
+      if (existingEvents.length > 0) return; // Déjà là
+
+      try {
+        // 2. Fetcher l'API
+        const res = await fetch("https://calendrier.api.gouv.fr/jours-feries/metropole.json");
+        if (!res.ok) throw new Error("Erreur récupération jours fériés");
+        
+        const data = await res.json();
+        
+        // 3. Convertir et ajouter au calendrier
+        // L'API renvoie un objet : { "2025-01-01": "1er janvier", ... }
+        const events = Object.entries(data).map(([date, name]) => ({
+          id: `holiday-${date}`,
+          title: name,
+          start: date,
+          allDay: true,
+          backgroundColor: "#28a745", // Vert pour les jours fériés
+          borderColor: "#28a745",
+          textColor: "#fff",
+          display: "block", // ou 'background' si on veut juste colorer la case
+          extendedProps: {
+            description: "Jour férié en France",
+            calendarId: holidayCalId,
+            event_role: "Viewer"
+          },
+          editable: false // Non modifiable
+        }));
+
+        events.forEach(ev => calendar.addEvent(ev));
+        showMessage("Jours fériés ajoutés", "success");
+
+      } catch (err) {
+        console.error(err);
+        showMessage("Impossible de charger les jours fériés", "error");
+        e.target.checked = false;
+      }
+    } else {
+      // 4. Supprimer les événements
+      removeCalendarEvents(holidayCalId, calendar);
+    }
+  });
+
+  leftDiv.appendChild(checkbox);
+
+  const colorDiv = document.createElement("div");
+  colorDiv.classList.add("calendar-color");
+  colorDiv.style.background = "#28a745"; // Vert
+  leftDiv.appendChild(colorDiv);
+
+  const titleDiv = document.createElement("div");
+  titleDiv.classList.add("event-info2");
+  const titleSpan = document.createElement("div");
+  titleSpan.classList.add("event-title2");
+  titleSpan.textContent = "Jours Fériés (France)";
+  titleDiv.appendChild(titleSpan);
+  leftDiv.appendChild(titleDiv);
+
+  calDiv.appendChild(leftDiv);
+  
+  // Pas de menu (supprimer/modifier) pour ce calendrier système
+  
+  calendarListDiv.appendChild(calDiv);
+}
+
 // Fonction de mapping
 function mapDefaultView(viewFromDb) {
   switch (viewFromDb) {
@@ -721,14 +848,14 @@ document.addEventListener("DOMContentLoaded", async function () {
   const userPreference = await getUserPreference();
   calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: mapDefaultView(userPreference?.defaultView || "Semaine"), // Vue principale : semaine horaire
-    allDaySlot: false, // pas de créneaux "toute la journée"
+    allDaySlot: true, // pas de créneaux "toute la journée"
     slotEventOverlap: false, // interdit chevauchement visuel
     eventOverlap: false, // interdit drag & drop sur événements chevauchants
     eventOrder: "start,-duration", // tri par début, puis durée
     locale: "fr",
     themeSystem: "standard",
     nowIndicator: true,
-    slotMinTime: "00:00:01",
+    slotMinTime: "01:00:01",
     slotMaxTime: "23:59:59",
     slotDuration: "00:15:00",
     slotLabelInterval: "01:00",
@@ -891,6 +1018,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     },
   });
   calendar.render();
+  
+  // --- Initialiser le calendrier des jours fériés ---
+  initHolidayCalendar(calendar);
+
   // --- Charger les calendriers de l'utilisateur ---
   const activeIds = getActiveCalendarIdsLocal();
   if (activeIds.length === 0) {
