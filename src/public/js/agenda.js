@@ -860,8 +860,6 @@ document.addEventListener("DOMContentLoaded", async function () {
           59
         );
 
-        //console.log("Start Of Day :", startOfDay);
-        //console.log("End Of Day   :", endOfDay);
         openEventDetailsPopup(
           {
             start: info.start,

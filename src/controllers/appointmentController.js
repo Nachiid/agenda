@@ -12,6 +12,12 @@ exports.rajouteAppointment = async (req, res) => {
         .json({ error: "manque d'inforamtion pour créer un rdv" });
     }
 
+    if (name.length > 20) {
+      return res.status(400).json({
+        error: "Le nom du rendez-vous ne doit pas dépasser 20 caractères.",
+      });
+    }
+
     // vérification les date
     const start = new Date(date_debut);
     const end = new Date(date_fin);
@@ -19,7 +25,7 @@ exports.rajouteAppointment = async (req, res) => {
     if (start >= end) {
       return res
         .status(400)
-        .json({ error: "date de debut doit etre avent la date de fin !" });
+        .json({ error: "date de debut doit etre avant la date de fin !" });
     }
     const calendar = await model.getUserCalendar(calendarId, userId);
     if (!calendar) {
@@ -80,6 +86,13 @@ exports.updateAppointment = async (req, res) => {
     if (!id_rdv) {
       return res.status(400).json({ error: "L'id du rendez-vous est requis" });
     }
+
+    if (name.length > 20) {
+      return res.status(400).json({
+        error: "Le nom du rendez-vous ne doit pas dépasser 20 caractères.",
+      });
+    }
+
     const updatedRdv = await model.updateAppointment(
       id_rdv,
       {
@@ -110,13 +123,12 @@ exports.updateAppointment = async (req, res) => {
 
 exports.getAppointments = async (req, res) => {
   try {
-    const { calendarIds } = req.body; 
-    
+    const { calendarIds } = req.body;
+
     const userID = req.user.id;
 
     // Récupération de tous les calendriers
     const calendars = await model.getCalendars(calendarIds, userID);
-    console.log("calendars : " + calendars);
 
     const now = new Date();
 

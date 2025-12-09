@@ -40,8 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         window.createCalendarElement(result.item, window.calendar);
                     } else if (type === 'appointment'){
                         // Mise à jour du calendrier
-
-                        console.log(" rdv = " + result.item);
                         window.updateCalendar({
                             type: "add",
                             eventData: result.item,

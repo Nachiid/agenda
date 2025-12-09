@@ -21,37 +21,6 @@
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/rrule@2.6.4/dist/es5/rrule.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/rrule@6.1.7/index.global.min.js"></script>
-    .calendarFieldContainer {
-      margin-bottom: 1rem;
-    }
-
-    .checkbox-label {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-      color: #fff;
-      font-weight: 600;
-      margin-top: 1rem;
-    }
-    
-    .checkbox-label input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: #4f46e5;
-      margin: 0;
-      cursor: pointer;
-    }
-
-    /* === POPUP choix suppression récurrence === */
-    #recurrenceDeleteModal .modal-content {
-      text-align: center;
-    }
-    #recurrenceDeleteModal .btn-row {
-      justify-content: center;
-      margin-top: 1.5rem;
-      gap: 1rem;
-    }
   </style>
 </head>
 
@@ -94,7 +63,6 @@
         <div class="nav-links">
           <a href="agenda" class="nav-link active">Agenda</a>
           <button class="nav-link" id="btnTrash">Corbeille</button>
-
           <a href="/profile" class="nav-link">Profil</a>
           <button class="nav-link" onclick="logout()">Se déconnecter</button>
         </div>
@@ -188,7 +156,7 @@
       <form id="newCalendarForm" class="event-form">
         <div class="form-group">
           <label for="newCalendarTitle">Nom du calendrier</label>
-          <input type="text" id="newCalendarTitle" placeholder="Ex : Projets, Loisirs..." required />
+          <input type="text" id="newCalendarTitle" placeholder="Ex : Projets, Loisirs..." maxlength="20" required />
         </div>
         <div class="form-group">
           <label for="calendarType">Type</label>
@@ -233,7 +201,7 @@
       <form id="eventForm" class="event-form">
         <div class="form-group">
           <label for="eventTitle">Nom de l’événement</label>
-          <input type="text" id="eventTitle" placeholder="Ex : Réunion d’équipe" required />
+          <input type="text" id="eventTitle" placeholder="Ex : Réunion d’équipe" maxlength="20" required />
         </div>
         <div class="form-row">
           <div class="form-group half">
@@ -312,20 +280,6 @@
         <button class="btn-share" data-id="">Partager</button>
       </div>
       <button class="btn-close">Fermer</button>
-    </div>
-  </div>
-
-  <!-- === POPUP PARTAGE AGENDA === -->
-  <div id="shareCalendarModal" class="modal hidden">
-    <div class="modal-content">
-      <h3>Partager le calendrier</h3>
-
-      <input type="text" id="shareEmailInput" placeholder="email..." />
-
-      <div id="shareUserResults"></div>
-
-      <button id="btnCancelShare">Annuler</button>
-      <button id="btnConfirmShare">Envoyer</button>
     </div>
   </div>
 

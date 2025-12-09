@@ -310,7 +310,6 @@ exports.searchUserAppointments = async function (userId, name) {
 // plusieur calandars
 exports.getCalendars = async function (ids, userId) {
   // 1. Calendriers dont l'utilisateur est propriétaire
-  console.log(userId);
   const ownedCalendars = await Calendar.find({
     _id: { $in: ids },
     userId: userId,
