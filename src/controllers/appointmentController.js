@@ -110,7 +110,8 @@ exports.updateAppointment = async (req, res) => {
 
 exports.getAppointments = async (req, res) => {
   try {
-    const { calendarIds } = req.body;
+    const { calendarIds } = req.body; 
+    
     const userID = req.user.id;
 
     // Récupération de tous les calendriers
