@@ -12,9 +12,9 @@ exports.rajouteAppointment = async (req, res) => {
         .json({ error: "manque d'inforamtion pour créer un rdv" });
     }
 
-    if (name.length > 20) {
+    if (name.length > 10) {
       return res.status(400).json({
-        error: "Le nom du rendez-vous ne doit pas dépasser 20 caractères.",
+        error: "Le nom du rendez-vous ne doit pas dépasser 10 caractères.",
       });
     }
 
@@ -87,9 +87,9 @@ exports.updateAppointment = async (req, res) => {
       return res.status(400).json({ error: "L'id du rendez-vous est requis" });
     }
 
-    if (name.length > 20) {
+    if (name.length > 10) {
       return res.status(400).json({
-        error: "Le nom du rendez-vous ne doit pas dépasser 20 caractères.",
+        error: "Le nom du rendez-vous ne doit pas dépasser 10 caractères.",
       });
     }
 
