@@ -3,7 +3,7 @@
 
   --gradient-theme-start: #667ce7;
   --gradient-theme-end: #6f60bf;
-  
+
   --title-color: #000;
 
   --profil-background: #fff;
@@ -11,6 +11,9 @@
   --profil-text-input: #000;
   --context-parag-color: #6b7280;
 
+  --scroll-track: rgba(255, 255, 255, 0.1);
+  --scroll-thumb: rgba(255, 255, 255, 0.3);
+  --scroll-thumb-hover: rgba(255, 255, 255, 0.5);
 }
 
 :root.dark {
@@ -25,4 +28,7 @@
   --profil-text-input: #d6d2f3;
   --context-parag-color: #dcd8ff;
 
+  --scroll-track: rgba(0, 0, 0, 0.25);
+  --scroll-thumb: rgba(0, 0, 0, 0.45);
+  --scroll-thumb-hover: rgba(0, 0, 0, 0.65);
 }

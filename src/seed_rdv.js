@@ -28,28 +28,23 @@ async function addAppointmentsByEmail(email) {
       "Appel client",
       "Médecin",
       "Sport",
-      "Sortie famille",
+      "Sortie",
       "Formation",
-      "Déjeuner pro",
-      "Projet personnel",
-      "Préparation dossier",
-      "Visite partenaire",
+      "Déjeuner",
+      "Projet ",
+      "Préparation ",
+      "Visite",
     ];
 
     for (const calendar of calendars) {
       const newAppointments = [];
 
-      // corriger les anciens calendriers sans `mode`
-      if (!calendar.mode) {
-        calendar.mode = calendar.title === "travail" ? "entreprise" : "perso";
-      }
 
       // Génération RDV
       const today = new Date();
 
-      for (let i = 0; i < 70; i++) {
+      for (let i = 0; i < 50; i++) {
         // Nombre de jours aléatoires autour d’aujourd’hui
-        // Exemple : -30 à +30
         const offsetDays = Math.floor(Math.random() * 61) - 30;
 
         const start = new Date(today);
@@ -66,7 +61,7 @@ async function addAppointmentsByEmail(email) {
           randomTitles[Math.floor(Math.random() * randomTitles.length)];
 
         newAppointments.push({
-          name: `${randomTitle} (${calendar.title})`,
+          name: `${randomTitle}`,
           date_debut: start,
           date_fin: end,
           description: `Rendez-vous lié à "${randomTitle}" programmé le ${start.toLocaleDateString()} à ${start.getHours()}h.`,

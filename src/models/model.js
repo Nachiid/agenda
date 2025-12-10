@@ -486,26 +486,48 @@ exports.createCalendar = async function (
   isShared = false
 ) {
   const colorPalette = [
-    "#3498db", // Bleu
-    "#2ecc71", // Vert
-    "#e74c3c", // Rouge
+    "#3498db", // Bleu clair
+    "#2ecc71", // Vert clair
+    "#e74c3c", // Rouge clair
     "#f1c40f", // Jaune
     "#9b59b6", // Violet
     "#1abc9c", // Turquoise
     "#e67e22", // Orange
-    "#34495e", // Gris foncé
-    "#ff6b6b", // Rose
+    "#ff6b6b", // Rose clair
+    "#6c5ce7", // Indigo
     "#16a085", // Vert foncé
+
+    "#e84393", // Rose vif
+    "#00cec9", // Cyan clair
+    "#fdcb6e", // Sable doré
+    "#0984e3", // Bleu électrique
+    "#55efc4", // Menthe pastel
+    "#d63031", // Rouge intense
+    "#4834d4", // Bleu-violet profond
+    "#f8a5c2", // Rose pastel
+    "#00b894", // Vert émeraude
+    "#fab1a0", // Pêche doux
   ];
+
+  // Couleur spéciale pour calendrier permanent (alerte)
+  const partage = "#d63031"; // Rouge intense, très lisible
 
   const userCalendars = await Calendar.find({ userId });
   const usedColors = userCalendars.map((c) => c.color);
 
-  const availableColors = colorPalette.filter((c) => !usedColors.includes(c));
-  const color =
-    availableColors.length > 0
-      ? availableColors[0]
-      : colorPalette[Math.floor(Math.random() * colorPalette.length)];
+  let color;
+
+  // Si calendrier permanent
+  if (mode === "permanent") {
+    color = partage;
+  } else {
+    // Logique normale
+    const availableColors = colorPalette.filter((c) => !usedColors.includes(c));
+    color =
+      availableColors.length > 0
+        ? availableColors[0]
+        : colorPalette[Math.floor(Math.random() * colorPalette.length)];
+  }
 
   const newCalendar = new Calendar({
     title,
@@ -515,8 +537,10 @@ exports.createCalendar = async function (
     appointments,
     isShared,
   });
+
   return await newCalendar.save();
 };
+
 
 /**
  * Marque un calendrier comme inactif (suppression réversible).

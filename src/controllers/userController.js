@@ -32,7 +32,7 @@ exports.register = async (req, res) => {
   try {
     const NewUser = await model.register(firstName, lastName, email, password);
     const userId = await model.getUserIdByEmail(email);
-    await model.createCalendar(userId, "Rendez-vous partagés", "permanent", [], true);
+    await model.createCalendar(userId, "Partagés", "permanent", [], true);
     await model.createCalendar(userId, "Mon agenda", "personnel", []);
     return res
       .status(201)

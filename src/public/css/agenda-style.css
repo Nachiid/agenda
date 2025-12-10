@@ -322,7 +322,6 @@ body {
   flex: 1 1 100%;
 }
 
-
 /* ====== MAIN CONTENT ====== */
 /* Conteneur global du calendrier */
 #calendar-wrapper {
@@ -458,9 +457,11 @@ body {
 
 .sidebar-title {
   font-size: 1rem;
+  margin-top: 0.3rem;
   font-weight: 700;
   color: white;
   margin-bottom: 1rem;
+  line-height: 1.2;
 }
 
 .sidebar-section {
@@ -516,6 +517,33 @@ body {
 }
 
 /* liste des cal */
+
+.calendar-list,
+.calendar-list-entrep {
+  display: flex;
+  flex-direction: column;
+  gap: 0rem;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.calendar-list {
+  height: calc(5 * 50px + 4 * 0.5rem);
+  /* 5 * hauteur item + 4 * gap */
+  /* Ajuste 50px à la hauteur exacte de .event-item2 */
+}
+
+#calendar-list::-webkit-scrollbar,
+#calendar-list-entrep::-webkit-scrollbar {
+  width: 8px;
+}
+
+#calendar-list,
+#calendar-list-entrep {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+}
+
 .event-item2 {
   display: flex;
   justify-content: space-between;
@@ -638,6 +666,35 @@ body {
 }
 
 /* ====== CALENDAR CHECKLIST ====== */
+
+.calendars-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0; 
+  gap: 0.5rem;
+}
+
+.calendars-list > .sidebar-section {
+  flex-shrink: 0;
+}
+
+.calendars-list > h3 {
+  flex-shrink: 0;
+}
+
+.calendars-list > .sidebar-title {
+  flex-shrink: 0; /* ne rétrécit pas */
+  margin-bottom: 0.5rem;
+}
+
+#calendar-list,
+#calendar-list-entrep {
+  flex: 1; /* occupe tout l’espace restant */
+  overflow-y: auto; /* scrolle si nécessaire */
+  min-height: 0; /* empêche la création d’un sous-scroll */
+}
+
 .calendars-list label {
   display: flex;
   align-items: center;
@@ -665,6 +722,51 @@ body {
   width: 16px;
   height: 16px;
   accent-color: #4f46e5;
+}
+
+/* Conteneur du toggle */
+#triToggle {
+  width: 48px;
+  height: 24px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  box-sizing: border-box;
+}
+
+/* Knob */
+#triToggle .toggle-knob {
+  width: 20px;
+  height: 20px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+}
+
+/* État activé */
+#triToggle[data-state="1"] .toggle-knob {
+  /* déplacer exactement la largeur du toggle - largeur du knob - 2*padding */
+  transform: translateX(calc(48px - 20px - 4px));
+}
+
+/* Fond différent selon l’état */
+#triToggle[data-state="1"] {
+  background-color: #667ce7; /* violet clair */
+}
+
+#triToggle[data-state="0"] {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Hover */
+#triToggle:hover {
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 /*--------------------------------------------------------------*/

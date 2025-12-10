@@ -7,7 +7,7 @@ const model = require("../models/model");
 exports.softDelete = async (req, res) => {
     const { item_type, id } = req.params;
     const userId = req.user.id; 
-    const { date_to_exclude } = req.body; // Récupération date exclusion (optionnel)
+    const { date_to_exclude } = req.body;
 
     try {
         let result;

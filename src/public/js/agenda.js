@@ -31,6 +31,19 @@ function addActiveCalendarIdLocal(id) {
   setActiveCalendarIdsLocal(ids);
 }
 
+function removeNewEvents() {
+  if (!calendar) return;
+
+  // Récupérer tous les events
+  const events = calendar.getEvents();
+
+  events.forEach((event) => {
+    if (event.extendedProps?.isNew === true) {
+      event.remove();
+    }
+  });
+}
+
 /**
  * Supprime un ID de la liste des calendriers actifs
  * S'assure qu'il reste au moins un ID actif
@@ -66,6 +79,7 @@ function updateCalendarView(calendars, calendar) {
               calendarId: cal._id,
               event_role: cal.role,
               isRecurent: r.isRecurent || [],
+              isNew: false,
             },
             display: "auto",
           };
@@ -111,7 +125,6 @@ function updateCalendarView(calendars, calendar) {
         });
       }
     });
-
     calendar.render();
   } catch (err) {
     showMessage("Erreur lors de la mise à jour du calendrier", "error");
@@ -139,45 +152,38 @@ function removeCalendarEvents(calendarId, calendar) {
  * Gère l'affichage des calendriers avec max 4 visibles et un bouton "Afficher plus / moins"
  */
 function renderCalendarListUI(listDivs) {
-  const MAX_VISIBLE = 4;
+  const VISIBLE_COUNT = 6;
 
-  // Accepte un seul élément ou un tableau
   const divArray = Array.isArray(listDivs) ? listDivs : [listDivs];
 
   divArray.forEach((div) => {
     if (!div) return;
 
     const items = Array.from(div.querySelectorAll(".event-item2"));
+    if (items.length === 0) return;
 
-    // Réinitialisation propre
-    div.style.maxHeight = "";
-    div.style.overflowY = "";
+    // Hauteur d'un item
+    const itemHeight = items[0].offsetHeight;
+    const gap = parseFloat(getComputedStyle(div).gap) || 0;
 
-    if (items.length <= MAX_VISIBLE) {
-      // Pas de scroll si 4 ou moins
-      return;
-    }
+    // Hauteur finale = visible items + gap entre eux
+    const visibleHeight =
+      itemHeight * Math.min(items.length, VISIBLE_COUNT) +
+      gap * (Math.min(items.length, VISIBLE_COUNT) - 1);
 
-    // Calcul précis de la hauteur des 4 premiers items
-    let height = 0;
-    for (let i = 0; i < MAX_VISIBLE; i++) {
-      height += items[i].offsetHeight;
-    }
-
-    // Appliquer le scroll uniquement AU conteneur, pas au parent
-    div.style.maxHeight = height + "px";
-    div.style.overflowY = "auto";
+    div.style.height = visibleHeight + "px";
+    div.style.overflowY = items.length > VISIBLE_COUNT ? "auto" : "hidden";
   });
 }
 
 /**
- * Crée un element dans la list des calendriers /////////////////
+ * Crée un element dans la list des calendriers
  */
 
 function createCalendarElement(cal, calendar) {
   let calendarListDiv;
 
-  if (cal.mode === "personnel") {
+  if (cal.mode === "personnel" || cal.mode === "permanent") {
     calendarListDiv = document.getElementById("calendar-list");
   } else if (cal.mode === "entreprise") {
     calendarListDiv = document.getElementById("calendar-list-entrep");
@@ -214,6 +220,7 @@ function createCalendarElement(cal, calendar) {
         return;
       }
       if (activeIds.includes(calendarId)) {
+        removeNewEvents();
         removeActiveCalendarIdLocal(calendarId);
         removeCalendarEvents(calendarId, calendar);
       }
@@ -238,6 +245,7 @@ function createCalendarElement(cal, calendar) {
         return;
       }
       updateCalendarView(data.calendars, calendar);
+      removeNewEvents();
       updateCalendarCheckboxes(getActiveCalendarIdsLocal());
       await window.fetchAppointments(getActiveCalendarIdsLocal());
     } catch (err) {
@@ -328,7 +336,7 @@ function createCalendarElement(cal, calendar) {
   const ExpoBtn = document.createElement("Button");
   ExpoBtn.classList.add("menu-expo");
   ExpoBtn.dataset.id = cal._id;
-  ExpoBtn.innerHTML = `<i class="fas fa-expo-alt"></i> Exporter`;
+  ExpoBtn.innerHTML = `<i class="fa-solid fa-arrow-up-from-bracket"></i> Exporter`;
   menu.appendChild(ExpoBtn);
 
   ExpoBtn.addEventListener("click", (e) => {
@@ -337,12 +345,65 @@ function createCalendarElement(cal, calendar) {
     window.location.href = `/user/calendar/export/${calendarId}`;
   });
 
-  // Bouton supprimer
-  const deleteBtn = document.createElement("button");
-  deleteBtn.classList.add("menu-delete", "delete-btn-cal");
-  deleteBtn.dataset.id = cal._id;
-  deleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i> Supprimer`;
-  menu.appendChild(deleteBtn);
+  if (cal.mode !== "permanent") {
+    // Bouton supprimer
+    const deleteBtn = document.createElement("button");
+    deleteBtn.classList.add("menu-delete", "delete-btn-cal");
+    deleteBtn.dataset.id = cal._id;
+    deleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i> Supprimer`;
+    menu.appendChild(deleteBtn);
+
+    // --- Gestion suppression existante ---
+    deleteBtn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const calendarId = calDiv.dataset.id;
+      const confirmed = await showConfirm(
+        `Voulez-vous vraiment placer ce calendrier dans la corbeille ?`
+      );
+      if (!confirmed) return;
+
+      try {
+        /*const date_to_exclude = new Date();*/
+        const res = await fetch(`/delete/calendar/${calendarId}`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          /*body: JSON.stringify({ date_to_exclude }),*/
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          let errorMessage = data.message || "Erreur lors de la suppression.";
+          if (data.error) {
+            errorMessage += `: ${data.error}`;
+          }
+          showMessage(errorMessage, "error");
+          return;
+        }
+        calDiv.remove();
+
+        renderCalendarListUI([
+          document.getElementById("calendar-list"),
+          document.getElementById("calendar-list-entrep"),
+        ]);
+
+        removeCalendarEvents(calendarId, calendar);
+
+        showMessage("Calendrier placé dans la corbeille.", "success");
+        if (getActiveCalendarIdsLocal().length === 0) {
+          const firstCalendarDiv = document.querySelector(".event-item2");
+          if (firstCalendarDiv) {
+            const newCalendarId = firstCalendarDiv.dataset.id;
+            setActiveCalendarIdsLocal([newCalendarId]);
+          }
+        }
+      } catch (err) {
+        showMessage("Erreur serveur", "error");
+      }
+    });
+  }
 
   calDiv.appendChild(menuWrapper);
 
@@ -360,51 +421,6 @@ function createCalendarElement(cal, calendar) {
       m.classList.add("hidden");
       m.classList.remove("show");
     });
-  });
-
-  // --- Gestion suppression existante ---
-  deleteBtn.addEventListener("click", async (e) => {
-    e.stopPropagation();
-    const calendarId = calDiv.dataset.id;
-    const confirmed = await showConfirm(
-      `Voulez-vous vraiment placer ce calendrier dans la corbeille ?`
-    );
-    if (!confirmed) return;
-
-    try {
-      const res = await fetch(`/delete/calendar/${calendarId}`, {
-        method: "POST",
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        let errorMessage = data.message || "Erreur lors de la suppression.";
-        if (data.error) {
-          errorMessage += `: ${data.error}`;
-        }
-        showMessage(errorMessage, "error");
-        return;
-      }
-      calDiv.remove();
-
-      renderCalendarListUI([
-        document.getElementById("calendar-list"),
-        document.getElementById("calendar-list-entrep"),
-      ]);
-
-      removeCalendarEvents(calendarId, calendar);
-
-      showMessage("Calendrier placé dans la corbeille.", "success");
-      if (getActiveCalendarIdsLocal().length === 0) {
-        const firstCalendarDiv = document.querySelector(".event-item2");
-        if (firstCalendarDiv) {
-          const newCalendarId = firstCalendarDiv.dataset.id;
-          setActiveCalendarIdsLocal([newCalendarId]);
-        }
-      }
-    } catch (err) {
-      showMessage("Erreur serveur", "error");
-    }
   });
 
   calendarListDiv.appendChild(calDiv);
@@ -444,6 +460,7 @@ function openEventDetailsPopup(event, mode) {
       date_fin: event.end,
       calendar_id: event.extendedProps.calendarId,
       role: event.extendedProps.event_role,
+      isNew: false,
     };
 
     //renderCalendarField("edit");
@@ -642,38 +659,44 @@ function updateCalendar({ type, eventData }) {
         eventToUpdate.setProp("title", eventData.name);
 
         if (eventData.isRecurent && eventData.isRecurent.length > 0) {
-           // Si l'événement devient récurrent ou change de récurrence
-           // Le plus simple est souvent de supprimer et recréer pour rrule
-           eventToUpdate.remove();
-           const recurrence = eventData.isRecurent[0];
-           const duration = new Date(eventData.date_fin) - new Date(eventData.date_debut);
-           calendar.addEvent({
-              id: eventData._id,
-              title: eventData.name,
-              allDay: duration >= 86400000,
-              rrule: {
-                freq: recurrence.type,
-                dtstart: eventData.date_debut,
-                until: recurrence.date_fin
-              },
-              duration: duration,
-              extendedProps: { 
-                  description: eventData.description,
-                  isRecurent: eventData.isRecurent
-              },
-           });
+          // Si l'événement devient récurrent ou change de récurrence
+          // Le plus simple est souvent de supprimer et recréer pour rrule
+          eventToUpdate.remove();
+          const recurrence = eventData.isRecurent[0];
+          const duration =
+            new Date(eventData.date_fin) - new Date(eventData.date_debut);
+          calendar.addEvent({
+            id: eventData._id,
+            title: eventData.name,
+            allDay: duration >= 86400000,
+            rrule: {
+              freq: recurrence.type,
+              dtstart: eventData.date_debut,
+              until: recurrence.date_fin,
+            },
+            duration: duration,
+            extendedProps: {
+              description: eventData.description,
+              isRecurent: eventData.isRecurent,
+              isNew: false,
+            },
+          });
         } else {
-            // Si ce n'est plus récurrent, on s'assure qu'il est bien set
-            // Note: setStart/setEnd might not work well if transitioning from rrule to normal
-            // Safer to remove and re-add if structure changes significantly, but let's try basic update
-             eventToUpdate.setStart(eventData.date_debut);
-             eventToUpdate.setEnd(eventData.date_fin);
-             
-             const duration = new Date(eventData.date_fin) - new Date(eventData.date_debut);
-             eventToUpdate.setAllDay(duration >= 86400000);
+          // Si ce n'est plus récurrent, on s'assure qu'il est bien set
+          // Note: setStart/setEnd might not work well if transitioning from rrule to normal
+          // Safer to remove and re-add if structure changes significantly, but let's try basic update
+          eventToUpdate.setStart(eventData.date_debut);
+          eventToUpdate.setEnd(eventData.date_fin);
 
-             eventToUpdate.setExtendedProp("description", eventData.description);
-             eventToUpdate.setExtendedProp("isRecurent", eventData.isRecurent || []);
+          const duration =
+            new Date(eventData.date_fin) - new Date(eventData.date_debut);
+          eventToUpdate.setAllDay(duration >= 86400000);
+
+          eventToUpdate.setExtendedProp("description", eventData.description);
+          eventToUpdate.setExtendedProp(
+            "isRecurent",
+            eventData.isRecurent || []
+          );
         }
       }
       break;
@@ -685,11 +708,13 @@ function updateCalendar({ type, eventData }) {
         extendedProps: {
           description: eventData.description,
           isRecurent: eventData.isRecurent || [],
+          isNew: true,
         },
         event_role: "Editor",
       };
 
-      const duration = new Date(eventData.date_fin) - new Date(eventData.date_debut);
+      const duration =
+        new Date(eventData.date_fin) - new Date(eventData.date_debut);
       if (duration >= 86400000) {
         newEventObj.allDay = true;
       }
@@ -740,7 +765,7 @@ function initHolidayCalendar(calendar) {
   if (!calendarListDiv) return;
 
   const holidayCalId = "french-holidays";
-  
+
   // Vérifier si déjà présent
   if (calendarListDiv.querySelector(`[data-id="${holidayCalId}"]`)) return;
 
@@ -762,19 +787,23 @@ function initHolidayCalendar(calendar) {
   // Gestionnaire d'événements pour la checkbox
   checkbox.addEventListener("change", async (e) => {
     const isChecked = e.target.checked;
-    
+
     if (isChecked) {
       // 1. Vérifier si les événements sont déjà chargés (pour éviter de refetcher inutilement)
-      const existingEvents = calendar.getEvents().filter(ev => ev.extendedProps.calendarId === holidayCalId);
+      const existingEvents = calendar
+        .getEvents()
+        .filter((ev) => ev.extendedProps.calendarId === holidayCalId);
       if (existingEvents.length > 0) return; // Déjà là
 
       try {
         // 2. Fetcher l'API
-        const res = await fetch("https://calendrier.api.gouv.fr/jours-feries/metropole.json");
+        const res = await fetch(
+          "https://calendrier.api.gouv.fr/jours-feries/metropole.json"
+        );
         if (!res.ok) throw new Error("Erreur récupération jours fériés");
-        
+
         const data = await res.json();
-        
+
         // 3. Convertir et ajouter au calendrier
         // L'API renvoie un objet : { "2025-01-01": "1er janvier", ... }
         const events = Object.entries(data).map(([date, name]) => ({
@@ -789,21 +818,20 @@ function initHolidayCalendar(calendar) {
           extendedProps: {
             description: "Jour férié en France",
             calendarId: holidayCalId,
-            event_role: "Viewer"
+            event_role: "Viewer",
           },
-          editable: false
+          editable: false,
         }));
 
-        events.forEach(ev => calendar.addEvent(ev));
+        events.forEach((ev) => calendar.addEvent(ev));
         showMessage("Jours fériés ajoutés", "success");
-
       } catch (err) {
         console.error(err);
         showMessage("Impossible de charger les jours fériés", "error");
         e.target.checked = false;
       }
     } else {
-      // 4. Supprimer les événements
+      // Supprimer les événements
       removeCalendarEvents(holidayCalId, calendar);
     }
   });
@@ -819,12 +847,12 @@ function initHolidayCalendar(calendar) {
   titleDiv.classList.add("event-info2");
   const titleSpan = document.createElement("div");
   titleSpan.classList.add("event-title2");
-  titleSpan.textContent = "Jours Fériés (France)";
+  titleSpan.textContent = "Jours Fériés FR";
   titleDiv.appendChild(titleSpan);
   leftDiv.appendChild(titleDiv);
 
   calDiv.appendChild(leftDiv);
-  
+
   calendarListDiv.appendChild(calDiv);
 }
 
@@ -860,7 +888,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     locale: "fr",
     themeSystem: "standard",
     nowIndicator: true,
-    slotMinTime: "01:00:01",
+    slotMinTime: "00:00:01",
     slotMaxTime: "23:59:59",
     slotDuration: "00:15:00",
     slotLabelInterval: "01:00",
@@ -1010,7 +1038,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Ajuste la couleur des événements en fonction du calendrier
     eventContent: function (arg) {
-      const backgroundColor = arg.event.backgroundColor || "#4f46e5";
+      const backgroundColor = arg.event.backgroundColor || "#ff9f1c";
       const textColor = "#fff";
 
       return {
@@ -1019,7 +1047,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     },
   });
   calendar.render();
-  
+
   // --- Initialiser le calendrier des jours fériés ---
   initHolidayCalendar(calendar);
 
@@ -1555,7 +1583,7 @@ const persoDiv = document.getElementById("calendar-list");
 const entrepDiv = document.getElementById("calendar-list-entrep");
 const event = document.querySelector("#evenement_a_venir");
 
-const labels = ["Mes calendrier Personnel", "Mes calendrier Professionel"];
+const labels = ["Mes calendriers Personnels", "Mes calendriers Professionels"];
 
 const mode = document.querySelector(".calendar-mode");
 
