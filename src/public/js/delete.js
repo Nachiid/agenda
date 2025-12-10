@@ -38,12 +38,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Rafraîchir la vue principale sans recharger la page
                     if (type === "calendar") {
                         window.createCalendarElement(result.item, window.calendar);
+                        window.addActiveCalendarIdLocal(result.item._id);
+                        window.updateCalendarCheckboxes();
+                        window.updateCalendarView([result.item], window.calendar);
+                        window.fetchAppointments(window.getActiveCalendarIdsLocal());
                     } else if (type === 'appointment'){
                         // Mise à jour du calendrier
                         window.updateCalendar({
                             type: "add",
                             eventData: result.item,
                         });
+                        window.fetchAppointments(window.getActiveCalendarIdsLocal());
                     }
 
                 } else {
