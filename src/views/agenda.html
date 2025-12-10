@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="css/global-style.css" />
   <link rel="stylesheet" href="css/agenda-style.css" />
 
-
   <!-- Font Awesome Free -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <!-- Tippy.js CSS -->
@@ -285,19 +284,7 @@
     </div>
   </div>
 
-  <!-- === POPUP PARTAGE AGENDA === -->
-  <div id="shareCalendarProModal" class="modal hidden">
-    <div class="modal-content">
-      <h3>Partager le calendrier</h3>
 
-      <input type="text" id="shareEmailInput" placeholder="email..." />
-
-      <div id="shareUserResults"></div>
-
-      <button id="btnCancelShare">Annuler</button>
-      <button id="btnConfirmShare">Envoyer</button>
-    </div>
-  </div>
 
   <!-- === POPUP PARTAGE RENDEZ-VOUS === -->
   <div id="shareAppointmentModal" class="modal hidden">
@@ -339,6 +326,22 @@
       </div>
     </div>
   </div>
+
+<!-- === POPUP shareCalendarModal === -->
+    <div id="shareCalendarModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Partager le calendrier</h3>
+
+      <input type="text" id="shareEmailInput" placeholder="email...">
+
+      <div id="shareUserResults"></div>
+
+      <button id="btnCancelShare">Annuler</button>
+      <button id="btnConfirmShare">Envoyer</button>
+    </div>
+  </div>
+
+
 
 </body>
 <script src="/js/theme.js" defer></script>

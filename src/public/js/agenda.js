@@ -175,7 +175,7 @@ function renderCalendarListUI(listDivs) {
     div.style.overflowY = items.length > VISIBLE_COUNT ? "auto" : "hidden";
   });
 }
-
+window.renderCalendarListUI = renderCalendarListUI;
 /**
  * Crée un element dans la list des calendriers
  */
@@ -932,6 +932,14 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
           }
         }, 30);
+      }
+    },
+
+    windowResize: function () {
+      if (window.innerWidth < 500) {
+        calendar.changeView("listWeek");
+      } else {
+        calendar.changeView("timeGridWeek");
       }
     },
 
