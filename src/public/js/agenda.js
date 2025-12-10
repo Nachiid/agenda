@@ -1,5 +1,5 @@
 let calendar; // variable globale
-window.calendar = calendar;
+
 /**
  * Met à jour le data-attribute avec la liste d'IDs
  */
@@ -30,6 +30,7 @@ function addActiveCalendarIdLocal(id) {
   if (!ids.includes(id)) ids.push(id);
   setActiveCalendarIdsLocal(ids);
 }
+window.addActiveCalendarIdLocal = addActiveCalendarIdLocal;
 
 function removeNewEvents() {
   if (!calendar) return;
@@ -131,6 +132,7 @@ function updateCalendarView(calendars, calendar) {
     console.error(err);
   }
 }
+window.updateCalendarView = updateCalendarView;
 
 /**updateCalendarView
  * supprimer les événements d’un calendrier spécifique
@@ -427,6 +429,7 @@ function createCalendarElement(cal, calendar) {
 }
 
 window.createCalendarElement = createCalendarElement;
+window.updateCalendarCheckboxes = updateCalendarCheckboxes;
 /**
  * Met à jour les cases à cocher des calendriers
  * en fonction des IDs stockés dans le localStorage
@@ -1055,6 +1058,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     },
   });
   calendar.render();
+  window.calendar = calendar;
 
   // --- Initialiser le calendrier des jours fériés ---
   initHolidayCalendar(calendar);
