@@ -58,6 +58,32 @@ async function chargerProfil() {
     console.error(error);
   }
 }
+// === CONFIRMATION LORS DU CHANGEMENT D'EMAIL + SAUVEGARDE AUTO ===
+let oldEmailValue = "";
+
+document.querySelector("#email").addEventListener("focus", function () {
+  oldEmailValue = this.value; // Sauvegarde de l'ancien email
+});
+
+document.querySelector("#email").addEventListener("change", async function () {
+  const newEmail = this.value.trim();
+
+  // Si l'email n'a pas changé, on ne fait rien
+  if (newEmail === oldEmailValue) return;
+
+  const confirmed = await showConfirm(
+    " Modifier votre email changera votre méthode de connexion.\n\n" +
+    "Voulez-vous enregistrer ce changement maintenant ?"
+  );
+
+  if (!confirmed) {
+    this.value = oldEmailValue; // Restaure l'ancien email si annulation
+    return;
+  }
+
+  //  Enregistrement auto du profil
+  document.querySelector("#profileForm").requestSubmit();
+});
 
 // Charger le profil dès que la page est prête
 document.addEventListener("DOMContentLoaded", chargerProfil);
