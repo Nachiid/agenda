@@ -81,3 +81,32 @@ exports.getTrash = async (req, res) => {
         res.status(500).json({ message: "Erreur serveur." });
     }
 };
+
+/**
+ * Supprime définitivement un élément (calendrier ou rdv) de la corbeille.
+ */
+exports.deletePermanent = async (req, res) => {
+    const { item_type, id } = req.params;
+    const userId = req.user.id;
+
+    try {
+        let result;
+        if (item_type === 'calendar') {
+            result = await model.hardDeleteCalendar(userId, id);
+        } else if (item_type === 'appointment') {
+            result = await model.hardDeleteAppointment(id, userId);
+        } else {
+            return res.status(400).json({ message: "Type d'élément non valide." });
+        }
+
+        if (!result) {
+            return res.status(404).json({ message: "Élément non trouvé ou droits insuffisants." });
+        }
+
+        return res.status(200).json({ message: `L'élément a été supprimé définitivement.` });
+
+    } catch (error) {
+        console.error(`Erreur lors de la suppression définitive de ${item_type}:`, error);
+        res.status(500).json({ message: "Erreur serveur lors de la suppression." });
+    }
+};

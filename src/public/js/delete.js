@@ -15,13 +15,13 @@ document.addEventListener('DOMContentLoaded', function () {
         trashModal.classList.add('hidden');
     });
 
-    // Gère les clics pour restaurer les éléments
+    // Gère les clics pour restaurer ou supprimer définitivement les éléments
     trashContent.addEventListener('click', async (event) => {
-        if (event.target.classList.contains('btn-restore')) {
-            const button = event.target;
-            const id = button.dataset.id;
-            const type = button.dataset.type;
+        const button = event.target;
+        const id = button.dataset.id;
+        const type = button.dataset.type;
 
+        if (button.classList.contains('btn-restore')) {
             try {
                 const response = await fetch(`/restore/${type}/${id}`, {
                     method: 'POST',
@@ -51,6 +51,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             } catch (error) {
                 console.error('Erreur de restauration:', error);
+                alert(error.message);
+            }
+        } else if (button.classList.contains('btn-delete-permanent')) {
+            try {
+                const response = await fetch(`/delete/permanent/${type}/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    loadTrashContent();
+                } else {
+                    throw new Error(result.message || "Erreur lors de la suppression définitive.");
+                }
+            } catch (error) {
+                console.error('Erreur de suppression:', error);
                 alert(error.message);
             }
         }
@@ -84,7 +104,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     const li = document.createElement('li');
                     li.innerHTML = `
                         <span>${cal.title} (Calendrier)</span>
-                        <button class="btn-restore" data-id="${cal._id}" data-type="calendar">Restaurer</button>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn-restore" data-id="${cal._id}" data-type="calendar">Restaurer</button>
+                            <button class="btn-delete-permanent" 
+                                    style="background: #ef4444; color: white; border: none; padding: 0.4rem 0.9rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s ease; box-shadow: 0 2px 5px rgba(239, 68, 68, 0.3);"
+                                    onmouseover="this.style.background='#dc2626'; this.style.transform='translateY(-1px)';"
+                                    onmouseout="this.style.background='#ef4444'; this.style.transform='translateY(0)';"
+                                    data-id="${cal._id}" data-type="calendar">Supprimer</button>
+                        </div>
                     `;
                     calendarsList.appendChild(li);
                 });
@@ -101,7 +128,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     const li = document.createElement('li');
                     li.innerHTML = `
                         <span>${app.name} (Rendez-vous du calendrier "${app.calendarTitle}")</span>
-                        <button class="btn-restore" data-id="${app._id}" data-type="appointment">Restaurer</button>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn-restore" data-id="${app._id}" data-type="appointment">Restaurer</button>
+                            <button class="btn-delete-permanent" 
+                                    style="background: #ef4444; color: white; border: none; padding: 0.4rem 0.9rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s ease; box-shadow: 0 2px 5px rgba(239, 68, 68, 0.3);"
+                                    onmouseover="this.style.background='#dc2626'; this.style.transform='translateY(-1px)';"
+                                    onmouseout="this.style.background='#ef4444'; this.style.transform='translateY(0)';"
+                                    data-id="${app._id}" data-type="appointment">Supprimer</button>
+                        </div>
                     `;
                     appointmentsList.appendChild(li);
                 });

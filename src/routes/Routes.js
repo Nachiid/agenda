@@ -117,6 +117,9 @@ router.post("/delete/:item_type/:id", auth, deleteController.softDelete);
 // Restaurer un élément de la corbeille
 router.post("/restore/:item_type/:id", auth, deleteController.restoreItem);
 
+// Supprimer définitivement un élément de la corbeille
+router.delete("/delete/permanent/:item_type/:id", auth, deleteController.deletePermanent);
+
 // Récupérer le contenu de la corbeille
 router.get("/trash", auth, deleteController.getTrash);
 

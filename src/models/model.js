@@ -836,3 +836,54 @@ exports.purgeOldItems = async function () {
     }
   );
 };
+
+/**
+ * Supprime définitivement un calendrier de la corbeille.
+ */
+exports.hardDeleteCalendar = async function (userId, calendarId) {
+  // On vérifie que le calendrier est bien inactif et appartient à l'utilisateur
+  const result = await Calendar.deleteOne({
+    _id: calendarId,
+    userId: userId,
+    actif: false,
+  });
+
+  if (result.deletedCount > 0) {
+    // Nettoyage des partages
+    await sharedCalendar.deleteMany({ calendarId: calendarId });
+    return true;
+  }
+  return false;
+};
+
+/**
+ * Supprime définitivement un rendez-vous de la corbeille.
+ */
+exports.hardDeleteAppointment = async function (appointmentId, userId) {
+  // 1. Trouver le calendrier qui contient ce RDV
+  const calendar = await Calendar.findOne({ "appointments._id": appointmentId });
+  if (!calendar) return false;
+
+  // 2. Vérifier les droits (Propriétaire ou Éditeur)
+  const isOwner = calendar.userId.toString() === userId.toString();
+  let isEditor = false;
+
+  if (!isOwner) {
+    const shared = await sharedCalendar.findOne({
+      calendarId: calendar._id,
+      userId: userId,
+      role: "Editor",
+    });
+    if (shared) isEditor = true;
+  }
+
+  if (!isOwner && !isEditor) return false;
+
+  // 3. Supprimer le rendez-vous du tableau
+  const result = await Calendar.updateOne(
+    { _id: calendar._id },
+    { $pull: { appointments: { _id: appointmentId } } }
+  );
+
+  return result.modifiedCount > 0;
+};
