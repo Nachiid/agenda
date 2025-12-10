@@ -17,7 +17,11 @@ body {
   left: 0;
   width: 100%;
   height: 5rem; /* ajuster selon la hauteur de la navbar */
-  background: linear-gradient(to right, #667ce7 0%, #6f60bf 100%);
+  background: linear-gradient(
+    to right,
+    var(--gradient-theme-start) 0%,
+    var(--gradient-theme-end) 100%
+  );
   z-index: 999; /* en dessous de la navbar elle-même */
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 1.1rem;
