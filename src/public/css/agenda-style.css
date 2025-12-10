@@ -341,7 +341,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 30;
-  background: white;
+  background: var(--calendar-bg);
   border-radius: 0.5rem;
 }
 
@@ -396,10 +396,10 @@ body {
 
 /* ====== CALENDAR ====== */
 #calendar {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--calendar-bg);
   border-radius: 1rem;
   padding: 1rem;
-  color: #1f2937;
+  color: var(--calendar-text);
   height: 100%;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   overflow: hidden;
@@ -410,7 +410,29 @@ body {
 .fc-toolbar-title {
   font-size: 1.25rem !important;
   font-weight: 600 !important;
-  color: #1f2937 !important;
+  color: var(--calendar-text) !important;
+}
+
+.fc-col-header {
+  background: var(--calendar-bg);
+}
+
+.fc-col-header-cell-cushion,
+.fc-daygrid-day-number,
+.fc-timegrid-slot-label-cushion,
+.fc-list-day-text,
+.fc-list-day-side-text {
+  color: var(--calendar-text) !important;
+  text-decoration: none !important;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: var(--calendar-border) !important;
+}
+
+.fc-daygrid-day:hover {
+  background-color: var(--calendar-hover);
 }
 
 .fc-event {
@@ -423,11 +445,11 @@ body {
   width: 8px;
 }
 #calendar::-webkit-scrollbar-track {
-  background: #e5e7eb;
+  background: var(--calendar-scroll-track);
   border-radius: 10px;
 }
 #calendar::-webkit-scrollbar-thumb {
-  background: #9ca3af;
+  background: var(--calendar-scroll-thumb);
   border-radius: 10px;
 }
 

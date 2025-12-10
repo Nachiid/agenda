@@ -14,6 +14,13 @@
   --scroll-track: rgba(255, 255, 255, 0.1);
   --scroll-thumb: rgba(255, 255, 255, 0.3);
   --scroll-thumb-hover: rgba(255, 255, 255, 0.5);
+
+  --calendar-bg: rgba(255, 255, 255, 0.95);
+  --calendar-text: #1f2937;
+  --calendar-border: #e5e7eb;
+  --calendar-hover: rgba(0, 0, 0, 0.05);
+  --calendar-scroll-track: #e5e7eb;
+  --calendar-scroll-thumb: #9ca3af;
 }
 
 :root.dark {
@@ -31,4 +38,11 @@
   --scroll-track: rgba(0, 0, 0, 0.25);
   --scroll-thumb: rgba(0, 0, 0, 0.45);
   --scroll-thumb-hover: rgba(0, 0, 0, 0.65);
+
+  --calendar-bg: rgba(31, 27, 51, 0.95);
+  --calendar-text: #dcd8ff;
+  --calendar-border: #4a446a;
+  --calendar-hover: rgba(255, 255, 255, 0.08);
+  --calendar-scroll-track: #374151;
+  --calendar-scroll-thumb: #6b7280;
 }
