@@ -90,6 +90,7 @@ body {
 .search-wrapper {
   width: 100%;
   max-width: 500px;
+  position: relative;
 }
 
 .search-container {
@@ -155,144 +156,114 @@ body {
 
 /* ===== RESPONSIVE ===== */
 
-/* 950px : cacher juste le texte du logo */
-@media (max-width: 950px) {
-  .logo-text {
+/* < 1070px : on supprime le logo */
+@media (max-width: 1070px) {
+  .logo {
     display: none;
   }
 }
 
-/* 850px : logo caché, recherche à côté du bouton, liens restent à droite */
-@media (max-width: 850px) {
-  .logo svg,
-  .logo-text {
-    display: none;
+/* ===== RESPONSIVE AGENDA - AMÉLIORATION CENTRAGE ===== */
+
+/* < 900px : Layout ajusté - Mode Mobile/Tablette */
+@media (max-width: 900px) {
+  
+  /* 1. Navbar height auto pour englober les 2 lignes */
+  .navbar-wrapper {
+    height: auto; 
+    min-height: 5rem;
+    padding-bottom: 0.8rem;
   }
 
+  .dashboard-container {
+    margin-top: 10.5rem; 
+  }
+
+  /* 2. On centre le contenu global de la navbar */
   .nav-content {
-    flex-wrap: nowrap; /* reste sur une ligne */
-    align-items: center;
-    justify-content: space-between; /* bouton + recherche à gauche, liens à droite */
-  }
-
-  .left-area {
-    flex: 0 0 auto; /* bouton reste à gauche */
-    order: 1;
-  }
-
-  .nav-search-area {
-    order: 2; /* juste après le bouton */
-    flex: 1 1 auto; /* prend l’espace restant entre bouton et liens */
     display: flex;
-    justify-content: flex-start; /* barre commence après bouton */
-    margin-top: 0;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-  }
-
-  .nav-links {
-    flex: 0 0 auto; /* liens prennent leur place naturelle */
-    order: 3;
-    justify-content: flex-end;
+    flex-wrap: wrap; 
+    justify-content: center; /* C'est ici que la magie opère : tout est centré */
+    align-items: center;
     gap: 0.5rem;
   }
 
-  .search-wrapper {
-    width: 100%;
-    max-width: 500px;
-    box-sizing: border-box;
-  }
-}
-
-/* 750px et en dessous : réduction progressive du champ de recherche */
-@media (max-width: 850px) {
-  .nav-search-area {
-    order: 2; /* reste sur la ligne avec bouton et liens */
-    flex: 1 1 auto; /* prend l’espace restant et rétrécit si nécessaire */
-    display: flex;
-    justify-content: flex-start; /* alignée avec bouton */
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    margin-top: 0;
-    min-width: 0; /* permet à flex de rétrécir */
+  /* --- LIGNE 1 : LES LIENS --- */
+  .nav-links {
+    order: 1;
+    flex: 1 1 100%; /* Force une ligne complète */
+    justify-content: center; /* Centre les liens (Agenda, Profil...) */
+    margin-bottom: 0.5rem;
+    gap: 1.2rem; /* Un peu plus d'espace entre les liens pour le confort tactile */
   }
 
-  .search-wrapper {
-    width: 100%;
-    max-width: 100%; /* ne dépasse jamais la navbar */
-    min-width: 0; /* permet de rétrécir progressivement */
-    box-sizing: border-box;
-  }
-
-  .search-container {
-    width: 100%;
-    min-width: 0; /* important pour rétraction du champ input */
-    box-sizing: border-box;
-  }
-
-  .search-container input {
-    min-width: 0; /* permet au placeholder de ne pas bloquer la réduction */
-  }
-}
-
-@media (max-width: 520px) {
-  .nav-content {
-    flex-wrap: wrap;
-    align-items: center;
-    /*justify-content: flex-start;*/
-    gap: 0;
-  }
-
-  /* Ligne supérieure : bouton + liens */
+  /* --- LIGNE 2 : GROUPE "BURGER + RECHERCHE" --- */
+  
+  /* Le bouton Burger (3 barres) */
   .left-area {
+    order: 2;
+    flex: 0 0 auto;
+    margin-right: 0.5rem; /* Petit espace entre le burger et la recherche */
+  }
+
+  /* La barre de recherche */
+  .nav-search-area {
+    order: 3;
+    flex: 0 1 auto; /* Ne s'étire plus à fond (flex-grow: 0), s'adapte (auto) */
+    
+    /* On définit une largeur confortable mais fixe pour qu'elle soit centrée avec le burger */
+    width: 320px; 
+    max-width: 100%; /* Pour ne pas dépasser sur les très petits écrans */
+    
+    margin-top: 0;
     display: flex;
-    align-items: center;
-    order: 1;
-    flex: 0 0 auto; /* bouton prend sa largeur naturelle */
+    justify-content: center;
   }
 
-  .nav-links {
-    display: flex;
-    align-items: center;
-    order: 1;
-    flex: 1 1 auto;
-    gap: 2.7rem; /* distance entre liens */
-    justify-content: flex-start; /* liens alignés à gauche */
-  }
-
-  /* Formulaire prend toute la largeur */
-  .nav-search-area form#appointments_search {
-    width: 100%;
-    display: flex; /* permet à .search-wrapper de s’étendre */
-    flex: 1 1 auto;
-    margin-top: 0.5rem;
-  }
-
+  /* On s'assure que l'input remplit bien la zone définie ci-dessus */
+  .nav-search-area form#appointments_search,
   .search-wrapper {
-    width: 100%; /* déjà présent, mais on s’assure */
-    display: flex;
-    justify-content: flex-start; /* début aligné avec le bouton */
+    width: 100%;
   }
 
+  /* Finition visuelle de l'input */
   .search-container {
-    flex: 1 1 auto; /* input s’étend sur toute la largeur restante */
-    min-width: 0; /* important pour que l’input rétrécisse si nécessaire */
-  }
-
-  .search-container input {
     width: 100%;
     box-sizing: border-box;
+    /* Optionnel : centrer le texte ou l'icone si désiré, sinon laisser par défaut */
   }
 }
 
-/* Pour écrans encore plus petits, réduire progressivement gap et input */
-@media (max-width: 400px) {
-  .nav-links {
-    gap: 0.5rem; /* espace réduit entre liens */
+/* < 500px : Ajustement pour les petits téléphones */
+@media (max-width: 500px) {
+  .nav-search-area {
+    width: 100%; /* Sur petit écran, on laisse la recherche prendre toute la largeur restante */
+    min-width: 0;
+  }
+  
+  /* Réduire la taille des liens si ça déborde */
+  .nav-link {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* < 650px : Optimisation pour petits écrans (comme sur le profil) */
+@media (max-width: 650px) {
+  /* On cache le texte du logo pour gagner de la place */
+  .logo-text {
+    display: none;
   }
 
-  .search-wrapper {
-    max-width: 100%; /* input continue de rétrécir */
+  /* On réduit la taille des liens ou on cache le texte si nécessaire */
+  .nav-link {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.85rem;
+  }
+  
+  /* Si vous voulez que les liens soient centrés sur tout petits écrans */
+  .nav-links {
+    gap: 0.5rem;
   }
 }
 
