@@ -167,22 +167,21 @@ body {
 
 /* < 900px : Layout ajusté - Mode Mobile/Tablette */
 @media (max-width: 900px) {
-  
   /* 1. Navbar height auto pour englober les 2 lignes */
   .navbar-wrapper {
-    height: auto; 
+    height: auto;
     min-height: 5rem;
     padding-bottom: 0.8rem;
   }
 
   .dashboard-container {
-    margin-top: 10.5rem; 
+    margin-top: 10.5rem;
   }
 
   /* 2. On centre le contenu global de la navbar */
   .nav-content {
     display: flex;
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
     justify-content: center; /* C'est ici que la magie opère : tout est centré */
     align-items: center;
     gap: 0.5rem;
@@ -198,7 +197,7 @@ body {
   }
 
   /* --- LIGNE 2 : GROUPE "BURGER + RECHERCHE" --- */
-  
+
   /* Le bouton Burger (3 barres) */
   .left-area {
     order: 2;
@@ -210,11 +209,11 @@ body {
   .nav-search-area {
     order: 3;
     flex: 0 1 auto; /* Ne s'étire plus à fond (flex-grow: 0), s'adapte (auto) */
-    
+
     /* On définit une largeur confortable mais fixe pour qu'elle soit centrée avec le burger */
-    width: 320px; 
+    width: 320px;
     max-width: 100%; /* Pour ne pas dépasser sur les très petits écrans */
-    
+
     margin-top: 0;
     display: flex;
     justify-content: center;
@@ -240,7 +239,7 @@ body {
     width: 100%; /* Sur petit écran, on laisse la recherche prendre toute la largeur restante */
     min-width: 0;
   }
-  
+
   /* Réduire la taille des liens si ça déborde */
   .nav-link {
     padding: 0.4rem 0.5rem;
@@ -260,7 +259,7 @@ body {
     padding: 0.4rem 0.5rem;
     font-size: 0.85rem;
   }
-  
+
   /* Si vous voulez que les liens soient centrés sur tout petits écrans */
   .nav-links {
     gap: 0.5rem;
@@ -668,7 +667,7 @@ body {
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 0; 
+  min-height: 0;
   gap: 0.5rem;
 }
 
@@ -1416,6 +1415,7 @@ body {
   color: var(--profil-text-input); /* couleur cohérente avec le thème */
   transition: transform 0.2s ease, color 0.2s ease;
   display: flex;
+  margin-right: 15px;
   align-items: center;
   justify-content: center;
   padding: 0.25rem;
@@ -1435,4 +1435,151 @@ body {
 .sidebar.hidden {
   width: 0;
   opacity: 0;
+}
+
+/* Champ caché */
+#mobileSearchBtn {
+  display: none;
+}
+
+/* ====== NAVBAR RESPONSIVE ====== */
+/* < 900px : Réorganisation de la navbar */
+/* ---- NAVBAR ---- */
+/* NAVBAR TOUJOURS EN UNE LIGNE */
+@media (max-width: 900px) {
+  .left-area {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  /* BOUTON MENU */
+  #sidebarToggle {
+    color: white;
+    font-size: 1.6rem;
+    background: none;
+    border: none;
+  }
+
+  /* BOUTON RECHERCHE */
+  #mobileSearchBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    z-index: 9999; /* 🔥 toujours visible */
+  }
+
+  /* Champ caché */
+  #appointments_search {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    padding: 0.6rem;
+    background: #1f2937;
+
+    transform-origin: top;
+    transform: scaleY(0);
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.25s ease;
+  }
+
+  /* Champ affiché */
+  #appointments_search.active {
+    transform: scaleY(1);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .logo-text {
+    display: none; /* cacher le texte du logo */
+  }/* Navbar principale */
+.navbar {
+    height: 45px;
+    display: flex;
+    align-items: center; /* centre verticalement */
+    justify-content: space-between; /* espace entre gauche et droite */
+    padding: 0 10px;
+    position: relative;
+}
+
+/* Conteneur de gauche (logo + boutons éventuels) */
+.left-area {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* espace entre logo et autres éléments */
+}
+
+/* Logo */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* espace entre SVG et texte */
+}
+
+/* Zone des liens et boutons à droite */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Boutons du type sidebarToggle et mobileSearchBtn */
+#sidebarToggle,
+#mobileSearchBtn {
+    font-size: 18px;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Si tu veux que les boutons restent bien visibles même sur mobile */
+.nav-links button,
+.nav-links a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    background: none;
+    border: none;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    margin-top: 55px; /* décale légèrement vers le bas */
+}
+
+
+/* Ajustement pour la zone recherche si besoin */
+.nav-search-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.left-area {
+
+    display: none;
+}
+
+    .sidebar {
+        position: fixed;   /* flotte au-dessus du contenu */
+        top: 70px;         /* décale pour ne pas cacher la navbar */
+        left: 0;
+        height: calc(99vh - 45px); /* prend toute la hauteur sauf la navbar */
+        z-index: 1000;     /* au-dessus du reste */
+        background-color: #1f2937; 
+        box-shadow: 2px 0 12px rgba(0,0,0,0.5);
+    }
+
+    
+
+
 }
