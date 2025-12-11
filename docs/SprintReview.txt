@@ -1,55 +1,50 @@
-# **Sprint Review – Sprint en cours**
+# **Sprint Review – Sprint 4**
 
-# **Fonctionnalités terminées**
+## **Objectifs du Sprint 4**
 
-### **1. Affichage des calendriers en parallèle**
+Le Sprint 4 avait pour objectifs principaux :
 
-La fonctionnalité est entièrement opérationnelle.
-L’utilisateur peut désormais afficher plusieurs calendriers en même temps, avec une intégration fluide dans FullCalendar.
-
-### **2. Définition d’une vue par défaut**
-
-La gestion de la vue par défaut (jour, semaine, mois ou liste) a été implémentée avec succès.
-Le calendrier se charge automatiquement selon la préférence définie par l’utilisateur.
-
-### **4. Import et export de calendriers**
-
-L’import/export au format ICS fonctionne correctement.
-L’utilisateur peut importer un fichier ICS, avec détection automatique du nom du calendrier, et exporter ses calendriers vers un format compatible.
-
-### **5. Recherche globale de rendez-vous**
-
-La recherche fonctionne sur l’ensemble des calendriers de l’utilisateur.
-Cela permet de trouver rapidement un rendez-vous sans parcourir les différentes vues.
+1. Implémenter les rendez-vous récurrents.
+2. Mettre en place un système de corbeille avec restauration sur 30 jours.
+3. Ajouter le mode sombre pour l’interface.
+4. Permettre un mode équipe / entreprise pour la collaboration.
+5. Intégrer les jours fériés dans le calendrier.
 
 ---
 
-# **Fonctionnalités partiellement réalisées**
+## **Fonctionnalités réalisées**
 
-### **3. Gestion des rendez-vous directement depuis le calendrier**
-
-* ✔ Modification d’un rendez-vous → **fonctionnelle**
-* ✔ Suppression d’un rendez-vous → **fonctionnelle**
-* x Création d’un rendez-vous depuis un créneau du calendrier → **non réalisée dans ce sprint**
-
-La gestion est donc partielle ; l’ajout direct depuis le calendrier reste à faire dans un prochain sprint.
+* **Rendez-vous récurrents** : Fonctionnalité implémentée et testée. Les utilisateurs peuvent créer des événements répétitifs quotidiens, hebdomadaires, mensuels, annuels ou personnalisés.
+* **Corbeille (restauration 30 jours)** : Les éléments supprimés sont correctement déplacés dans la corbeille et peuvent être restaurés facilement.
+* **Mode sombre** : Activation et désactivation du mode sombre parfaitement fonctionnelle, avec conservation des préférences utilisateur.
+* **Mode équipe / entreprise** : Collaboration multi-utilisateurs totalement opérationnelle, avec gestion des droits et partage de calendriers.
+* **Intégration des jours fériés** : Le calendrier prend en compte les jours fériés, visibles dans toutes les vues (jour, semaine, mois).
 
 ---
 
-# ** Fonctionnalité en cours / avec bugs**
+## **Points forts du Sprint**
 
-### **6. Collaboration entre utilisateurs**
-
-* ✔ Partage de calendrier → **fonctionnel**
-* x Affichage des calendriers partagés → **bug d’organisation**
-
-  * Les calendriers partagés apparaissent mais **ne sont pas triés** correctement selon les droits (éditeur / viewer).
-* ✏ Le développeur travaille encore sur :
-
-  * la gestion correcte de l’affichage selon les droits,
-  * la finalisation du partage de rendez-vous.
-
-Cette fonctionnalité est donc **en cours de développement**, partiellement disponible mais non finalisée.
+* Toutes les fonctionnalités prévues ont été livrées **complètement fonctionnelles** et validées par les tests.
+* L’application est **stable et performante**, sans bugs majeurs.
+* L’UI/UX a été améliorée, avec un design cohérent entre les différents modes et fonctionnalités.
+* La collaboration et les droits d’accès dans le mode équipe ont été testés et fonctionnent parfaitement.
+* Les retours des utilisateurs testeurs ont été **très positifs**, notamment sur les fonctionnalités collaboratives et le mode sombre.
 
 ---
 
+## **Démonstration**
+
+* Création d’un rendez-vous récurrent et modification d’un événement existant.
+* Suppression et restauration d’un rendez-vous depuis la corbeille.
+* Passage du mode clair au mode sombre et vérification de l’interface.
+* Partage d’un calendrier avec plusieurs utilisateurs et test des droits.
+* Affichage des jours fériés dans toutes les vues du calendrier.
+
+---
+
+## **Décisions et prochaines étapes**
+
+* **Décision** : Toutes les fonctionnalités du Sprint 4 sont **approuvées et prêtes pour production**.
+* **Prochaines étapes** : Préparer le Sprint 5 avec des améliorations possibles sur la **performance**, l’**optimisation du code**, et des fonctionnalités avancées comme les notifications ou synchronisations externes.
+
+---

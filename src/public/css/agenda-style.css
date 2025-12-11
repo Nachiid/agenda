@@ -1498,40 +1498,40 @@ body {
   }
   .logo-text {
     display: none; /* cacher le texte du logo */
-  }/* Navbar principale */
-.navbar {
+  } /* Navbar principale */
+  .navbar {
     height: 45px;
     display: flex;
     align-items: center; /* centre verticalement */
     justify-content: space-between; /* espace entre gauche et droite */
     padding: 0 10px;
     position: relative;
-}
+  }
 
-/* Conteneur de gauche (logo + boutons éventuels) */
-.left-area {
+  /* Conteneur de gauche (logo + boutons éventuels) */
+  .left-area {
     display: flex;
     align-items: center;
     gap: 10px; /* espace entre logo et autres éléments */
-}
+  }
 
-/* Logo */
-.logo {
+  /* Logo */
+  .logo {
     display: flex;
     align-items: center;
     gap: 8px; /* espace entre SVG et texte */
-}
+  }
 
-/* Zone des liens et boutons à droite */
-.nav-links {
+  /* Zone des liens et boutons à droite */
+  .nav-links {
     display: flex;
     align-items: center;
     gap: 8px;
-}
+  }
 
-/* Boutons du type sidebarToggle et mobileSearchBtn */
-#sidebarToggle,
-#mobileSearchBtn {
+  /* Boutons du type sidebarToggle et mobileSearchBtn */
+  #sidebarToggle,
+  #mobileSearchBtn {
     font-size: 18px;
     color: white;
     background: none;
@@ -1540,11 +1540,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-}
+  }
 
-/* Si tu veux que les boutons restent bien visibles même sur mobile */
-.nav-links button,
-.nav-links a {
+  /* Si tu veux que les boutons restent bien visibles même sur mobile */
+  .nav-links button,
+  .nav-links a {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1555,31 +1555,25 @@ body {
     text-decoration: none;
     cursor: pointer;
     margin-top: 55px; /* décale légèrement vers le bas */
-}
+  }
 
-
-/* Ajustement pour la zone recherche si besoin */
-.nav-search-area {
+  /* Ajustement pour la zone recherche si besoin */
+  .nav-search-area {
     display: flex;
     align-items: center;
     gap: 8px;
-}
-.left-area {
-
+  }
+  .left-area {
     display: none;
-}
+  }
 
-    .sidebar {
-        position: fixed;   /* flotte au-dessus du contenu */
-        top: 70px;         /* décale pour ne pas cacher la navbar */
-        left: 0;
-        height: calc(99vh - 45px); /* prend toute la hauteur sauf la navbar */
-        z-index: 1000;     /* au-dessus du reste */
-        background-color: #1f2937; 
-        box-shadow: 2px 0 12px rgba(0,0,0,0.5);
-    }
-
-    
-
-
+  .sidebar {
+    position: fixed; /* flotte au-dessus du contenu */
+    top: 70px; /* décale pour ne pas cacher la navbar */
+    left: 0;
+    height: calc(99vh - 45px); /* prend toute la hauteur sauf la navbar */
+    z-index: 1000; /* au-dessus du reste */
+    background-color: #1f2937;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.5);
+  }
 }

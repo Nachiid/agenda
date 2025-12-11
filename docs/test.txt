@@ -1,0 +1,60 @@
+3. Résultats des Tests – Sprint 4
+3.1 Rendez-vous récurrents
+Test	Description	Résultat
+TR-01	Création d’un rendez-vous quotidien	Passé
+TR-02	Création d’un rendez-vous hebdomadaire	Passé
+TR-03	Création d’un rendez-vous mensuel	Passé
+TR-04	Création d’un rendez-vous annuel	Passé
+TR-05	Création d’un rendez-vous récurrent personnalisé	Passé
+TR-06	Modification d’un rendez-vous récurrent existant	Passé
+TR-07	Suppression d’un rendez-vous récurrent	Passé
+TR-08	Gestion des dates exclues et jours à éviter	Passé
+TR-09	Création d’un rendez-vous récurrent avec date de fin	Passé
+TR-10	Gestion de conflits de rendez-vous récurrents	Passé
+TR-11	Vérification du décalage horaire pour les rendez-vous récurrents	Passé
+TR-12	Création d’un rendez-vous récurrent sur plusieurs calendriers	Passé
+3.2 Système de corbeille (restauration 30 jours)
+Test	Description	Résultat
+TC-01	Suppression d’un rendez-vous	Passé
+TC-02	Vérification que le rendez-vous est bien dans la corbeille	Passé
+TC-03	Restauration d’un rendez-vous supprimé	Passé
+TC-04	Suppression définitive après 30 jours	Passé
+TC-05	Suppression et restauration d’un calendrier complet	Passé
+TC-06	Suppression d’un rendez-vous récurrent	Passé
+TC-07	Restauration d’un rendez-vous récurrent	Passé
+TC-08	Suppression d’un calendrier partagé	Passé
+TC-09	Vérification que les droits d’accès sont préservés après restauration	Passé
+3.3 Mode sombre
+Test	Description	Résultat
+TS-01	Activation du mode sombre	Passé
+TS-02	Désactivation du mode sombre	Passé
+TS-03	Conservation du mode sombre après rafraîchissement	Passé
+TS-04	Compatibilité avec toutes les vues (jour, semaine, mois, liste)	Passé
+TS-05	Vérification de l’affichage des couleurs dans les calendriers partagés	Passé
+TS-06	Compatibilité avec les rendez-vous récurrents	Passé
+TS-07	Vérification sur plusieurs navigateurs (Chrome, Firefox, Edge)	Passé
+TS-08	Passage automatique selon l’heure de la journée (optionnel)	Passé
+3.4 Mode équipe / entreprise (collaboration)
+Test	Description	Résultat
+TM-01	Création d’un calendrier partagé	Passé
+TM-02	Attribution de rôle Editor	Passé
+TM-03	Attribution de rôle Viewer	Passé
+TM-04	Modification d’un rendez-vous par un Editor	Passé
+TM-05	Visualisation seule par un Viewer	Passé
+TM-06	Ajout d’un utilisateur au calendrier partagé	Passé
+TM-07	Suppression d’un utilisateur du calendrier partagé	Passé
+TM-08	Vérification des notifications sur modification	Passé
+TM-09	Vérification de l’accès simultané par plusieurs utilisateurs	Passé
+TM-10	Gestion des droits après suppression d’un calendrier	Passé
+TM-11	Test de filtrage par utilisateur et par rôle	Passé
+TM-12	Vérification des conflits de rendez-vous entre utilisateurs	Passé
+3.5 Intégration des jours fériés
+Test	Description	Résultat
+TF-01	Affichage des jours fériés dans la vue jour	Passé
+TF-02	Affichage des jours fériés dans la vue semaine	Passé
+TF-03	Affichage des jours fériés dans la vue mois	Passé
+TF-04	Affichage correct dans les calendriers partagés	Passé
+TF-05	Gestion des jours fériés pour les rendez-vous récurrents	Passé
+TF-06	Vérification du fuseau horaire pour les jours fériés	Passé
+TF-07	Compatibilité avec différents modes (sombre, clair)	Passé
+TF-08	Synchronisation avec export ICS	Passé

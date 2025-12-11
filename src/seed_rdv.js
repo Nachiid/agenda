@@ -43,7 +43,7 @@ async function addAppointmentsByEmail(email) {
       // Génération RDV
       const today = new Date();
 
-      for (let i = 0; i < 50; i++) {
+      for (let i = 0; i < 20; i++) {
         // Nombre de jours aléatoires autour d’aujourd’hui
         const offsetDays = Math.floor(Math.random() * 61) - 30;
 
