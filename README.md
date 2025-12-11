@@ -1,148 +1,274 @@
-# 🗓️ Application Web Agenda
-
-Une application web moderne permettant de gérer ses **rendez-vous et calendriers personnels ou professionnels**.
-Développée avec **Node.js**, **Express**, **MongoDB** et intégrée avec **FullCalendar.js** pour une expérience utilisateur fluide et intuitive.
-
----
-
-## 🚀 Fonctionnalités
-
-### **Sprint 0 – Fonctionnalités de base**
-
-* 👤 **Création de compte** : inscription avec email et mot de passe.
-* 🔐 **Connexion / Authentification JWT** : accès sécurisé avec gestion des cookies.
-* ➕ **Ajout de rendez-vous** : planifier un événement avec titre, date, heure et description.
-* ✏️ **Modification de rendez-vous** : mettre à jour les informations d’un événement.
-* ❌ **Suppression de rendez-vous** : supprimer un rendez-vous existant.
-* 📋 **Affichage d’une liste de rendez-vous** : visualiser les rendez-vous à venir.
-
-### **Sprint 1 – Fonctionnalités avancées**
-
-* 📅 **Affichage du calendrier interactif** : vue jour, semaine ou mois via FullCalendar.
-* 🗂️ **Gestion de plusieurs calendriers** : création, modification, suppression et affichage des calendriers.
-* 🎨 **Calendriers colorés et catégorisés** : distinguer les rendez-vous personnels, professionnels, etc.
-* 👤 **Modification du profil utilisateur** : nom, email, mot de passe.
-* 🧹 **Suppression de compte** : suppression définitive et sécurisée du compte et des données.
+```
+      ___           ___           ___                    ___           ___           ___           ___           ___           ___
+     /\__\         /\  \         /\__\                  /\  \         /\  \         /\  \         /\__\         /\  \         /\  \
+    /::|  |       /::\  \       /::|  |                /::\  \       /::\  \       /::\  \       /::|  |       /::\  \       /::\  \
+   /:|:|  |      /:/\:\  \     /:|:|  |               /:/\:\  \     /:/\:\  \     /:/\:\  \     /:|:|  |      /:/\:\  \     /:/\:\  \
+  /:/|:|__|__   /:/  \:\  \   /:/|:|  |__            /::\~\:\  \   /:/  \:\  \   /::\~\:\  \   /:/|:|  |__   /:/  \:\__\   /::\~\:\  \
+ /:/ |::::\__\ /:/__/ \:\__\ /:/ |:| /\__\          /:/\:\ \:\__\ /:/__/_\:\__\ /:/\:\ \:\__\ /:/ |:| /\__\ /:/__/ \:|__| /:/\:\ \:\__\
+ \/__/~~/:/  / \:\  \ /:/  / \/__|:|/:/  /          \/__\:\/:/  / \:\  /\ \/__/ \:\~\:\ \/__/ \/__|:|/:/  / \:\  \ /:/  / \/__\:\/:/  /
+       /:/  /   \:\  /:/  /      |:/:/  /                \::/  /   \:\ \:\__\    \:\ \:\__\       |:/:/  /   \:\  /:/  /       \::/  /
+      /:/  /     \:\/:/  /       |::/  /                 /:/  /     \:\/:/  /     \:\ \/__/       |::/  /     \:\/:/  /        /:/  /
+     /:/  /       \::/  /        /:/  /                 /:/  /       \::/  /       \:\__\         /:/  /       \::/__/        /:/  /
+     \/__/         \/__/         \/__/                  \/__/         \/__/         \/__/         \/__/         ~~            \/__/
+```
 
 ---
 
-## 🏗️ Architecture du projet
+# 📅 Mon Agenda – Application Web de Gestion de Calendriers & Rendez-vous
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=node.js&logoColor=white" />
+  <img src="https://img.shields.io/badge/Express-5-000000?style=for-the-badge&logo=express&logoColor=white" />
+  <img src="https://img.shields.io/badge/MongoDB-8+-47A248?style=for-the-badge&logo=mongodb&logoColor=white" />
+  <img src="https://img.shields.io/badge/FullCalendar-6.1-0275d8?style=for-the-badge&logo=google-calendar&logoColor=white" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Status-Production-success?style=flat-square" />
+  <img src="https://img.shields.io/badge/Responsive-100%25-brightgreen?style=flat-square" />
+  <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" />
+</p>
+
+---
+
+## 🎯 **Présentation**
+
+**Agenda** est une application web moderne, intuitive et responsive permettant de gérer plusieurs calendriers, organiser des rendez-vous, collaborer avec une équipe et synchroniser ses données via le format **ICS**.
+
+Développée en **Node.js + Express + MongoDB**, elle s'appuie sur **[FullCalendar](https://fullcalendar.io)** pour un rendu interactif, fluide et ergonomique sur ordinateur, tablette et mobile.
+
+---
+
+# ✨ Fonctionnalités
+
+## 🔐 **Authentification & Sécurité**
+
+- Création de compte
+- Connexion sécurisée (JWT)
+- Modification du profil
+- Suppression définitive du compte
+- Hashage des mots de passe (bcrypt)
+- Middleware d’authentification dédié
+
+---
+
+## 📆 **Gestion avancée des rendez-vous**
+
+- CRUD complet (ajout, modifier, supprimer)
+- Déplacement & redimensionnement dans FullCalendar
+- Recherche globale
+- Rendez-vous récurrents
+- Corbeille avec restauration 30 jours
+- Jours fériés automatiques selon pays
+- Import & export ICS
+
+---
+
+## 🗂️ **Calendriers personnalisés**
+
+- Création / modification / suppression
+- Couleur personnalisée
+- Affichage parallèle multi-calendriers
+- Permissions partagées
+- Mode entreprise (accès équipe)
+
+---
+
+## 👥 **Collaboration & Mode Entreprise**
+
+- Partage de calendriers
+- Droits d’accès (lecture / écriture)
+- Visualisation de disponibilité d’équipe
+- Gestion multi-utilisateurs
+
+---
+
+## 📱 **Interface responsive & moderne**
+
+- Compatible ordinateur, tablette, mobile
+- Adaptation automatique des vues FullCalendar
+- Mode sombre
+- Design clean & ergonomique
+- Comportements dynamiques (tooltips, interactions directes)
+
+---
+
+# 🏗️ Architecture du projet
 
 ```
-agenda/
+agenda
+│
+├── docs/                → documentation projet (backlog, diagrammes, revues)
 ├── src/
-│   ├── server.js               # Point d’entrée du serveur Express
-│   ├── routes/                 # Routes API
-│   ├── controllers/            # Logique métier (users, agenda, calendars)
-│   ├── models/                 # Modèles Mongoose (User, Calendar, Appointment)
-│   ├── middlewares/            # Authentification & sécurité
-│   └── views/                  # Fichiers frontend (HTML, CSS, JS)
+│   ├── controllers/     → logique métier (rendez-vous, calendrier, user…)
+│   ├── middleware/      → authentification JWT
+│   ├── models/          → schémas Mongoose + connexion DB
+│   ├── public/
+│   │   ├── css/         → styles globaux et pages (global, agenda, thème…)
+│   │   └── js/          → scripts front-end modulaires
+│   ├── routes/          → routes Express
+│   ├── views/           → pages HTML principales
+│   └── server.js        → serveur Express
 │
-├── public/
-│   ├── js/
-│   │   ├── agenda.js           # Gestion du calendrier (FullCalendar)
-│   │   ├── appointment.js      # Gestion des rendez-vous
-│   │   └── utils.js            # Fonctions utilitaires
-│   └── css/
-│       └── style.css           # Feuille de style principale
-│
-├── .env                        # Variables d’environnement (SECRET_KEY, DB_URI, etc.)
-├── package.json
-└── README.md
+└── package.json
+
 ```
 
 ---
 
-## ⚙️ Installation et configuration
+# 🛠️ Technologies
 
-### 1️⃣ Cloner le projet
+### Backend
+
+- Node.js
+- Express 5
+- MongoDB / Mongoose
+- JWT
+- bcrypt
+- Multer
+- node-ical / ICS
+- dotenv
+
+### Frontend
+
+- HTML / CSS / JS
+- FullCalendar
+- Tippy.js
+- Thème clair et sombre
+
+---
+
+# 📦 Installation
+
+### 1. Cloner le dépôt
 
 ```bash
 git clone https://gitlab.univ-lorraine.fr/e80624u/agenda.git
 cd agenda
 ```
 
-### 2️⃣ Installer les dépendances
+### 2. Installer les dépendances
 
 ```bash
 npm install
 ```
 
-### 3️⃣ Créer un fichier `.env` à la racine
+### 3. Configurer l'environnement
 
-```bash
-SECRET_KEY=ton_secret_jwt
-MONGODB_URI=mongodb://localhost:27017/agenda
+Créer `.env` :
+
+```
 PORT=3000
+MONGO_URI=mongodb://localhost:27017/agenda
+JWT_SECRET=votre_secret
 ```
 
-### 4️⃣ Lancer le serveur
-
-#### En mode développement :
+### 4. Lancer l’application
 
 ```bash
 npm run dev
 ```
 
-#### En mode production :
+---
+
+# 🧪 Seed Database
 
 ```bash
-npm start
+node src/seed.js
+node src/seed_rdv.js
 ```
 
-Le serveur sera disponible sur :
-👉 [http://localhost:3000](http://localhost:3000)
+---
+
+# 📁 Documentation
+
+Le dossier `docs/` contient :
+
+- Backlog produit
+- Diagramme UML
+- Sprint Reviews
+- Rétrospectives
+- Tests Effectués
 
 ---
 
-## 🧩 Dépendances principales
+# 🖥️ Responsive Preview
 
-| Package             | Utilisation                            |
-| ------------------- | -------------------------------------- |
-| **express**         | Framework web principal                |
-| **mongoose**        | ORM pour MongoDB                       |
-| **jsonwebtoken**    | Authentification sécurisée (JWT)       |
-| **bcrypt**          | Hachage des mots de passe              |
-| **cookie-parser**   | Gestion des cookies utilisateur        |
-| **dotenv**          | Gestion des variables d’environnement  |
-| **cors**            | Autorisation des requêtes cross-origin |
-| **tippy.js**        | Tooltips dynamiques pour FullCalendar  |
-| **nodemon** *(dev)* | Rechargement automatique du serveur    |
+| Desktop            | Tablette               | Mobile                       |
+| ------------------ | ---------------------- | ---------------------------- |
+| ✔️ Support complet | ✔️ Adaptation des vues | ✔️ Mode listWeek automatique |
 
 ---
 
-## 🧠 Logique métier
+# 🔒 Sécurité
 
-* Chaque **utilisateur** possède un ou plusieurs **calendriers**.
-* Chaque **calendrier** contient plusieurs **rendez-vous**.
-* Les utilisateurs peuvent :
-
-  * Sélectionner un calendrier actif.
-  * Ajouter, modifier ou supprimer des rendez-vous dans ce calendrier.
-  * Personnaliser la couleur et le titre de chaque calendrier.
-* L’application gère les rendez-vous avec **FullCalendar** pour un rendu visuel optimal.
+- Hashage des mots de passe
+- JWT signé
+- Middleware d’accès
+- Permissions granulaire
+- Validation back-end et front-end
 
 ---
 
-## 🛡️ Sécurité
+---
 
-* Authentification basée sur **JWT** stocké dans les cookies.
-* Routes protégées côté serveur via un **middleware d’authentification**.
-* Données utilisateurs et mots de passe **hachés avec bcrypt**.
-* Headers anti-cache et contrôle des accès pour éviter la réutilisation de session.
+# 👥 Équipe de développement
+
+- [NACHID Ayman](https://github.com/Nachiid)
+- KECHICHE Younes
+- MEZOUARA Yasser
+- MADANE Youssef
 
 ---
 
-## 🎯 Améliorations futures (Backlog avancé)
+# 📜 Licence
 
-* 🔁 Répétition intelligente des rendez-vous (récurrence personnalisée).
-* 👥 Partage de calendriers entre utilisateurs.
-* 🔔 Notifications (email / push) avant les rendez-vous.
-* 🌓 Mode sombre / clair dynamique.
-* 📊 Statistiques et suivi du temps.
-* 🔍 Recherche avancée dans les événements.
+Projet sous licence **MIT**.
 
 ---
 
-📅 Année : 2026
-📜 Licence : MIT
+```
+      ___           ___           ___           ___                  ___           ___                         ___
+     /__/|         /  /\         /  /\         /  /\                /  /\         /  /\                       /__/\
+    |  |:|        /  /:/_       /  /:/_       /  /::\              /  /:/        /  /::\                     |  |::\
+    |  |:|       /  /:/ /\     /  /:/ /\     /  /:/\:\            /  /:/        /  /:/\:\    ___     ___     |  |:|:\
+  __|  |:|      /  /:/ /:/_   /  /:/ /:/_   /  /:/~/:/           /  /:/  ___   /  /:/~/::\  /__/\   /  /\  __|__|:|\:\
+ /__/\_|:|____ /__/:/ /:/ /\ /__/:/ /:/ /\ /__/:/ /:/           /__/:/  /  /\ /__/:/ /:/\:\ \  \:\ /  /:/ /__/::::| \:\
+ \  \:\/:::::/ \  \:\/:/ /:/ \  \:\/:/ /:/ \  \:\/:/            \  \:\ /  /:/ \  \:\/:/__\/  \  \:\  /:/  \  \:\~~\__\/
+  \  \::/~~~~   \  \::/ /:/   \  \::/ /:/   \  \::/              \  \:\  /:/   \  \::/        \  \:\/:/    \  \:\
+   \  \:\        \  \:\/:/     \  \:\/:/     \  \:\               \  \:\/:/     \  \:\         \  \::/      \  \:\
+    \  \:\        \  \::/       \  \::/       \  \:\               \  \::/       \  \:\         \__\/        \  \:\
+     \__\/         \__\/         \__\/         \__\/                \__\/         \__\/                       \__\/
+```
+
+```
+
+                                                   ___           ___                            
+                                                  /\  \         /\  \         _____             
+                                                 /::\  \        \:\  \       /::\  \            
+                                                /:/\:\  \        \:\  \     /:/\:\  \           
+                                               /:/ /::\  \   _____\:\  \   /:/  \:\__\          
+                                              /:/_/:/\:\__\ /::::::::\__\ /:/__/ \:|__|         
+                                              \:\/:/  \/__/ \:\~~\~~\/__/ \:\  \ /:/  /         
+                                               \::/__/       \:\  \        \:\  /:/  /          
+                                                \:\  \        \:\  \        \:\/:/  /           
+                                                 \:\__\        \:\__\        \::/  /            
+                                                  \/__/         \/__/         \/__/             
+```
+
+```
+      ___           ___           ___           ___          _____          ___                         ___
+     /  /\         /  /\         /__/\         /  /\        /  /::\        /__/\                       /  /\
+    /  /:/_       /  /:/         \  \:\       /  /:/_      /  /:/\:\       \  \:\                     /  /:/_
+   /  /:/ /\     /  /:/           \__\:\     /  /:/ /\    /  /:/  \:\       \  \:\    ___     ___    /  /:/ /\
+  /  /:/ /::\   /  /:/  ___   ___ /  /::\   /  /:/ /:/_  /__/:/ \__\:|  ___  \  \:\  /__/\   /  /\  /  /:/ /:/_
+ /__/:/ /:/\:\ /__/:/  /  /\ /__/\  /:/\:\ /__/:/ /:/ /\ \  \:\ /  /:/ /__/\  \__\:\ \  \:\ /  /:/ /__/:/ /:/ /\
+ \  \:\/:/~/:/ \  \:\ /  /:/ \  \:\/:/__\/ \  \:\/:/ /:/  \  \:\  /:/  \  \:\ /  /:/  \  \:\  /:/  \  \:\/:/ /:/
+  \  \::/ /:/   \  \:\  /:/   \  \::/       \  \::/ /:/    \  \:\/:/    \  \:\  /:/    \  \:\/:/    \  \::/ /:/
+   \__\/ /:/     \  \:\/:/     \  \:\        \  \:\/:/      \  \::/      \  \:\/:/      \  \::/      \  \:\/:/
+     /__/:/       \  \::/       \  \:\        \  \::/        \__\/        \  \::/        \__\/        \  \::/
+     \__\/         \__\/         \__\/         \__\/                       \__\/                       \__\/
+
+```
+
+---
