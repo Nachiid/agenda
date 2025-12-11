@@ -29,12 +29,16 @@
   <!-- Navigation -->
   <div class="navbar-wrapper">
     <nav class="navbar">
+                 <button id="sidebarToggle">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        <button id="mobileSearchBtn">
+              <i class="fas fa-search"></i>
+            </button>
       <div class="nav-content">
         <!-- Zone gauche : logo + bouton -->
         <div class="left-area">
-          <button id="sidebarToggle">
-            <i class="fa-solid fa-bars"></i>
-          </button>
+
           <div class="logo">
             <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect width="40" height="40" rx="8" fill="#4F46E5" />
@@ -49,7 +53,8 @@
           </div>
         </div>
 
-        <!-- Zone centrale : recherche -->
+
+
         <div class="nav-search-area">
           <div id="appointments_search" class="form">
             <div class="search-wrapper">
@@ -64,6 +69,10 @@
 
         <!-- Zone droite : liens -->
         <div class="nav-links">
+                  <!-- Zone centrale : recherche -->
+
+
+
           <a href="agenda" class="nav-link active">Agenda</a>
           <button class="nav-link" id="btnTrash">Corbeille</button>
           <a href="/profile" class="nav-link">Profil</a>
@@ -276,9 +285,9 @@
       <p class="details-description"></p>
 
       <div class="btn-row">
-        <button class="btn-edit detail-edit">Modifier</button>
-        <button class="btn-delete delete-edit" data-id="">Supprimer</button>
-        <button class="btn-share" data-id="">Partager</button>
+        <button class="btn-edit detail-edit  btn btn-primary ">Modifier</button>
+        <button class="btn-delete delete-edit  btn btn-secondary " data-id="">Supprimer</button>
+        <button class="btn-share  btn btn-primary" data-id="">Partager</button>
       </div>
       <button class="btn-close">Fermer</button>
     </div>
@@ -295,8 +304,8 @@
 
       <div id="shareRdvUserResults"></div>
 
-      <button id="btnSendShareRdv">Envoyer</button>
-      <button id="btnCancelShareRdv">Annuler</button>
+      <button id="btnSendShareRdv" class="confirm-ok btn btn-primary">Envoyer</button>
+      <button id="btnCancelShareRdv"class="confirm-cancel btn btn-secondary">Annuler</button>
     </div>
   </div>
 
@@ -335,9 +344,9 @@
       <input type="text" id="shareEmailInput" placeholder="email...">
 
       <div id="shareUserResults"></div>
+      <button id="btnConfirmShare" class="confirm-ok btn btn-primary">Envoyer</button>
+      <button id="btnCancelShare" class="confirm-cancel btn btn-secondary" >Annuler</button>
 
-      <button id="btnCancelShare">Annuler</button>
-      <button id="btnConfirmShare">Envoyer</button>
     </div>
   </div>
 

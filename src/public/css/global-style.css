@@ -422,14 +422,278 @@ h1, h2, h3 {
   border-radius: 8px;
 }
 
-#shareUserResults .user-result {
+#shareUserResults #shareRdvUserResults .user-result {
   padding: 6px 8px;
   border-bottom: 1px solid #ddd;
   cursor: pointer;
 }
 
-#shareUserResults .user-result:hover {
+#shareUserResults  #shareRdvUserResults .user-result:hover {
   background: #f0f0f0;
 }
 
 
+
+
+
+
+
+
+
+/* Modal général */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5); /* overlay sombre */
+  backdrop-filter: blur(5px);
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* Quand le modal est actif */
+.modal:not(.hidden) {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Contenu du modal */
+.modal-content {
+  background: #1f2937; /* couleur foncée pour matcher ton thème */
+  color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: modalFadeIn 0.3s ease;
+}
+
+/* Animation */
+@keyframes modalFadeIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Titres du modal */
+.modal-content h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  color: #e0e0ff;
+}
+
+/* Input email */
+#shareEmailInput,  #shareRdvEmailInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  background-color: #2a2e3b;
+  color: white;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+#shareEmailInput::placeholder ,#shareRdvEmailInput::placeholder {
+  color: #a0a0b0;
+}
+
+#shareEmailInput:focus ,#placeholder:focus{
+  background-color: #3b3f52;
+  box-shadow: inset 0 2px 6px rgba(79, 70, 229, 0.5);
+}
+
+/* Résultats de recherche utilisateurs */
+#shareUserResults,#shareRdvUserResults {
+  max-height: 150px;
+  overflow-y: auto;
+  background-color: #2a2e3b;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  font-size: 0.95rem;
+  color: #e0e0ff;
+}
+
+/* Boutons du modal */
+.modal-content .btn {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+/* Layout des boutons : alignés côte à côte */
+.modal-content .btn-group {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+/* Boutons full width si tu veux */
+.modal-content .btn-full {
+  width: 100%;
+}
+
+
+/* Modal général */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal:not(.hidden) {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Contenu du modal */
+.modal-content {
+  background: #1f2937; /* sombre pour le thème */
+  color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: modalFadeIn 0.3s ease;
+}
+
+/* Animation */
+@keyframes modalFadeIn {
+  from { transform: translateY(-30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Titre de l'événement */
+.details-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-align: center;
+  color: #e0e0ff;
+  letter-spacing: 0.5px;
+}
+
+/* Date de l'événement */
+.details-date {
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  color: #ffffff;
+  background-color: #4f46e5; /* violet theme */
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  display: inline-block;
+  margin: 0 auto;
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+}
+
+/* Description */
+.details-description {
+  font-size: 1rem;
+  color: #c0c0ff;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Boutons */
+.btn-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Boutons style général */
+.btn-edit,
+.btn-delete,
+.btn-share,
+.btn-close {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.6rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Bouton primaire violet */
+.btn-primary {
+  background: #4f46e5;
+  color: white;
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+}
+
+.btn-primary:hover {
+  background: #4338ca;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
+}
+
+/* Bouton secondaire blanc/violet */
+.btn-secondary {
+  background: white;
+  color: #4f46e5;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary:hover {
+  background: #f9fafb;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Bouton Fermer discret */
+.btn-close {
+  background: transparent;
+  color: #c0c0ff;
+  font-weight: 600;
+  align-self: center;
+  padding: 0.5rem 1rem;
+}
+
+.btn-close:hover {
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+/* Responsive pour mobile */
+@media (max-width: 500px) {
+  .modal-content {
+    width: 95%;
+    padding: 1.5rem;
+  }
+  .btn-row {
+    flex-direction: column;
+  }
+}

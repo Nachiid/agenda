@@ -907,9 +907,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     selectable: true,
     editable: true,
     dayMaxEvents: true,
-    height: "auto",
-    contentHeight: "auto",
+    // ✅ Modifications pour prendre toute la hauteur
+    height: "calc(100vh - 50px)",   // 100% de la fenêtre - hauteur navbar
+    contentHeight: "calc(20vh - 10px)",
     expandRows: true,
+
 
     eventTimeFormat: { hour: "2-digit", minute: "2-digit", hour12: false },
 
@@ -1629,3 +1631,24 @@ function applyCalendarFilter(state) {
 const sidebar = document.querySelector(".sidebar");
 const toggleBtn = document.getElementById("sidebarToggle");
 const main = document.querySelector(".main-content");
+
+
+
+const searchArea = document.getElementById('appointments_search');
+const searchBtn = document.getElementById('mobileSearchBtn');
+
+searchBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  searchArea.classList.toggle('active');
+});
+
+document.addEventListener('click', (e) => {
+  if (!searchArea.contains(e.target) && e.target !== searchBtn) {
+    searchArea.classList.remove('active');
+  }
+});
+
+
+
+
+
