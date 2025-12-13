@@ -463,7 +463,11 @@ eventForm.addEventListener("submit", async (e) => {
           body: JSON.stringify({ calendarIds: activeIds }),
         });
         const calData = await calRes.json();
-        window.updateCalendarView(calData.calendars, window.calendar);
+       // window.updateCalendarView(calData.calendars, window.calendar);
+        window.updateCalendar({
+          type: "update",
+          eventData: updatedData.rdv,
+        });
         // Aussi rafraichir la liste latérale
         window.fetchAppointments(activeIds);
       } else {
